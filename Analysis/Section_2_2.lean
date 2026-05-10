@@ -561,8 +561,59 @@ example (a b c d e:Nat) (hab: a ≤ b) (hbc: b < c) (hde: d < e) :
 theorem Nat.strong_induction {m₀:Nat} {P: Nat → Prop}
   (hind: ∀ m, m ≥ m₀ → (∀ m', m₀ ≤ m' ∧ m' < m → P m') → P m) :
     ∀ m, m ≥ m₀ → P m := by
-  
-  sorry
+    have h : ∀ N, ∀ m', m₀ ≤ m' ∧ m' <= N → P m' := by
+      apply induction
+      . rintro m ⟨h1, h⟩
+        apply hind
+        exact h1
+        intro m' hm
+        rcases h with ⟨w, hw⟩
+        symm at hw
+        apply add_eq_zero at hw
+        have (x: Nat): ¬ x < 0:= by
+          intro h
+          rcases h with ⟨⟨k,hk⟩, hneq0⟩
+          symm at hk
+          apply add_eq_zero at hk
+          exact hneq0 hk.left
+        simp_all
+      intro n ih m' h
+      by_cases hm : m' = (n++)
+      . apply hind
+        exact h.left
+        intro mm hmm
+        apply ih
+        constructor
+        exact hmm.left
+        rw [hm] at hmm
+        rw [le_iff]
+        rcases hmm.right with ⟨⟨w, hw⟩, _⟩
+        rcases w
+        rw [add_zero'] at *
+        symm at hw
+        contradiction
+        rename_i a
+        use a
+        rw [add_succ] at hw
+        injection hw
+      apply ih
+      constructor
+      exact h.left
+      rcases h.right with ⟨w, hw⟩
+      rcases w
+      . rw [add_zero'] at hw
+        symm at hw
+        contradiction
+      rename_i a
+      use a
+      rw [add_succ] at hw
+      injection hw
+    intro m hm
+    apply h (m++)
+    constructor
+    . exact hm
+    use 1
+    rw [succ_eq_add_one]
 
 /-- Exercise 2.2.6 (backwards induction)
     Compare with Mathlib's {name}`Nat.decreasingInduction`. -/
