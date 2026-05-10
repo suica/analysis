@@ -462,21 +462,45 @@ theorem Nat.trichotomous (a b:Nat) : a < b ∨ a = b ∨ a > b := by
 def Nat.decLe : (a b : Nat) → Decidable (a ≤ b)
   | 0, b => by
     apply isTrue
-    
-    sorry
+    use b
+    simp
   | a++, b => by
     cases decLe a b with
     | isTrue h =>
       cases decEq a b with
       | isTrue h =>
         apply isFalse
-        sorry
+        rw [h]
+        intro hh
+        rcases hh with ⟨k, h⟩
+        conv at h =>
+          pattern b
+          rw [<- add_zero b]
+        rw [succ_add, <- add_succ] at h
+        apply add_left_cancel at h
+        contradiction
       | isFalse h =>
         apply isTrue
-        sorry
+        rename_i hab
+        rcases hab with ⟨k, hk⟩
+        cases k
+        . simp [add_zero'] at hk
+          symm at hk
+          contradiction
+        rename_i j
+        use j
+        rw [hk]
+        simp_all [add_succ, succ_add]
     | isFalse h =>
       apply isFalse
-      sorry
+      intro hh
+      rcases hh with ⟨w, h⟩
+      rename_i hh
+      have : a ≤ b:= by
+        use (w++)
+        rw [h]
+        simp [add_succ, succ_add]
+      contradiction
 
 instance Nat.decidableRel : DecidableRel (· ≤ · : Nat → Nat → Prop) := Nat.decLe
 
@@ -537,6 +561,7 @@ example (a b c d e:Nat) (hab: a ≤ b) (hbc: b < c) (hde: d < e) :
 theorem Nat.strong_induction {m₀:Nat} {P: Nat → Prop}
   (hind: ∀ m, m ≥ m₀ → (∀ m', m₀ ≤ m' ∧ m' < m → P m') → P m) :
     ∀ m, m ≥ m₀ → P m := by
+  
   sorry
 
 /-- Exercise 2.2.6 (backwards induction)
