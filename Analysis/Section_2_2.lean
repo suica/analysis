@@ -179,13 +179,11 @@ extracts a witness `x` and a proof `hx : P x` of the property from a hypothesis 
 
 /-- Lemma 2.2.10 (unique predecessor) / Exercise 2.2.2 -/
 lemma Nat.uniq_succ_eq (a:Nat) (ha: a.IsPos) : ∃! b, b++ = a := by
-  revert ha
-  revert a
-  apply induction fun a ↦ ∀ ha : a.IsPos, ∃! b, b++ = a
-  . intro ha
-    exact absurd rfl ha
-  intro n _ hpos
-  exact ExistsUnique.intro n rfl fun b hb ↦ succ_cancel hb
+  cases a with
+  | zero =>
+      contradiction
+  | succ n =>
+      exact ExistsUnique.intro n rfl fun b hb ↦ succ_cancel hb
 
 /-- Definition 2.2.11 (Ordering of the natural numbers).
     This defines the {kw (of := «term_≤_»)}`≤` notation on the natural numbers. -/
