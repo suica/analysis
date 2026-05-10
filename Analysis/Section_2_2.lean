@@ -363,7 +363,25 @@ theorem Nat.lt_iff_succ_le (a b:Nat) : a < b ↔ a++ ≤ b := by
 
 /-- (f) a < b if and only if b = a + d for positive d. -/
 theorem Nat.lt_iff_add_pos (a b:Nat) : a < b ↔ ∃ d:Nat, d.IsPos ∧ b = a + d := by
-  sorry
+  rw [Nat.lt_iff_succ_le]
+  constructor
+  . intro h
+    rcases h with ⟨k, hk⟩
+    rw [hk, succ_add]
+    use (k++)
+    constructor
+    . apply succ_ne
+    rw [add_succ]
+  intro h
+  rcases h with ⟨d, hdpos, h⟩
+  rw [h]
+  rw [succ_eq_add_one]
+  rw [<- add_le_add_left]
+  cases d with
+  | zero => contradiction
+  | succ i =>
+    use i
+    rw [one_add]
 
 /-- If a < b then a ̸= b,-/
 theorem Nat.ne_of_lt (a b:Nat) : a < b → a ≠ b := by
@@ -395,7 +413,8 @@ theorem Nat.lt_of_le_of_lt {a b c : Nat} (hab: a ≤ b) (hbc: b < c) : a < c := 
 /-- This lemma was a {lit}`why?` statement from Proposition 2.2.13,
 but is more broadly useful, so is extracted here. -/
 theorem Nat.zero_le (a:Nat) : 0 ≤ a := by
-  sorry
+  use a
+  rw [zero_add]
 
 /-- Proposition 2.2.13 (Trichotomy of order for natural numbers) / Exercise 2.2.4
     Compare with Mathlib's {name}`trichotomous`.  Parts of this theorem have been placed
