@@ -230,7 +230,20 @@ example : (8:Nat) > 5 := by
 
 /-- Compare with Mathlib's {name}`Nat.lt_succ_self`. -/
 theorem Nat.succ_gt_self (n:Nat) : n++ > n := by
-  sorry
+  rw [Nat.gt_iff_lt, Nat.lt_iff]
+  constructor
+  . use 1
+    apply Nat.succ_eq_add_one
+  have succ_ne_self (n : Nat) : n++ ≠ n := by
+    induction n with
+    | zero =>
+        decide
+    | succ n ih =>
+        intro h
+        exact ih (succ_cancel h)
+  symm
+  apply succ_ne_self
+
 
 /-- Proposition 2.2.12 (Basic properties of order for natural numbers) / Exercise 2.2.3
 
