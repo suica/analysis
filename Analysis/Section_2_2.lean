@@ -430,9 +430,24 @@ theorem Nat.trichotomous (a b:Nat) : a < b ∨ a = b ∨ a > b := by
   . rw [lt_iff_succ_le] at case1
     rw [le_iff_lt_or_eq] at case1
     tauto
-  . have why : a++ > b := by sorry
+  . have why : a++ > b := by
+      rw [case2]
+      apply succ_gt_self
     tauto
-  have why : a++ > b := by sorry
+  have why : a++ > b := by
+    rcases case3 with ⟨⟨k, hk⟩, hneq⟩
+    constructor
+    . use (k++)
+      simp_all [add_succ]
+    intro h
+    rw [hk] at h
+    rw [<- add_succ] at h
+    conv at h=>
+      pattern b
+      rw [<- add_zero b]
+    apply add_left_cancel at h
+    contradiction
+
   tauto
 
 /--
@@ -447,6 +462,7 @@ theorem Nat.trichotomous (a b:Nat) : a < b ∨ a = b ∨ a > b := by
 def Nat.decLe : (a b : Nat) → Decidable (a ≤ b)
   | 0, b => by
     apply isTrue
+    
     sorry
   | a++, b => by
     cases decLe a b with
