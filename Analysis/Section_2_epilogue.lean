@@ -260,6 +260,9 @@ theorem Nat.recurse_uniq {P : PeanoAxioms} (f: P.Nat → P.Nat → P.Nat) (c: P.
   intro y hy
   ext i
   simp_all [a]
+  revert i
+  apply P.induction
+  . simp_all
   sorry
 
 end PeanoAxioms
