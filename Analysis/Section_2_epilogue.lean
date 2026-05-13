@@ -97,7 +97,7 @@ abbrev Chapter2.Nat.equivNat_ordered_ring : Chapter2.Nat ≃+*o ℕ where
 lemma Chapter2.Nat.pow_eq_pow (n m : Chapter2.Nat) :
     n.toNat ^ m.toNat = (n^m).toNat := by
   induction m
-  rw [zero_toNat]
+  rw [zero_toNat, pow_zero]
   sorry
 
 
