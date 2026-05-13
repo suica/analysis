@@ -96,7 +96,8 @@ abbrev Chapter2.Nat.equivNat_ordered_ring : Chapter2.Nat ≃+*o ℕ where
 /-- The conversion preserves exponentiation. -/
 lemma Chapter2.Nat.pow_eq_pow (n m : Chapter2.Nat) :
     n.toNat ^ m.toNat = (n^m).toNat := by
-  induction n gen
+  induction m
+  rw [zero_toNat]
   sorry
 
 
