@@ -214,20 +214,12 @@ noncomputable abbrev Equiv.fromNat (P : PeanoAxioms) : Equiv Mathlib_Nat P where
     exact P.succ_cancel rfl
 
 /-- The task here is to establish that any two structures obeying the Peano axioms are equivalent. -/
-noncomputable abbrev Equiv.mk' (P Q : PeanoAxioms) : Equiv P Q := {
-  equiv := by
-        have h1:= Equiv.fromNat P
-        have h2:= Equiv.fromNat Q
-        have h3 : Equiv P Q := by
-          apply Equiv.trans _ h2
-          apply Equiv.symm
-          exact h1
-        exact h3.equiv
-  equiv_zero := by
-    sorry
-  equiv_succ := by
-    sorry
-}
+noncomputable abbrev Equiv.mk' (P Q : PeanoAxioms) : Equiv P Q := by
+  have h1 := Equiv.fromNat P
+  have h2 := Equiv.fromNat Q
+  apply Equiv.trans _ h2
+  apply Equiv.symm
+  exact h1
 
 /-- There is only one equivalence between any two structures obeying the Peano axioms. -/
 theorem Equiv.uniq {P Q : PeanoAxioms} (equiv1 equiv2 : PeanoAxioms.Equiv P Q) :
