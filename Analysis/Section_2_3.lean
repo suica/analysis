@@ -209,9 +209,19 @@ lemma Nat.mul_cancel_right {a b c: Nat} (h: a * c = b * c) (hc: c.IsPos) : a = b
 /-- (Not from textbook) {name}`Nat` is an ordered semiring.
 This allows tactics such as {tactic}`gcongr` to apply to the Chapter 2 natural numbers. -/
 instance Nat.isOrderedRing : IsOrderedRing Nat where
-  zero_le_one := by sorry
-  mul_le_mul_of_nonneg_left := by sorry
-  mul_le_mul_of_nonneg_right := by sorry
+  zero_le_one := by
+    use 1
+    simp
+  mul_le_mul_of_nonneg_left := by
+    intro a ha b c hbc
+    rcases hbc with ⟨k, hk⟩
+    simp [hk, mul_add]
+    use (a*k)
+  mul_le_mul_of_nonneg_right := by
+    intro c hc a b hab
+    rcases hab with ⟨k, hk⟩
+    rw [hk, add_mul]
+    use (k*c)
 
 /-- This illustration of the {tactic}`gcongr` tactic is not from the
     textbook. -/
