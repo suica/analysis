@@ -239,16 +239,23 @@ theorem Nat.recurse_uniq {P : PeanoAxioms} (f: P.Nat → P.Nat → P.Nat) (c: P.
     ∃! (a: P.Nat → P.Nat), a P.zero = c ∧ ∀ n, a (P.succ n) = f n (a n) := by
   let e := (Equiv.fromNat P).equiv
   let a : P.Nat → P.Nat :=
-    fun n => e
+    fun n =>
       (match e.symm n with
-      | .zero => Nat.zero
-      | .succ i => i+1)
-
+      | .zero => c
+      | .succ i => e i)
+  have h1: e.symm P.zero = Nat.zero := by
+    sorry
+  have h2: ∀ i, e.symm (P.succ i) = Nat.succ (e.symm i) := by
+    sorry
   apply ExistsUnique.intro a
   . constructor
-    . simp_all [a, e]
+    . simp_all [a]
+    simp_all [a]
+    apply P.induction
+    . simp_all
       sorry
-    simp [a, e]
+    intro n
+    simp [h2 n]
     sorry
   intro y hy
   ext i
