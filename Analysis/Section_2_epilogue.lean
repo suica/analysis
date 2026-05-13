@@ -161,7 +161,12 @@ theorem natCast_injective (P : PeanoAxioms) : Function.Injective P.natCast := by
 
 /-- One can start the proof here with {syntax tactic}`unfold Function.Surjective`, although it is not strictly necessary. -/
 theorem natCast_surjective (P : PeanoAxioms) : Function.Surjective P.natCast := by
-  sorry
+  apply P.induction
+  . use 0
+  intro b h
+  choose a h using h
+  use (a+1)
+  simp_all only [natCast]
 
 /-- The notion of an equivalence between two structures obeying the Peano axioms.
     The symbol {kw (of := «term_≃_»)}`≃` is an alias for Mathlib's {name}`Equiv` class; for instance {lean}`P.Nat ≃ Q.Nat` is
@@ -175,8 +180,14 @@ class Equiv (P Q : PeanoAxioms) where
     Some of this API can be invoked automatically via the {tactic}`simp` tactic. -/
 abbrev Equiv.symm {P Q: PeanoAxioms} (equiv : Equiv P Q) : Equiv Q P where
   equiv := equiv.equiv.symm
-  equiv_zero := by sorry
-  equiv_succ n := by sorry
+  equiv_zero := by
+    rw [<- equiv.equiv_zero]
+    simp
+  equiv_succ n := by
+    have := equiv.equiv_succ (equiv.equiv.symm n)
+    simp_all
+    rw [<- this]
+    simp
 
 /-- This exercise will require application of Mathlib's API for the {name}`Equiv` class.
     Some of this API can be invoked automatically via the {tactic}`simp` tactic. -/
@@ -189,7 +200,8 @@ abbrev Equiv.trans {P Q R: PeanoAxioms} (equiv1 : Equiv P Q) (equiv2 : Equiv Q R
 noncomputable abbrev Equiv.fromNat (P : PeanoAxioms) : Equiv Mathlib_Nat P where
   equiv := {
     toFun := P.natCast
-    invFun := by sorry
+    invFun := by
+      sorry
     left_inv := by sorry
     right_inv := by sorry
   }
