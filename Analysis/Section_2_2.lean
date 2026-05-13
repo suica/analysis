@@ -620,7 +620,37 @@ theorem Nat.strong_induction {m₀:Nat} {P: Nat → Prop}
 theorem Nat.backwards_induction {n:Nat} {P: Nat → Prop}
   (hind: ∀ m, P (m++) → P m) (hn: P n) :
     ∀ m, m ≤ n → P m := by
-  sorry
+  induction n with
+  | zero =>
+    intro k hk
+    rw [Nat.le_iff] at hk
+    rcases hk with ⟨a , ha⟩
+    symm at ha
+    apply add_eq_zero at ha
+    rw [ha.left]
+    exact hn
+  | succ i ih =>
+    have := hind _ hn
+    apply ih at this
+    intro k hk
+    by_cases h: k ≤ i
+    . apply this
+      exact h
+    have hk: k = i++:= by
+      rcases hk with ⟨a, ha⟩
+      cases a with
+      | zero =>
+          rw [add_zero'] at ha
+          simp [ha]
+      | succ a =>
+          exfalso
+          apply h
+          refine ⟨a, ?_⟩
+          rw [add_succ] at ha
+          apply succ_cancel at ha
+          exact ha
+    rw [hk]
+    exact hn
 
 /-- Exercise 2.2.7 (induction from a starting point)
     Compare with Mathlib's {name}`Nat.le_induction`. -/
