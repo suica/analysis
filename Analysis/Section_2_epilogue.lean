@@ -97,8 +97,9 @@ abbrev Chapter2.Nat.equivNat_ordered_ring : Chapter2.Nat ≃+*o ℕ where
 lemma Chapter2.Nat.pow_eq_pow (n m : Chapter2.Nat) :
     n.toNat ^ m.toNat = (n^m).toNat := by
   induction m
-  rw [zero_toNat, pow_zero]
-  sorry
+  . rw [zero_toNat, _root_.Nat.pow_zero, show (zero = 0) by decide]
+  rename_i i ih
+  rw [succ_toNat, pow_succ, map_mul, pow_add, _root_.Nat.pow_one, ih]
 
 
 /-- The Peano axioms for an abstract type {name}`Nat` -/
@@ -139,7 +140,24 @@ abbrev natCast (P : PeanoAxioms) : ℕ → P.Nat := fun n ↦ match n with
 
 /-- One can start the proof here with {syntax tactic}`unfold Function.Injective`, although it is not strictly necessary. -/
 theorem natCast_injective (P : PeanoAxioms) : Function.Injective P.natCast := by
-  sorry
+  intro a b h
+  induction a generalizing b
+  . cases b
+    . rfl
+    rename_i n
+    symm at h
+    apply P.succ_ne at h
+    contradiction
+  rename_i i ih
+  cases b
+  . simp_all [natCast]
+    apply P.succ_ne at h
+    exact h
+  rename_i n
+  simp_all [natCast]
+  apply P.succ_cancel at h
+  apply ih
+  exact h
 
 /-- One can start the proof here with {syntax tactic}`unfold Function.Surjective`, although it is not strictly necessary. -/
 theorem natCast_surjective (P : PeanoAxioms) : Function.Surjective P.natCast := by
