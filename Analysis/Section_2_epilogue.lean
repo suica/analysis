@@ -200,10 +200,13 @@ abbrev Equiv.trans {P Q R: PeanoAxioms} (equiv1 : Equiv P Q) (equiv2 : Equiv Q R
 noncomputable abbrev Equiv.fromNat (P : PeanoAxioms) : Equiv Mathlib_Nat P where
   equiv := {
     toFun := P.natCast
-    invFun := by
-      sorry
-    left_inv := by sorry
-    right_inv := by sorry
+    invFun := fun p => (Function.invFun P.natCast) p
+    left_inv := by
+      intro p
+      apply Function.leftInverse_invFun P.natCast_injective
+    right_inv := by
+      intro p
+      apply Function.rightInverse_invFun P.natCast_surjective
   }
   equiv_zero := by sorry
   equiv_succ n := by sorry
