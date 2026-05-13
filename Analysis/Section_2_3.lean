@@ -264,6 +264,10 @@ theorem Nat.pow_one (m: Nat) : m ^ (1:Nat) = m := by
 /-- Exercise 2.3.4-/
 theorem Nat.sq_add_eq (a b: Nat) :
     (a + b) ^ (2 : Nat) = a ^ (2 : Nat) + 2 * a * b + b ^ (2 : Nat) := by
-  sorry
+  have h: (2 = 0++++) := by decide
+  simp [h, pow_succ]
+  ring_nf
+  rw [<- h]
+  rfl
 
 end Chapter2
