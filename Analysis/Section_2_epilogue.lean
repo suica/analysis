@@ -237,32 +237,36 @@ theorem Equiv.uniq {P Q : PeanoAxioms} (equiv1 equiv2 : PeanoAxioms.Equiv P Q) :
 /-- A sample result: recursion is well-defined on any structure obeying the Peano axioms-/
 theorem Nat.recurse_uniq {P : PeanoAxioms} (f: P.Nat → P.Nat → P.Nat) (c: P.Nat) :
     ∃! (a: P.Nat → P.Nat), a P.zero = c ∧ ∀ n, a (P.succ n) = f n (a n) := by
-  let e := (Equiv.fromNat P).equiv
+  let E := (Equiv.fromNat P)
+  let e := E.equiv
   let a : P.Nat → P.Nat :=
-    fun n => (
-      match e.symm n with
-      | .zero => c
-      | .succ i => f (e i) c
-      )
+    fun n => Nat.rec c (fun i acc => f (e i) acc) (e.symm n)
+    -- 不能是下面这个，否则要求 a 递归
+    -- fun n => (
+    --   match e.symm n with
+    --   | .zero => c
+    --   | .succ i => f (e i) (a i)
+    --   )
   have h1: e.symm P.zero = Nat.zero := by
-    sorry
+    exact (Equiv.symm_apply_eq e).mpr rfl
   have h2: ∀ i, e.symm (P.succ i) = Nat.succ (e.symm i) := by
-    sorry
+    intro i
+    apply (Equiv.symm_apply_eq e).mpr
+    have h := E.equiv_succ (e.symm i)
+    simp_all [e]
+    rw [<- h]
+    rfl
+
   apply ExistsUnique.intro a
   . constructor
     . simp_all [a]
-    simp_all [a]
-    apply P.induction
-    . simp_all
-    intro n
-    simp [h2 n]
-    sorry
+    . simp_all [a]
   intro y hy
   ext i
   simp_all [a]
   revert i
   apply P.induction
   . simp_all
-  sorry
+  simp_all
 
 end PeanoAxioms
