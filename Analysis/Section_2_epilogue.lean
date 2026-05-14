@@ -193,8 +193,15 @@ abbrev Equiv.symm {P Q: PeanoAxioms} (equiv : Equiv P Q) : Equiv Q P where
     Some of this API can be invoked automatically via the {tactic}`simp` tactic. -/
 abbrev Equiv.trans {P Q R: PeanoAxioms} (equiv1 : Equiv P Q) (equiv2 : Equiv Q R) : Equiv P R where
   equiv := equiv1.equiv.trans equiv2.equiv
-  equiv_zero := by sorry
-  equiv_succ n := by sorry
+  equiv_zero := by
+    have h1 := equiv1.equiv_zero
+    have h2 := equiv2.equiv_zero
+    rw [<- h2, <- h1]
+    apply Equiv.trans_apply
+  equiv_succ n := by
+    have h1 := equiv1.equiv_succ n
+    have h2 := equiv2.equiv_succ (equiv n)
+    simp_all [Equiv.trans_apply]
 
 /-- Useful Mathlib tools for inverting bijections include {name}`Function.surjInv` and {name}`Function.invFun`. -/
 noncomputable abbrev Equiv.fromNat (P : PeanoAxioms) : Equiv Mathlib_Nat P where
