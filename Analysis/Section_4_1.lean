@@ -390,16 +390,65 @@ theorem Int.mul_lt_mul_of_pos_right {a b c:Int} (hab : a < b) (hc: 0 < c) : a*c 
   contradiction
 
 /-- Lemma 4.1.11(d) (Negation reverses order) / Exercise 4.1.7 -/
-theorem Int.neg_gt_neg {a b:Int} (h: b < a) : -a < -b := by sorry
+theorem Int.neg_gt_neg {a b:Int} (h: b < a) : -a < -b := by
+  rcases h with ⟨⟨k, hk⟩, hneq⟩
+  rw [hk]
+  constructor
+  . use k
+    ring
+  simp_all
 
 /-- Lemma 4.1.11(d) (Negation reverses order) / Exercise 4.1.7 -/
-theorem Int.neg_ge_neg {a b:Int} (h: b ≤ a) : -a ≤ -b := by sorry
+theorem Int.neg_ge_neg {a b:Int} (h: b ≤ a) : -a ≤ -b := by
+  rcases h with ⟨k, hk⟩
+  use k
+  simp_all
 
 /-- Lemma 4.1.11(e) (Order is transitive) / Exercise 4.1.7 -/
-theorem Int.lt_trans {a b c:Int} (hab: a < b) (hbc: b < c) : a < c := by sorry
+theorem Int.lt_trans {a b c:Int} (hab: a < b) (hbc: b < c) : a < c := by
+  rcases hab with ⟨⟨k, hk⟩, hneq⟩
+  rcases hbc with ⟨⟨i, hi⟩, hneqi⟩
+  rw [hk] at hi
+  constructor
+  . use (k+i)
+    simp_all
+    ring
+  intro h
+  sorry
 
 /-- Lemma 4.1.11(f) (Order trichotomy) / Exercise 4.1.7 -/
-theorem Int.trichotomous' (a b:Int) : a > b ∨ a < b ∨ a = b := by sorry
+theorem Int.trichotomous' (a b:Int) : a > b ∨ a < b ∨ a = b := by
+  rcases trichotomous (a-b) with h | h | h
+  . right
+    right
+    have h1: a - b + b = 0 + b := by
+      congr
+    ring_nf at *
+    exact h1
+  . rcases h with ⟨k, kpos, hk⟩
+    left
+    constructor
+    . use k
+      rw [<- hk]
+      ring
+    intro h
+    rw [h] at hk
+    simp_all [ofNat_eq, natCast_eq, eq]
+  rcases h with ⟨k, kpos, hk⟩
+  have h: a - b + b = -↑k + b := by congr
+  right
+  left
+  constructor
+  . use k
+    ring_nf at *
+    simp_all
+  intro h1
+  simp at h
+  rw [h1] at hk
+  ring_nf at *
+  have : 0 = (k: Int) := by simp_all
+  simp_all [natCast_eq, ofNat_eq, eq]
+
 
 /-- Lemma 4.1.11(f) (Order trichotomy) / Exercise 4.1.7 -/
 theorem Int.not_gt_and_lt (a b:Int) : ¬ (a > b ∧ a < b):= by sorry
