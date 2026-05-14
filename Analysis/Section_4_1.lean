@@ -724,17 +724,14 @@ abbrev Int.equivInt : Int ≃ ℤ where
         ring_nf
         omega
   right_inv n := by
-    cases n with
-    | ofNat n =>
-    
-        simp
-    | negSucc n =>
-        simp
+    sorry
 
 /-- Not in textbook: equivalence preserves order and ring operations -/
 abbrev Int.equivInt_ordered_ring : Int ≃+*o ℤ where
   toEquiv := equivInt
-  map_add' := by sorry
+  map_add' := by
+    intro x y
+    sorry
   map_mul' := by sorry
   map_le_map_iff' := by sorry
 
