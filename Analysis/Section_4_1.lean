@@ -566,7 +566,8 @@ instance Int.instLinearOrder : LinearOrder Int where
       simp [natCast_eq, ofNat_eq, add_eq, eq] at this
       exact this.left
     have : i = (0: Int) := by
-      sorry
+      rw [this]
+      ring
     rw [this] at hi
     ring_nf at hi
     symm at hi
