@@ -40,8 +40,13 @@ structure PreInt where
 instance PreInt.instSetoid : Setoid PreInt where
   r a b := a.minuend + b.subtrahend = b.minuend + a.subtrahend
   iseqv := {
-    refl := by sorry
-    symm := by sorry
+    refl := by
+      intro x
+      rfl
+    symm := by
+      intro x y h
+      symm
+      exact h
     trans := by
       -- This proof is written to follow the structure of the original text.
       intro ⟨ a,b ⟩ ⟨ c,d ⟩ ⟨ e,f ⟩ h1 h2; simp_all
