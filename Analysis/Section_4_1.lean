@@ -290,13 +290,29 @@ theorem Int.sub_eq_formal_sub (a b:ℕ) : (a:Int) - (b:Int) = a —— b := by
 
 /-- Proposition 4.1.8 (No zero divisors) / Exercise 4.1.5 -/
 theorem Int.mul_eq_zero {a b:Int} (h: a * b = 0) : a = 0 ∨ b = 0 := by
-  obtain ⟨ c, d, rfl ⟩ := eq_diff a
-  obtain ⟨ e, f, rfl ⟩ := eq_diff b
-  simp_all [ofNat_eq, mul_eq, eq]
-  sorry
+  cases trichotomous a
+  . simp_all
+  . rename_i h1
+    rcases h1 with h2 | h2
+    . rcases h2 with ⟨k, hpos, hk⟩
+      right
+      obtain ⟨ e, f, rfl ⟩ := eq_diff b
+      simp_all [ofNat_eq, natCast_eq, mul_eq, eq]
+      cases h
+      . simp_all
+      simp_all
+    right
+    rcases h2 with ⟨k, hpos, hk⟩
+    obtain ⟨ e, f, rfl ⟩ := eq_diff b
+    simp_all [ofNat_eq, natCast_eq, neg_eq, eq, mul_eq]
+    cases h
+    . simp_all
+    simp_all
 
 /-- Corollary 4.1.9 (Cancellation law) / Exercise 4.1.6 -/
-theorem Int.mul_right_cancel₀ (a b c:Int) (h: a*c = b*c) (hc: c ≠ 0) : a = b := by sorry
+theorem Int.mul_right_cancel₀ (a b c:Int) (h: a*c = b*c) (hc: c ≠ 0) : a = b := by
+
+  sorry
 
 /-- Definition 4.1.10 (Ordering of the integers) -/
 instance Int.instLE : LE Int where
