@@ -566,7 +566,22 @@ theorem Int.neg_one_mul (a:Int) : -1 * a = -a := by
   rw [one_mul]
 
 /-- Exercise 4.1.8 -/
-theorem Int.no_induction : ∃ P: Int → Prop, (P 0 ∧ ∀ n, P n → P (n+1)) ∧ ¬ ∀ n, P n := by sorry
+theorem Int.no_induction : ∃ P: Int → Prop, (P 0 ∧ ∀ n, P n → P (n+1)) ∧ ¬ ∀ n, P n := by
+  push_neg
+  let P: Int -> Prop :=
+    fun x => x ≥ 0
+  use P
+  constructor
+  . constructor
+    simp_all [P]
+    intro i ih
+    simp_all [P]
+    apply le_trans ih
+    use 1
+    simp_all
+  use -1
+  simp_all [P]
+  decide
 
 /-- A nonnegative number squared is nonnegative. This is a special case of 4.1.9 that's useful for proving the general case. --/
 lemma Int.sq_nonneg_of_pos (n:Int) (h: 0 ≤ n) : 0 ≤ n*n := by
