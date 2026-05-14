@@ -596,7 +596,12 @@ theorem Int.sq_nonneg (n:Int) : 0 ≤ n*n := by
   exact h1
 
 /-- Exercise 4.1.9 -/
-theorem Int.sq_nonneg' (n:Int) : ∃ (m:Nat), n*n = m := by sorry
+theorem Int.sq_nonneg' (n:Int) : ∃ (m:Nat), n*n = m := by
+  have h:= sq_nonneg n
+  rcases h with ⟨w, h⟩
+  rw [h]
+  ring_nf
+  use w
 
 /--
   Not in textbook: create an equivalence between {name}`Int` and {lean}`ℤ`.
