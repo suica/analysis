@@ -354,7 +354,23 @@ theorem Int.lt_iff_exists_positive_difference (a b:Int) : a < b ↔ ∃ n:ℕ, n
   contradiction
 
 /-- Lemma 4.1.11(b) (Addition preserves order) / Exercise 4.1.7 -/
-theorem Int.add_lt_add_right {a b:Int} (c:Int) (h: a < b) : a+c < b+c := by sorry
+theorem Int.add_lt_add_right {a b:Int} (c:Int) (h: a < b) : a+c < b+c := by
+  rcases h with ⟨⟨k, hk⟩, hneq⟩
+  constructor
+  . use k
+    simp_all
+    ring
+  have cancel_right {a b c: Int}: a + b = c + b -> a = c := by
+    intro h
+    have h1: a + b + -b = c + b + -b:= by
+      congr 1
+    have h2: a + (b + -b) = c + (b + -b) := by
+      ring_nf at *
+      exact h1
+    simp_all
+  intro h
+  have h3 := cancel_right h
+  contradiction
 
 /-- Lemma 4.1.11(c) (Positive multiplication preserves order) / Exercise 4.1.7 -/
 theorem Int.mul_lt_mul_of_pos_right {a b c:Int} (hab : a < b) (hc: 0 < c) : a*c < b*c := by sorry
