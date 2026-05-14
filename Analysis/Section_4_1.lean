@@ -741,7 +741,31 @@ abbrev Int.equivInt_ordered_ring : Int ≃+*o ℤ where
             = ((a : ℤ) - (b : ℤ)) + ((c : ℤ) - (d : ℤ))
         omega
 
-  map_mul' := by sorry
-  map_le_map_iff' := by sorry
+  map_mul' := by
+    intro x y
+    refine Quotient.inductionOn₂ x y ?_
+    intro p q
+    cases p with
+    | mk a b =>
+    cases q with
+    | mk c d =>
+    -- 如果你的乘法是 (a,b)*(c,d) = (a*c + b*d, a*d + b*c)
+    change ((a * c + b * d : ℕ) : ℤ) - ((a * d + b * c : ℕ) : ℤ)
+        = ((a : ℤ) - (b : ℤ)) * ((c : ℤ) - (d : ℤ))
+    ring_nf
+    simp_all
+
+
+  map_le_map_iff' := by
+      intro x y
+      refine Quotient.inductionOn₂ x y ?_
+      intro p q
+      cases p with
+      | mk a b =>
+      cases q with
+      | mk c d =>
+      unfold LE.le instLE Int.instLEInt
+      simp_all
+      sorry
 
 end Section_4_1
