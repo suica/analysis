@@ -451,7 +451,22 @@ theorem Int.trichotomous' (a b:Int) : a > b ∨ a < b ∨ a = b := by
 
 
 /-- Lemma 4.1.11(f) (Order trichotomy) / Exercise 4.1.7 -/
-theorem Int.not_gt_and_lt (a b:Int) : ¬ (a > b ∧ a < b):= by sorry
+theorem Int.not_gt_and_lt (a b:Int) : ¬ (a > b ∧ a < b):= by
+  intro h
+  rcases h with ⟨⟨⟨k, hk⟩, neq⟩, ⟨⟨k2, hk2⟩, neq2⟩⟩
+  rw [hk2] at hk
+  have h1: a + -a = a + ↑k2 + ↑k + -a := by congr
+  have h2: (0: Int) = ↑k2 + ↑k := by
+    ring_nf at h1
+    exact h1
+  simp [natCast_eq, eq, ofNat_eq, add_eq] at h2
+  have h3: k2 = (0: Int) := by
+    have h := add_eq_zero.mp (symm h2)
+    congr
+    exact h.left
+  rw [h3] at hk2
+  ring_nf at *
+  contradiction
 
 /-- Lemma 4.1.11(f) (Order trichotomy) / Exercise 4.1.7 -/
 theorem Int.not_gt_and_eq (a b:Int) : ¬ (a > b ∧ a = b):= by sorry
