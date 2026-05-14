@@ -227,12 +227,20 @@ instance Int.instAddGroup : AddGroup Int :=
 /-- Proposition 4.1.6 (laws of algebra) / Exercise 4.1.4 -/
 instance Int.instAddCommGroup : AddCommGroup Int where
   add_comm := by
-    intro a b
-    sorry
+    intro x y
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    obtain ⟨ c, d, rfl ⟩ := eq_diff y
+    simp [add_eq, eq]
+    ring
 
 /-- Proposition 4.1.6 (laws of algebra) / Exercise 4.1.4 -/
 instance Int.instCommMonoid : CommMonoid Int where
-  mul_comm := by sorry
+  mul_comm := by
+    intro x y
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    obtain ⟨ c, d, rfl ⟩ := eq_diff y
+    simp [mul_eq, eq]
+    ring
   mul_assoc := by
     -- This proof is written to follow the structure of the original text.
     intro x y z
@@ -240,8 +248,14 @@ instance Int.instCommMonoid : CommMonoid Int where
     obtain ⟨ c, d, rfl ⟩ := eq_diff y
     obtain ⟨ e, f, rfl ⟩ := eq_diff z
     simp_rw [mul_eq]; congr 1 <;> ring
-  one_mul := by sorry
-  mul_one := by sorry
+  one_mul := by
+    intro x
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    simp [ofNat_eq, mul_eq]
+  mul_one := by
+    intro x
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    simp [ofNat_eq, mul_eq]
 
 /-- Proposition 4.1.6 (laws of algebra) / Exercise 4.1.4 -/
 instance Int.instCommRing : CommRing Int where
