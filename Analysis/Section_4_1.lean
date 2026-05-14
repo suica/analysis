@@ -373,7 +373,21 @@ theorem Int.add_lt_add_right {a b:Int} (c:Int) (h: a < b) : a+c < b+c := by
   contradiction
 
 /-- Lemma 4.1.11(c) (Positive multiplication preserves order) / Exercise 4.1.7 -/
-theorem Int.mul_lt_mul_of_pos_right {a b c:Int} (hab : a < b) (hc: 0 < c) : a*c < b*c := by sorry
+theorem Int.mul_lt_mul_of_pos_right {a b c:Int} (hab : a < b) (hc: 0 < c) : a*c < b*c := by
+  rcases hab with ⟨⟨k, hk⟩, hneq⟩
+  rcases hc with ⟨⟨i, hi⟩, hneqi⟩
+  -- simp_all [natCast_eq, ofNat_eq]
+  constructor
+  . use (k*i)
+    simp [hk, hi]
+    ring_nf
+  intro h
+  have : a = b := by
+    apply mul_right_cancel₀ a b c
+    exact h
+    symm
+    simpa
+  contradiction
 
 /-- Lemma 4.1.11(d) (Negation reverses order) / Exercise 4.1.7 -/
 theorem Int.neg_gt_neg {a b:Int} (h: b < a) : -a < -b := by sorry
