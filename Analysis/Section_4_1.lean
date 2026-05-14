@@ -499,11 +499,9 @@ instance Int.decidableRel : DecidableRel (· ≤ · : Int → Int → Prop) := b
 lemma Int.is_additive_identity_iff_eq_0 (b : Int) : (∀ a, a = a + b) ↔ b = 0 := by
   constructor
   . intro h
-    have h1 : ∀ (a : Int), a + 0 = a + b := by simp_all
-    have h2 : ∀ (a : Int), a + 0 - a = a + b -a := by simp_all
-    have h3 : ∀ (a : Int), 0 = b := by simp_all
-    symm
-    exact h3 0
+    have h1 := h 0
+    ring_nf at h1
+    exact symm h1
   intro h
   simp_all
 
