@@ -689,10 +689,47 @@ theorem Int.sq_nonneg' (n:Int) : ∃ (m:Nat), n*n = m := by
 -/
 abbrev Int.equivInt : Int ≃ ℤ where
   toFun := Quotient.lift (fun ⟨ a, b ⟩ ↦ a - b) (by
-    sorry)
-  invFun := sorry
-  left_inv n := sorry
-  right_inv n := sorry
+    intro a b h
+    simp_all
+    rw [PreInt.eq] at h
+    omega)
+  invFun: ℤ → Int := fun z =>
+    match z with
+    | Int.ofNat n => ↑n
+    | Int.negSucc n => -↑(n+1)
+  left_inv n := by
+    simp_all
+    refine Quotient.inductionOn n ?_
+    intro p
+    cases p with
+    | mk a b =>
+      simp
+      by_cases h : b ≤ a
+      · have : (a : ℤ) - b = Int.ofNat (a - b) := by
+          ring_nf
+          simp_all
+        rw [this]
+        simp
+        -- 需要证明 ⟦(a-b,0)⟧ = ⟦(a,b)⟧
+        apply Quotient.sound
+        rw [PreInt.eq]
+        omega
+      · have : (a : ℤ) - b = Int.negSucc (b - a - 1) := by
+          omega
+        rw [this]
+        simp
+        -- 需要证明 ⟦(0,b-a)⟧ = ⟦(a,b)⟧
+        apply Quotient.sound
+        rw [PreInt.eq]
+        ring_nf
+        omega
+  right_inv n := by
+    cases n with
+    | ofNat n =>
+    
+        simp
+    | negSucc n =>
+        simp
 
 /-- Not in textbook: equivalence preserves order and ring operations -/
 abbrev Int.equivInt_ordered_ring : Int ≃+*o ℤ where
