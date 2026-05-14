@@ -414,7 +414,22 @@ theorem Int.lt_trans {a b c:Int} (hab: a < b) (hbc: b < c) : a < c := by
     simp_all
     ring
   intro h
-  sorry
+  rw [h] at hi
+  have h: c + - c = c +  ↑k + ↑i -c := by
+    congr
+  have h2: (0: Int) = ↑k + ↑i := by
+    ring_nf at h
+    exact h
+  have h2: 0 = k + i := by
+    simp [natCast_eq, ofNat_eq, eq, add_eq] at h2
+    exact h2
+  rw [show ↑k = (0: Int) from by
+    have := add_eq_zero.mp (symm h2)
+    rw [this.left]
+    ring ] at hk
+  ring_nf at hk
+  symm at hk
+  contradiction
 
 /-- Lemma 4.1.11(f) (Order trichotomy) / Exercise 4.1.7 -/
 theorem Int.trichotomous' (a b:Int) : a > b ∨ a < b ∨ a = b := by
