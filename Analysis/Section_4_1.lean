@@ -610,7 +610,18 @@ instance Int.instLinearOrder : LinearOrder Int where
     rw [j0] at hj
     ring_nf at hj
     exact hj
-  le_total := sorry
+  le_total := fun a b => by
+    rcases trichotomous' a b with h | h | h
+    . right
+      rcases h with ⟨w, hw⟩
+      exact w
+    . left
+      rcases h with ⟨w, hw⟩
+      exact w
+    . left
+      use 0
+      ring_nf
+      simp_all
   toDecidableLE := decidableRel
 
 /-- Exercise 4.1.3 -/
