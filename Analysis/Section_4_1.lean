@@ -259,10 +259,28 @@ instance Int.instCommMonoid : CommMonoid Int where
 
 /-- Proposition 4.1.6 (laws of algebra) / Exercise 4.1.4 -/
 instance Int.instCommRing : CommRing Int where
-  left_distrib := by sorry
-  right_distrib := by sorry
-  zero_mul := by sorry
-  mul_zero := by sorry
+  left_distrib := by
+    intro x y z
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    obtain ⟨ c, d, rfl ⟩ := eq_diff y
+    obtain ⟨ e, f, rfl ⟩ := eq_diff z
+    simp_all [add_eq, mul_eq, eq]
+    ring
+  right_distrib := by
+    intro x y z
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    obtain ⟨ c, d, rfl ⟩ := eq_diff y
+    obtain ⟨ e, f, rfl ⟩ := eq_diff z
+    simp_all [add_eq, mul_eq, eq]
+    ring
+  zero_mul := by
+    intro x
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    simp_all [ofNat_eq, mul_eq]
+  mul_zero := by
+    intro x
+    obtain ⟨ a, b, rfl ⟩ := eq_diff x
+    simp_all [ofNat_eq, mul_eq]
 
 /-- Definition of subtraction -/
 theorem Int.sub_eq (a b:Int) : a - b = a + (-b) := by rfl
