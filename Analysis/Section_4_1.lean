@@ -508,9 +508,53 @@ lemma Int.is_additive_identity_iff_eq_0 (b : Int) : (∀ a, a = a + b) ↔ b = 0
 
 /-- (Not from textbook) Int has the structure of a linear ordering. -/
 instance Int.instLinearOrder : LinearOrder Int where
-  le_refl := sorry
-  le_trans := sorry
-  lt_iff_le_not_ge := sorry
+  le_refl := fun x => by
+    use 0
+    simp_all
+  le_trans := fun a b c => by
+    intro h1 h2
+    rcases h1 with ⟨k, hk⟩
+    rcases h2 with ⟨k', hk'⟩
+    use k+k'
+    simp_all
+    ring
+  lt_iff_le_not_ge := fun a b => by
+    constructor
+    intro h
+    rcases h with ⟨haleb, neq⟩
+    constructor
+    . exact haleb
+    intro h
+    rcases h with ⟨k, hk⟩
+    by_cases h: k = 0
+    . rw [h] at hk
+      simp_all
+    rcases haleb with ⟨i, hi⟩
+    rw [hi] at hk
+    have : ↑i + ↑k = (0: Int) := by
+      have : a + - a = a + (i: Int) + (k: Int) + -a := by
+        congr
+      ring_nf at this
+      exact symm this
+    have : i = 0 := by
+      simp [natCast_eq, ofNat_eq, add_eq, eq] at this
+      exact this.left
+    have : i = (0: Int) := by
+      sorry
+    rw [this] at hi
+    ring_nf at hi
+    symm at hi
+    contradiction
+
+    intro ⟨⟨i,hk⟩, hnle⟩
+    constructor
+    . use i
+    intro h
+    rw [h] at hnle
+    have : b ≤ b := by
+      use 0
+      simp_all
+    contradiction
   le_antisymm := sorry
   le_total := sorry
   toDecidableLE := decidableRel
