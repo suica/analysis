@@ -75,7 +75,13 @@ abbrev Chapter2.Nat.map_le_map_iff : ∀ {n m : Nat}, n.toNat ≤ m.toNat ↔ n 
   intro n m
   constructor
   intro h
-  . sorry
+  . rw [le_iff_exists_add] at h
+    rcases h with ⟨k, hk⟩
+    use k
+    apply Chapter2.Nat.equivNat.injective
+    simp_all [map_add]
+    have := Chapter2.Nat.equivNat.right_inv k
+    exact Nat.add_right_cancel (congrFun (congrArg HAdd.hAdd (id (Eq.symm this))) k)
   intro h
   rcases h with ⟨k, hk⟩
   induction k generalizing m
