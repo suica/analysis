@@ -560,16 +560,40 @@ instance Int.instLinearOrder : LinearOrder Int where
   toDecidableLE := decidableRel
 
 /-- Exercise 4.1.3 -/
-theorem Int.neg_one_mul (a:Int) : -1 * a = -a := by sorry
+theorem Int.neg_one_mul (a:Int) : -1 * a = -a := by
+  rw [neg_mul]
+  congr
+  rw [one_mul]
 
 /-- Exercise 4.1.8 -/
 theorem Int.no_induction : ∃ P: Int → Prop, (P 0 ∧ ∀ n, P n → P (n+1)) ∧ ¬ ∀ n, P n := by sorry
 
 /-- A nonnegative number squared is nonnegative. This is a special case of 4.1.9 that's useful for proving the general case. --/
-lemma Int.sq_nonneg_of_pos (n:Int) (h: 0 ≤ n) : 0 ≤ n*n := by sorry
+lemma Int.sq_nonneg_of_pos (n:Int) (h: 0 ≤ n) : 0 ≤ n*n := by
+  rcases h with ⟨k, hk⟩
+  use k*k
+  rw [hk]
+  ring_nf
+  simp_all [natCast_eq]
 
 /-- Exercise 4.1.9. The square of any integer is nonnegative. -/
-theorem Int.sq_nonneg (n:Int) : 0 ≤ n*n := by sorry
+theorem Int.sq_nonneg (n:Int) : 0 ≤ n*n := by
+  rcases le_total 0 n with h | h
+  . apply sq_nonneg_of_pos
+    exact h
+  suffices h: 0 ≤ (-n) * (-n) from by
+    have h1: -n * -n = n * n := by
+      rw [neg_mul, mul_neg]
+      ring
+    rw [<- h1]
+    exact h
+  apply sq_nonneg_of_pos
+  rcases h with ⟨w, h⟩
+  use w
+  ring_nf
+  have h1: 0 + -n = n + ↑w + -n := by congr
+  ring_nf at h1
+  exact h1
 
 /-- Exercise 4.1.9 -/
 theorem Int.sq_nonneg' (n:Int) : ∃ (m:Nat), n*n = m := by sorry
