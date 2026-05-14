@@ -731,7 +731,16 @@ abbrev Int.equivInt_ordered_ring : Int ≃+*o ℤ where
   toEquiv := equivInt
   map_add' := by
     intro x y
-    sorry
+    refine Quotient.inductionOn₂ x y ?_
+    intro p q
+    cases p with
+    | mk a b =>
+      cases q with
+      | mk c d =>
+        change ((a + c : ℕ) : ℤ) - ((b + d : ℕ) : ℤ)
+            = ((a : ℤ) - (b : ℤ)) + ((c : ℤ) - (d : ℤ))
+        omega
+
   map_mul' := by sorry
   map_le_map_iff' := by sorry
 
