@@ -582,7 +582,34 @@ instance Int.instLinearOrder : LinearOrder Int where
       use 0
       simp_all
     contradiction
-  le_antisymm := sorry
+  le_antisymm := fun a b => by
+    intro h1 h2
+    rcases h1 with ⟨i, hi⟩
+    rcases h2 with ⟨j, hj⟩
+    rw [hj] at hi
+    have : b + - b = b + ↑j + ↑i + -b := by
+      congr
+    ring_nf at this
+
+    have {a: Int} {k i : ℕ}: a = a + ↑i + ↑k -> i = 0 ∧ k = 0 := by
+      intro h
+      have : ↑i + ↑k = (0: Int) := by
+        have : a + - a = a + (i: Int) + (k: Int) + -a := by
+          congr
+        ring_nf at this
+        exact symm this
+      have h1:i = 0 ∧ k = 0 := by
+        simp [natCast_eq, ofNat_eq, add_eq, eq] at this
+        exact this
+      exact h1
+    have j0: j = 0 := by
+      have: j =0 ∧ i=0 := by
+        apply this
+        exact hi
+      exact this.left
+    rw [j0] at hj
+    ring_nf at hj
+    exact hj
   le_total := sorry
   toDecidableLE := decidableRel
 
