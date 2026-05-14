@@ -311,8 +311,17 @@ theorem Int.mul_eq_zero {a b:Int} (h: a * b = 0) : a = 0 ∨ b = 0 := by
 
 /-- Corollary 4.1.9 (Cancellation law) / Exercise 4.1.6 -/
 theorem Int.mul_right_cancel₀ (a b c:Int) (h: a*c = b*c) (hc: c ≠ 0) : a = b := by
-
-  sorry
+  have h1: a * c - b*c = 0 := by simp_all
+  have h2: (a + -b) *c = 0 := by
+    rw [right_distrib]
+    simp_all
+  have h3 := mul_eq_zero h2
+  obtain ⟨ a1, b1, rfl ⟩ := eq_diff a
+  obtain ⟨ c1, d1, rfl ⟩ := eq_diff b
+  rcases h3 with h | h
+  . simp_all [neg_eq, add_eq, ofNat_eq, eq]
+    ring
+  contradiction
 
 /-- Definition 4.1.10 (Ordering of the integers) -/
 instance Int.instLE : LE Int where
