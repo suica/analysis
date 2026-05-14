@@ -469,10 +469,15 @@ theorem Int.not_gt_and_lt (a b:Int) : ¬ (a > b ∧ a < b):= by
   contradiction
 
 /-- Lemma 4.1.11(f) (Order trichotomy) / Exercise 4.1.7 -/
-theorem Int.not_gt_and_eq (a b:Int) : ¬ (a > b ∧ a = b):= by sorry
+theorem Int.not_gt_and_eq (a b:Int) : ¬ (a > b ∧ a = b):= by
+  intro ⟨⟨a, hneq⟩, heq⟩
+  symm at heq
+  contradiction
 
 /-- Lemma 4.1.11(f) (Order trichotomy) / Exercise 4.1.7 -/
-theorem Int.not_lt_and_eq (a b:Int) : ¬ (a < b ∧ a = b):= by sorry
+theorem Int.not_lt_and_eq (a b:Int) : ¬ (a < b ∧ a = b):= by
+  intro ⟨⟨a, hneq⟩, heq⟩
+  contradiction
 
 /-- (Not from textbook) Establish the decidability of this order. -/
 instance Int.decidableRel : DecidableRel (· ≤ · : Int → Int → Prop) := by
