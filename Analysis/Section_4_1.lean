@@ -504,10 +504,21 @@ instance Int.decidableRel : DecidableRel (· ≤ · : Int → Int → Prop) := b
     cases (a + d).decLe (b + c) with
       | isTrue h =>
         apply isTrue
-        sorry
+        rw [le_iff_exists_add] at h
+        rcases h with ⟨k, hk⟩
+        use k
+        simp_all [natCast_eq, add_eq, eq]
+        ring_nf at *
+        simp_all
       | isFalse h =>
         apply isFalse
-        sorry
+        rw [not_le] at h
+        rw [lt_iff_exists_add] at h
+        rcases h with ⟨w, ⟨wpos, h⟩⟩
+        intro h'
+        rcases h' with ⟨i, hi⟩
+        simp_all [natCast_eq, add_eq, eq]
+        omega
   exact Quotient.recOnSubsingleton₂ n m this
 
 /-- (Not from textbook) 0 is the only additive identity -/
