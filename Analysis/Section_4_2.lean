@@ -57,13 +57,15 @@ instance PreRat.instSetoid : Setoid PreRat where
       intro x y z h1 h2
       have h3: x.numerator * y.denominator * (y.numerator * z.denominator) = y.numerator * x.denominator * (z.numerator * y.denominator) := by
         rw [h1,h2]
-
-      have h4: x.numerator * y.numerator * z.denominator = y.numerator * x.denominator * z.numerator := by
-        ring_nf
-        rw [mul_comm x.numerator y.numerator]
-        rw [mul_assoc, mul_assoc]
-        sorry
-      sorry
+      have h4: x.numerator  * z.denominator * (y.numerator * y.denominator) = x.denominator * z.numerator * (y.numerator * y.denominator) := by
+        linarith
+      by_cases h: y.numerator = 0
+      . rw [h] at h1
+        simp_all [y.nonzero]
+      apply mul_right_cancel₀ (b:= y.numerator * y.denominator)
+      simp_all [y.nonzero]
+      ring_nf at *
+      simp_all
     }
 
 @[simp]
