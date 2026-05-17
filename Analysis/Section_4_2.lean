@@ -47,9 +47,23 @@ structure PreRat where
 instance PreRat.instSetoid : Setoid PreRat where
   r a b := a.numerator * b.denominator = b.numerator * a.denominator
   iseqv := {
-    refl := by sorry
-    symm := by sorry
-    trans := by sorry
+    refl := by
+      intro a
+      rfl
+    symm := by
+      intro a b h
+      omega
+    trans := by
+      intro x y z h1 h2
+      have h3: x.numerator * y.denominator * (y.numerator * z.denominator) = y.numerator * x.denominator * (z.numerator * y.denominator) := by
+        rw [h1,h2]
+
+      have h4: x.numerator * y.numerator * z.denominator = y.numerator * x.denominator * z.numerator := by
+        ring_nf
+        rw [mul_comm x.numerator y.numerator]
+        rw [mul_assoc, mul_assoc]
+        sorry
+      sorry
     }
 
 @[simp]
