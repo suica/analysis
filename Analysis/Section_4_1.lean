@@ -749,12 +749,9 @@ abbrev Int.equivInt_ordered_ring : Int ≃+*o ℤ where
     | mk a b =>
     cases q with
     | mk c d =>
-    -- 如果你的乘法是 (a,b)*(c,d) = (a*c + b*d, a*d + b*c)
-    change ((a * c + b * d : ℕ) : ℤ) - ((a * d + b * c : ℕ) : ℤ)
-        = ((a : ℤ) - (b : ℤ)) * ((c : ℤ) - (d : ℤ))
-    ring_nf
-    simp_all
-
+      change ((a * c + b * d) : ℤ) - ((a * d + b * c) : ℤ)
+          = ((a : ℤ) - (b : ℤ)) * ((c : ℤ) - (d : ℤ))
+      ring_nf
 
   map_le_map_iff' := by
       intro x y
