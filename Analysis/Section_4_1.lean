@@ -724,7 +724,22 @@ abbrev Int.equivInt : Int ≃ ℤ where
         ring_nf
         omega
   right_inv n := by
-    sorry
+    simp [Quotient.lift]
+    cases n with
+    | ofNat n => rfl
+    | negSucc n =>
+      dsimp only [Int.negSucc]
+      have hrep : -1 + -↑n = 0 —— (1+n) := by
+        simp [ofNat_eq, natCast_eq, neg_eq, add_eq, add_comm]
+      rw [hrep, Quot.lift_mk]
+      . rw [Int.negSucc_eq]
+        ring_nf
+        rw [<- hrep]
+        rw [<- Int.add_neg_eq_sub]
+        simp_all only [Quotient.lift_mk]
+        omega
+      intro a b h
+      congr
 
 /-- Not in textbook: equivalence preserves order and ring operations -/
 abbrev Int.equivInt_ordered_ring : Int ≃+*o ℤ where
