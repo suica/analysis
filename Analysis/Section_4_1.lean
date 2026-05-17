@@ -756,13 +756,20 @@ abbrev Int.equivInt_ordered_ring : Int ≃+*o ℤ where
   map_le_map_iff' := by
       intro x y
       refine Quotient.inductionOn₂ x y ?_
-      intro p q
-      cases p with
-      | mk a b =>
-      cases q with
-      | mk c d =>
-      unfold LE.le instLE Int.instLEInt
-      simp_all
-      sorry
+      intro ⟨a,b⟩ ⟨c,d⟩
+      simp
+      constructor
+      . intro h
+        simp [LE.le, natCast_eq, add_eq, eq]
+        rw [Int.le_def, Int.nonneg_def] at h
+        rcases h with ⟨k, hk⟩
+        use k
+        omega
+      intro h
+      simp_all [LE.le, natCast_eq, add_eq, eq]
+      rw [Int.le, Int.nonneg_def]
+      rcases h with ⟨k, hk⟩
+      use k
+      omega
 
 end Section_4_1
