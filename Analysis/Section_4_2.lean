@@ -174,21 +174,23 @@ theorem Rat.of_Nat_eq (n:ℕ) : (ofNat(n):Rat) = (ofNat(n):Nat) // 1 := rfl
 
 /-- natCast distributes over successor -/
 theorem Rat.natCast_succ (n: ℕ) : ((n + 1: ℕ): Rat) = (n: Rat) + 1 := by
-  sorry
+  simp [Rat.of_Nat_eq, Rat.coe_Nat_eq, add_eq]
 
 /-- intCast distributes over addition -/
 lemma Rat.intCast_add (a b:ℤ) : (a:Rat) + (b:Rat) = (a+b:ℤ) := by
-  sorry
+  simp [Rat.coe_Int_eq, add_eq]
 
 /-- intCast distributes over multiplication -/
 lemma Rat.intCast_mul (a b:ℤ) : (a:Rat) * (b:Rat) = (a*b:ℤ) := by
-  sorry
+  simp [Rat.coe_Int_eq, mul_eq]
 
 /-- intCast commutes with negation -/
 lemma Rat.intCast_neg (a:ℤ) : - (a:Rat) = (-a:ℤ) := rfl
 
 theorem Rat.coe_Int_inj : Function.Injective (fun n:ℤ ↦ (n:Rat)) := by
-  sorry
+  simp [Rat.coe_Int_eq]
+  intro a b h
+  simp_all [eq]
 
 /--
   Whereas the book leaves the inverse of 0 undefined, it is more convenient in Lean to assign a
@@ -196,7 +198,21 @@ theorem Rat.coe_Int_inj : Function.Injective (fun n:ℤ ↦ (n:Rat)) := by
 -/
 instance Rat.instInv : Inv Rat where
   inv := Quotient.lift (fun ⟨ a, b, h1 ⟩ ↦ b // a) (by
-    sorry -- hint: split into the `a=0` and `a≠0` cases
+    intro a b h
+    obtain ⟨x1, x2, hx⟩ := a
+    obtain ⟨y1, y2, hy⟩ := b
+    simp_all
+    by_cases h1: x1 = 0
+    . have h2: y1 = 0 := by
+        rw [h1] at h
+        simp_all
+      simp_all [formalDiv]
+    have h2: y1 ≠ 0 := by
+      intro h'
+      rw [h'] at h
+      simp_all
+    simp_all [formalDiv, Quotient.eq]
+    linarith
 )
 
 lemma Rat.inv_eq (a:ℤ) {b:ℤ} (hb: b ≠ 0) : (a // b)⁻¹ = b // a := by
