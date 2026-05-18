@@ -502,17 +502,41 @@ theorem Rat.trichotomous (x:Rat) : x = 0 ∨ x.isPos ∨ x.isNeg := by
   ring_nf
   repeat omega
 
+lemma Rat.numerator_zero: ∀ (a b: ℤ), b > 0 -> 0 = (a: Rat) / b -> a = 0 := by
+    intro a b h1 h
+    rw [Rat.of_Nat_eq] at h
+    simp [Rat.coe_Int_eq, Rat.div_eq, Rat.coe_Int_eq, Rat.inv_eq] at h
+    rw [Rat.mul_eq, Rat.eq] at h
+    ring_nf at h
+    simp_all
+    decide
+    repeat omega
 
 /-- Lemma 4.2.7 (trichotomy of rationals) / Exercise 4.2.4 -/
 theorem Rat.not_zero_and_pos (x:Rat) : ¬(x = 0 ∧ x.isPos) := by
-  sorry
+  intro ⟨hz, pos⟩
+  obtain ⟨a, b, ⟨_,_, h⟩⟩ := pos
+  rw [hz] at h
+  apply numerator_zero at h
+  omega
+  omega
 
 /-- Lemma 4.2.7 (trichotomy of rationals) / Exercise 4.2.4 -/
 theorem Rat.not_zero_and_neg (x:Rat) : ¬(x = 0 ∧ x.isNeg) := by
-  sorry
+  intro ⟨hz, neg⟩
+  obtain ⟨a, apos, ⟨_,_, h⟩⟩ := neg
+  obtain ⟨x, y, ⟨_,_, h'⟩⟩ := apos
+  rw [h'] at hz
+  rw [of_Nat_eq, coe_Int_eq, div_eq] at hz
+  simp [coe_Int_eq, inv_eq] at hz
+  rw [mul_eq, neg_eq, eq] at hz
+  ring_nf at hz
+  repeat omega
+
 
 /-- Lemma 4.2.7 (trichotomy of rationals) / Exercise 4.2.4 -/
 theorem Rat.not_pos_and_neg (x:Rat) : ¬(x.isPos ∧ x.isNeg) := by
+  intro ⟨pos, neg⟩
   sorry
 
 /-- Definition 4.2.8 (Ordering of the rationals) -/
