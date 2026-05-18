@@ -406,7 +406,10 @@ instance Rat.instField : Field Rat where
   nnqsmul := _
 
 example : (3//4) / (5//6) = 9 // 10 := by
-  sorry
+  simp [Rat.div_eq, Rat.inv_eq]
+  simp_all [Rat.mul_eq]
+  rw [Rat.eq]
+  repeat simp_all
 
 /-- Definition of subtraction -/
 theorem Rat.sub_eq (a b:Rat) : a - b = a + (-b) := by rfl
@@ -416,9 +419,9 @@ def Rat.coe_int_hom : ℤ →+* Rat where
   map_zero' := rfl
   map_one' := rfl
   map_add' := by
-    sorry
+    simp_all
   map_mul' := by
-    sorry
+    simp_all
 
 /-- Definition 4.2.6 (positivity) -/
 def Rat.isPos (q:Rat) : Prop := ∃ a b:ℤ, a > 0 ∧ b > 0 ∧ q = a/b
@@ -428,7 +431,77 @@ def Rat.isNeg (q:Rat) : Prop := ∃ r:Rat, r.isPos ∧ q = -r
 
 /-- Lemma 4.2.7 (trichotomy of rationals) / Exercise 4.2.4 -/
 theorem Rat.trichotomous (x:Rat) : x = 0 ∨ x.isPos ∨ x.isNeg := by
-  sorry
+  obtain ⟨x1, x2, x3, x4⟩ := Rat.eq_diff x
+  obtain h | h | h := Int.lt_trichotomy 0 x1
+  obtain h' | h' | h' := Int.lt_trichotomy 0 x2
+  . right
+    left
+    use x1
+    use x2
+    simp_all
+    rw [div_eq, coe_Int_eq, coe_Int_eq, inv_eq, mul_eq]
+    ring_nf
+    decide
+    omega
+    omega
+  . symm at h'
+    contradiction
+  . right
+    right
+    use x1 // (-x2)
+    constructor
+    . use x1
+      use (-x2)
+      simp_all
+      rw [div_eq, coe_Int_eq, coe_Int_eq, neg_eq, inv_eq, mul_eq, eq]
+      ring_nf
+      repeat omega
+    rw [x4, neg_eq, eq]
+    ring_nf
+    repeat omega
+
+  left
+  rw [<- h] at x4
+  rw [x4, of_Nat_eq, eq, zero_mul]
+  simp_all
+
+  rw [<- h]
+  repeat omega
+
+  obtain h' | h' | h' := Int.lt_trichotomy 0 x2
+  . right
+    right
+    use (-x1) // x2
+    simp_all
+    constructor
+    . use (-x1)
+      use x2
+      simp_all
+      simp [coe_Int_eq, neg_eq, div_eq, coe_Int_eq, inv_eq]
+      rw [mul_eq, eq]
+      ring_nf
+      simp_all
+      repeat omega
+    rw [neg_eq]
+    ring_nf
+    omega
+  . simp_all
+
+  right
+  left
+  use (-x1)
+  use (-x2)
+  constructor
+  repeat omega
+  simp [coe_Int_eq, neg_eq, div_eq, coe_Int_eq, inv_eq]
+  rw [mul_eq]
+  ring_nf
+  simp_all
+
+  rw [eq]
+  ring_nf
+  repeat omega
+
 
 /-- Lemma 4.2.7 (trichotomy of rationals) / Exercise 4.2.4 -/
 theorem Rat.not_zero_and_pos (x:Rat) : ¬(x = 0 ∧ x.isPos) := by
