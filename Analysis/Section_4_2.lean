@@ -333,6 +333,8 @@ theorem Rat.ratCast_inj : Function.Injective (fun n:ℚ ↦ (n:Rat)) := by
   dsimp [Rat.cast, RatCast.ratCast] at h
   rw [eq] at h
   exact Rat.eq_iff_mul_eq_mul.mpr h
+  simp_all
+  simp_all
 
 theorem Rat.coe_Rat_eq (a:ℤ) {b:ℤ} (hb: b ≠ 0) : (a/b:ℚ) = a // b := by
   set q := (a/b:ℚ)
