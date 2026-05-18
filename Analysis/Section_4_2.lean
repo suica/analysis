@@ -97,7 +97,13 @@ theorem Rat.eq_diff (n:Rat) : ∃ a b, b ≠ 0 ∧ n = a // b := by
 
 -/
 instance Rat.decidableEq : DecidableEq Rat := by
-  sorry
+  intro a b
+  have : ∀ (n: PreRat) (m: PreRat),
+      Decidable (Quotient.mk PreRat.instSetoid n = Quotient.mk PreRat.instSetoid m) := by
+    intro ⟨ a,b, bnz ⟩ ⟨ c,d, dnz ⟩
+    rw [Quotient.eq]
+    apply decEq
+  exact Quotient.recOnSubsingleton₂ a b this
 
 /-- Lemma 4.2.3 (Addition well-defined) -/
 instance Rat.add_inst : Add Rat where
