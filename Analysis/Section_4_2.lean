@@ -328,7 +328,11 @@ instance Rat.instRatCast : RatCast Rat where
   ratCast q := q.num // q.den
 
 theorem Rat.ratCast_inj : Function.Injective (fun n:ℚ ↦ (n:Rat)) := by
-  sorry
+  intro a b h
+  simp_all
+  dsimp [Rat.cast, RatCast.ratCast] at h
+  rw [eq] at h
+  exact Rat.eq_iff_mul_eq_mul.mpr h
 
 theorem Rat.coe_Rat_eq (a:ℤ) {b:ℤ} (hb: b ≠ 0) : (a/b:ℚ) = a // b := by
   set q := (a/b:ℚ)
