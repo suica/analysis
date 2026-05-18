@@ -298,13 +298,27 @@ instance Rat.instCommRing : CommRing Rat where
     simp_all [mul_eq, add_eq, eq]
     ring_nf
   right_distrib := by
-    sorry
+    intro a b c
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    obtain ⟨b1, b2, hb, rfl⟩ := eq_diff b
+    obtain ⟨c1, c2, hc, rfl⟩ := eq_diff c
+    simp_all [mul_eq, add_eq, eq]
+    ring_nf
   zero_mul := by
-    sorry
+    intro a
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    simp_all [mul_eq, eq, of_Nat_eq]
   mul_zero := by
-    sorry
+    intro a
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    simp_all [mul_eq, eq, of_Nat_eq]
   mul_assoc := by
-    sorry
+    intro a b c
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    obtain ⟨b1, b2, hb, rfl⟩ := eq_diff b
+    obtain ⟨c1, c2, hc, rfl⟩ := eq_diff c
+    simp_all [mul_eq, eq]
+    ring_nf
   -- Usually CommRing will generate a natCast instance and a proof for this.
   -- However, we are using a custom natCast for which `natCast_succ` cannot
   -- be proven automatically by `rfl`. Luckily we have proven it already.
