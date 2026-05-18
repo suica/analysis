@@ -355,9 +355,14 @@ theorem Rat.div_eq (q r:Rat) : q/r = q * r⁻¹ := by rfl
 /-- Proposition 4.2.4 (laws of algebra) / Exercise 4.2.3 -/
 instance Rat.instField : Field Rat where
   exists_pair_ne := by
-    use 1
-    use 0
-    sorry
+    use 1 // 1
+    use 0 // 1
+    intro h
+    rw [Rat.eq] at h
+    ring_nf at h
+    . contradiction
+    decide
+    decide
   mul_inv_cancel := by
     intro a h
     obtain ⟨x1,x2,x3,x4⟩ := Rat.eq_diff a
