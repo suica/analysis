@@ -536,8 +536,24 @@ theorem Rat.not_zero_and_neg (x:Rat) : ¬(x = 0 ∧ x.isNeg) := by
 
 /-- Lemma 4.2.7 (trichotomy of rationals) / Exercise 4.2.4 -/
 theorem Rat.not_pos_and_neg (x:Rat) : ¬(x.isPos ∧ x.isNeg) := by
-  intro ⟨pos, neg⟩
-  sorry
+  intro ⟨h1, h2⟩
+  obtain ⟨a, b, ⟨_,_, h⟩⟩ := h1
+  obtain ⟨c, cpos, ⟨_,_, h⟩⟩ := h2
+  obtain ⟨x, y, ⟨_,_, h'⟩⟩ := cpos
+  rw [h'] at h
+  simp [coe_Int_eq, div_eq, inv_eq] at h
+  rw [mul_eq, mul_eq, neg_eq, eq] at h
+  ring_nf at h
+  have h: 0 = a * y + x * b := by omega
+  have :a * y >0 := by
+    (expose_names; exact Int.mul_pos left left_3)
+  have h':  a * y + x * b > 0 := by
+    refine Int.add_pos_of_nonneg_of_pos ?_ ?_
+    exact Int.le_of_lt this
+    (expose_names; exact Int.mul_pos left_2 left_1)
+  rw [<- h] at h'
+  repeat omega
+
 
 /-- Definition 4.2.8 (Ordering of the rationals) -/
 instance Rat.instLT : LT Rat where
