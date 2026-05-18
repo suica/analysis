@@ -237,29 +237,66 @@ AddGroup.ofLeftAxioms (by
   ring
 )
  (by
-  sorry) (by
-  sorry)
+    intro a
+    obtain ⟨x, y, ha, rfl⟩ := eq_diff a
+    rw [of_Nat_eq, add_eq]
+    repeat simp_all
+    )
+  (by
+    intro a
+    obtain ⟨x, y, ha, rfl⟩ := eq_diff a
+    simp_all [of_Nat_eq]
+    rw [neg_eq, add_eq, eq]
+    . ring_nf
+    . apply Int.mul_ne_zero
+      exact ha
+      exact ha
+    . decide
+    repeat simp_all
+    )
 
 /-- Proposition 4.2.4 (laws of algebra) / Exercise 4.2.3 -/
 instance Rat.instAddCommGroup : AddCommGroup Rat where
   add_comm := by
-    sorry
+    intro a b
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    obtain ⟨b1, b2, hb, rfl⟩ := eq_diff b
+    simp_all [add_eq, eq]
+    ring_nf
 
 /-- Proposition 4.2.4 (laws of algebra) / Exercise 4.2.3 -/
 instance Rat.instCommMonoid : CommMonoid Rat where
   mul_comm := by
-    sorry
+    intro a b
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    obtain ⟨b1, b2, hb, rfl⟩ := eq_diff b
+    simp_all [mul_eq, eq]
+    ring_nf
   mul_assoc := by
-    sorry
+    intro a b c
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    obtain ⟨b1, b2, hb, rfl⟩ := eq_diff b
+    obtain ⟨c1, c2, hc, rfl⟩ := eq_diff c
+    simp_all [mul_eq]
+    ring_nf
   one_mul := by
-    sorry
+    intro a
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    simp_all [of_Nat_eq, mul_eq]
   mul_one := by
-    sorry
+    intro a
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    simp_all [of_Nat_eq, mul_eq]
 
 /-- Proposition 4.2.4 (laws of algebra) / Exercise 4.2.3 -/
 instance Rat.instCommRing : CommRing Rat where
   left_distrib := by
-    sorry
+    intro a b c
+    obtain ⟨a1, a2, ha, rfl⟩ := eq_diff a
+    obtain ⟨b1, b2, hb, rfl⟩ := eq_diff b
+    obtain ⟨c1, c2, hc, rfl⟩ := eq_diff c
+    simp_all [mul_eq, add_eq, eq]
+    ring_nf
   right_distrib := by
     sorry
   zero_mul := by
