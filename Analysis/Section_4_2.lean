@@ -134,7 +134,23 @@ theorem Rat.mul_eq (a c:ℤ) {b d:ℤ} (hb: b ≠ 0) (hd: d ≠ 0) :
 
 /-- Lemma 4.2.3 (Negation well-defined) -/
 instance Rat.neg_inst : Neg Rat where
-  neg := Quotient.lift (fun ⟨ a, b, h1 ⟩ ↦ (-a) // b) (by sorry)
+  neg := Quotient.lift (fun ⟨ a, b, h1 ⟩ ↦ (-a) // b) (by
+    intro a b hab
+    simp_all [formalDiv]
+    by_cases h: a.denominator = 0
+    . have h1: b.denominator = 0 := by
+        obtain ⟨an, ad, ha⟩ := a
+        obtain ⟨bn, bd, hb⟩ := b
+        simp_all
+      simp_all
+    have h1: b.denominator ≠ 0 := by
+      intro hn
+      obtain ⟨an, ad, ha⟩ := a
+      obtain ⟨bn, bd, hb⟩ := b
+      simp_all
+    simp_all [Quotient.eq]
+    omega
+    )
 
 /-- Definition 4.2.2 (Negation of rationals) -/
 theorem Rat.neg_eq (a:ℤ) {b:ℤ} (hb: b ≠ 0) : - (a // b) = (-a) // b := by
