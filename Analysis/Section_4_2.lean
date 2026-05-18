@@ -120,7 +120,16 @@ theorem Rat.add_eq (a c:ℤ) {b d:ℤ} (hb: b ≠ 0) (hd: d ≠ 0) :
 
 /-- Lemma 4.2.3 (Multiplication well-defined) -/
 instance Rat.mul_inst : Mul Rat where
-  mul := Quotient.lift₂ (fun ⟨ a, b, h1 ⟩ ⟨ c, d, h2 ⟩ ↦ (a*c) // (b*d)) (by sorry)
+  mul := Quotient.lift₂ (fun ⟨ a, b, h1 ⟩ ⟨ c, d, h2 ⟩ ↦ (a*c) // (b*d)) (by
+    intro ⟨a1n, a1d, ha1⟩ ⟨b1n, b1d, hb1⟩ ⟨a2n, a2d, ha2⟩ ⟨b2n, b2d, hb2⟩ h1 h2
+    simp
+    rw [Rat.eq]
+    simp_all [PreRat.eq]
+    ring_nf
+
+    suffices _: a1n * a2d * (b1n * b2d) = a2n * a1d * (b2n * b1d) from by linarith
+    congr
+    repeat simp_all)
 
 /-- Definition 4.2.2 (Multiplication of rationals) -/
 theorem Rat.mul_eq (a c:ℤ) {b d:ℤ} (hb: b ≠ 0) (hd: d ≠ 0) :
