@@ -567,7 +567,45 @@ theorem Rat.lt_iff (x y:Rat) : x < y ↔ (x-y).isNeg := by rfl
 theorem Rat.le_iff (x y:Rat) : x ≤ y ↔ (x < y) ∨ (x = y) := by rfl
 
 theorem Rat.gt_iff (x y:Rat) : x > y ↔ (x-y).isPos := by
-  sorry
+  constructor
+  . intro h
+    rcases h with ⟨w, ⟨wpos, hw⟩⟩
+    have h': x - y = w := by
+      have : y - x = -w := by simp_all
+      have : y - x + x = -w + x := by simp_all
+      have : y - x + x = x - w := by
+        ring_nf
+        ring_nf at this
+        simp_all
+      have : y = x - w := by
+        ring_nf
+        ring_nf at this
+        simp_all
+      rw [this]
+      ring_nf
+    rw [h']
+    exact wpos
+  intro h
+  change (y-x).isNeg
+  obtain ⟨a, b, ⟨_,_, h⟩⟩ := h
+  use (a//b)
+  constructor
+  simp_all
+  use a
+  use b
+  simp_all
+  simp [coe_Int_eq, div_eq, inv_eq]
+  rw [mul_eq]
+  ring_nf
+  repeat omega
+  simp_all
+  rw [coe_Int_eq, coe_Int_eq, div_eq, inv_eq, mul_eq] at h
+  ring_nf at h
+  rw [<- h]
+  ring_nf
+  omega
+  omega
+  omega
 theorem Rat.ge_iff (x y:Rat) : x ≥ y ↔ (x > y) ∨ (x = y) := by
   sorry
 
