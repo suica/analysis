@@ -1069,8 +1069,12 @@ abbrev Rat.equivRat : Rat ≃ ℚ where
     )
   invFun := fun n: ℚ ↦ (n:Rat)
   left_inv n := by
+    obtain ⟨a, b, c⟩ :=  Rat.eq_diff n
     simp_all
-    sorry
+    simp [Rat.coe_Int_eq, Rat.div_eq, inv_eq]
+    rw [mul_eq]
+    ring_nf
+    repeat omega
   right_inv n := by
     simp_all
     norm_cast
