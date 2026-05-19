@@ -710,19 +710,55 @@ theorem Rat.not_lt_and_eq (x y:Rat) : ¬ (x < y ∧ x = y):= by
 
 /-- Proposition 4.2.9(b) (order is anti-symmetric) / Exercise 4.2.5 -/
 theorem Rat.antisymm (x y:Rat) : x < y ↔ y > x := by
+  simp_all
+
+lemma pos_add_pos(a b: Rat): a.isPos -> b.isPos -> (a+b).isPos := by
+  intro ha hb
   sorry
+
+lemma pos_mul_pos(a b: Rat): a.isPos -> b.isPos -> (a*b).isPos := by
+  intro ha hb
+  sorry
+
+lemma neg_add_neg(a b: Rat): a.isNeg -> b.isNeg -> (a+b).isNeg := by
+  intro ha hb
+  simp_all [Rat.isNeg]
+  rcases ha with ⟨x, ⟨xpos, hx⟩⟩
+  rcases hb with ⟨y, ⟨ypos, hy⟩⟩
+  use (x+y)
+  constructor
+  . apply pos_add_pos
+    exact xpos
+    exact ypos
+  simp_all
+  ring_nf
 
 /-- Proposition 4.2.9(c) (order is transitive) / Exercise 4.2.5 -/
 theorem Rat.lt_trans {x y z:Rat} (hxy: x < y) (hyz: y < z) : x < z := by
-  sorry
+  simp_all [lt_iff]
+  have : ((x-y)+(y-z)).isNeg := by
+    apply neg_add_neg
+    exact hxy
+    exact hyz
+  simp_all
 
 /-- Proposition 4.2.9(d) (addition preserves order) / Exercise 4.2.5 -/
 theorem Rat.add_lt_add_right {x y:Rat} (z:Rat) (hxy: x < y) : x + z < y + z := by
-  sorry
+  simp_all [lt_iff]
 
 /-- Proposition 4.2.9(e) (positive multiplication preserves order) / Exercise 4.2.5 -/
 theorem Rat.mul_lt_mul_right {x y z:Rat} (hxy: x < y) (hz: z.isPos) : x * z < y * z := by
-  sorry
+  simp_all [lt_iff, Rat.isNeg]
+  use (z * (y-x))
+  constructor
+  rcases hxy with ⟨w, ⟨wpos, hw⟩⟩
+  observe h': y - x = w
+  apply pos_mul_pos
+  . exact hz
+  rw [h']
+  exact wpos
+
+  ring_nf
 
 /-- (Not from textbook) Establish the decidability of this order. -/
 instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := by
