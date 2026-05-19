@@ -1034,11 +1034,7 @@ instance Rat.instIsStrictOrderedRing : IsStrictOrderedRing Rat where
     simp_all [le_iff]
     rcases h with h | h
     . left
-      have := add_lt_add_right (-c) h
-      ring_nf at this
-      have := add_lt_add_right (-a) this
-      ring_nf at this
-      have := add_lt_add_right (c) this
+      have := add_lt_add_right (-a) h
       ring_nf at this
       exact this
     right
