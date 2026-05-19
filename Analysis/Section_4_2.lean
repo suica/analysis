@@ -985,17 +985,66 @@ instance Rat.instLinearOrder : LinearOrder Rat where
 /-- (Not from textbook) Rat has the structure of a strict ordered ring. -/
 instance Rat.instIsStrictOrderedRing : IsStrictOrderedRing Rat where
   add_le_add_left := by
-    sorry
+    intro a b h c
+    rw [le_iff] at h
+    rcases h with h | h
+    . left
+      exact add_lt_add_right c h
+    right
+    simp_all
   add_le_add_right := by
-    sorry
+    intro a b h c
+    rw [le_iff] at h
+    rcases h with h | h
+    . left
+      simp_all [lt_iff]
+    right
+    simp_all
   mul_lt_mul_of_pos_left := by
-    sorry
+    intro a apos b c h
+    simp_all [lt_iff]
+    observe apos: a.isPos
+    observe cbpos: (c - b).isPos
+    use (a*c - a*b)
+    constructor
+    . observe : a * c - a * b = a * (c-b)
+      rw [this]
+      apply pos_mul_pos
+      . exact apos
+      exact cbpos
+    ring_nf
   mul_lt_mul_of_pos_right := by
-    sorry
+    intro c hc a b alb
+    observe h1: (0-c).isNeg
+    rw [zero_sub] at h1
+    observe h1: (c).isPos
+
+    use (b*c - a*c)
+    observe : b*c - a*c = (b-a)*c
+    constructor
+    . rw [this]
+      apply pos_mul_pos
+      observe : (a-b).isNeg
+      observe : (b-a).isPos
+      exact this
+      exact h1
+    ring_nf
   le_of_add_le_add_left := by
-    sorry
+    intro a b c h
+    simp_all [le_iff]
+    rcases h with h | h
+    . left
+      have := add_lt_add_right (-c) h
+      ring_nf at this
+      have := add_lt_add_right (-a) this
+      ring_nf at this
+      have := add_lt_add_right (c) this
+      ring_nf at this
+      exact this
+    right
+    exact h
   zero_le_one := by
-    sorry
+    decide
 
 /-- Exercise 4.2.6 -/
 theorem Rat.mul_lt_mul_right_of_neg (x y z:Rat) (hxy: x < y) (hz: z.isNeg) : x * z > y * z := by
