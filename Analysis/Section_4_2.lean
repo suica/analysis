@@ -621,9 +621,49 @@ theorem Rat.ge_iff (x y:Rat) : x ≥ y ↔ (x > y) ∨ (x = y) := by
   right
   simp_all
 
+lemma pos_or_neg(a b: Rat): (a-b).isPos ↔  (b-a).isNeg := by
+  constructor
+  . intro h
+    use (a-b)
+    simp_all
+  intro h
+  rcases h with ⟨w, ⟨wpos, hw⟩⟩
+  -- obtain ⟨c, b, ⟨_,_, h⟩⟩ := wpos
+  observe : b - a + a = -w + a
+  observe : b + (- a) + a = -w + a
+  ring_nf at this
+  observe :b + w = a - w + w
+  rw [sub_add_cancel] at this
+  observe : b + w -b = a - b
+  have : w + b - b = a - b := by
+    rw [add_comm]
+    exact this
+  observe : w = a - b
+  rw [<- this]
+  exact wpos
+
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.trichotomous' (x y:Rat) : x > y ∨ x < y ∨ x = y := by
-  sorry
+  simp_all
+  cases Rat.trichotomous (x-y)
+  . expose_names
+    right
+    right
+    observe : x - y + y = 0 + y
+    observe : x + (- y) + y = 0 + y
+    observe : x + 0 = 0 + y
+    ring_nf at this
+    exact this
+  . expose_names
+    rcases h with h | h
+    . left
+      rw [pos_or_neg] at h
+      rw [lt_iff]
+      exact h
+    right
+    left
+    rw [lt_iff]
+    exact h
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.not_gt_and_lt (x y:Rat) : ¬ (x > y ∧ x < y):= by
