@@ -714,11 +714,41 @@ theorem Rat.antisymm (x y:Rat) : x < y ↔ y > x := by
 
 lemma pos_add_pos(a b: Rat): a.isPos -> b.isPos -> (a+b).isPos := by
   intro ha hb
-  sorry
+  rcases ha with ⟨na, da, hna, hda, ha_eq⟩
+  rcases hb with ⟨nb, db, hnb, hdb, hb_eq⟩
+  use na * db + nb * da, da * db
+  constructor
+  · -- 证明分子为正
+    positivity
+  constructor
+  · -- 证明分母为正
+    positivity
+  · -- 证明 a + b 等于这个分数
+    rw [ha_eq, hb_eq]
+    simp [Rat.coe_Int_eq]
+    field_simp; ring_nf
+    simp [Rat.inv_eq]
+    field_simp; ring_nf
+    repeat rw [Rat.mul_eq]
+    ring_nf
+    repeat rw [Rat.add_eq]
+    repeat rw [Rat.eq]
+    ring_nf
+    all_goals (simp_all; try omega)
+
 
 lemma pos_mul_pos(a b: Rat): a.isPos -> b.isPos -> (a*b).isPos := by
   intro ha hb
-  sorry
+  rcases ha with ⟨na, da, hna, hda, ha_eq⟩
+  rcases hb with ⟨nb, db, hnb, hdb, hb_eq⟩
+  use na * nb, da * db
+  constructor
+  . positivity
+  constructor
+  . positivity
+  rw [ha_eq, hb_eq]
+  simp [Rat.coe_Int_eq]
+  field_simp
 
 lemma neg_add_neg(a b: Rat): a.isNeg -> b.isNeg -> (a+b).isNeg := by
   intro ha hb
