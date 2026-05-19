@@ -607,7 +607,19 @@ theorem Rat.gt_iff (x y:Rat) : x > y ↔ (x-y).isPos := by
   omega
   omega
 theorem Rat.ge_iff (x y:Rat) : x ≥ y ↔ (x > y) ∨ (x = y) := by
-  sorry
+  simp_all
+  constructor
+  . intro h
+    rw [Rat.le_iff] at h
+    rcases h with h1 | h1
+    . simp_all
+    simp_all
+  intro h
+  rcases h with h1 | h1
+  . left
+    exact h1
+  right
+  simp_all
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.trichotomous' (x y:Rat) : x > y ∨ x < y ∨ x = y := by
