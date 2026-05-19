@@ -956,8 +956,30 @@ instance Rat.instLinearOrder : LinearOrder Rat where
       rfl
     contradiction
 
-  le_antisymm := sorry
-  le_total := sorry
+  le_antisymm := by
+    intro a b h1 h2
+    simp_all [le_iff]
+    rcases h1 with h1 | h1
+    <;> rcases h2 with h2 | h2
+    . exfalso
+      have h := Rat.not_gt_and_lt a b
+      simp_all
+    . simp_all
+    . simp_all
+    . simp_all
+  le_total := by
+    intro a b
+    rcases trichotomous' a b with h | h | h
+    . right
+      rw [gt_iff_lt] at h
+      left
+      exact h
+    . left
+      left
+      exact h
+    . left
+      right
+      exact h
   toDecidableLE := decidableRel
 
 /-- (Not from textbook) Rat has the structure of a strict ordered ring. -/
