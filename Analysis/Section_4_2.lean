@@ -628,7 +628,6 @@ lemma pos_or_neg(a b: Rat): (a-b).isPos ↔  (b-a).isNeg := by
     simp_all
   intro h
   rcases h with ⟨w, ⟨wpos, hw⟩⟩
-  -- obtain ⟨c, b, ⟨_,_, h⟩⟩ := wpos
   observe : b - a + a = -w + a
   observe : b + (- a) + a = -w + a
   ring_nf at this
@@ -641,6 +640,18 @@ lemma pos_or_neg(a b: Rat): (a-b).isPos ↔  (b-a).isNeg := by
   observe : w = a - b
   rw [<- this]
   exact wpos
+
+lemma sub_neg(a b c: Rat) : a - b = -c → b - a = c := by
+  intro h
+  observe : - (a-b) = c
+  rw [<- this]
+  ring_nf at *
+
+lemma pos_or_neg'(a b: Rat): (a).isPos ↔  (-a).isNeg := by
+  observe h: (a + b) - b = a
+  have h1:= pos_or_neg (a+b) b
+  ring_nf at h1
+  exact h1
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.trichotomous' (x y:Rat) : x > y ∨ x < y ∨ x = y := by
@@ -667,10 +678,19 @@ theorem Rat.trichotomous' (x y:Rat) : x > y ∨ x < y ∨ x = y := by
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.not_gt_and_lt (x y:Rat) : ¬ (x > y ∧ x < y):= by
-  sorry
+  simp_all
+  simp [lt_iff]
+  intro ⟨a, ⟨apos, ha⟩⟩ h
+  rcases h with ⟨w, ⟨wpos, hw⟩⟩
+  observe h1: x - y = a
+  observe h2: (-w).isNeg
+  rw [<- hw, h1] at h2
+  apply not_pos_and_neg a
+  simp_all
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.not_gt_and_eq (x y:Rat) : ¬ (x > y ∧ x = y):= by
+  intro h
   sorry
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
