@@ -1091,37 +1091,8 @@ abbrev Rat.equivRat_order : Rat ≃o ℚ where
     obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
     obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
     simp_all
-    constructor
-    . intro h
-      rw [Rat.le_iff_eq_or_lt] at h
-      sorry
+    sorry
 
-      -- simp [Rat.intCast_div_eq_divInt] at h
-      -- rw [Rat.divInt_le_divInt] at h
-      -- rw [Rat.le_iff]
-      -- rw [Int.le_iff_eq_or_lt] at h
-      -- rcases h with h | h
-      -- . right
-      --   rw [eq]
-      --   linarith
-      --   repeat omega
-      -- left
-      -- use ((y1 * x2 - x1 * y2)  // (x2 * y2))
-      -- constructor
-      -- . use (y1 * x2 - x1 * y2), (x2 * y2)
-      --   repeat' constructor
-      --   linarith
-      --   . sorry
-      --   sorry
-      -- rw [sub_eq, neg_eq, add_eq, neg_eq, eq]
-      -- ring_nf
-      -- all_goals (try simp_all)
-      -- sorry
-      -- sorry
-    intro h
-    simp [Rat.intCast_div_eq_divInt]
-    rw [Rat.divInt_le_divInt]
-    repeat sorry
 /-- Not in textbook: equivalence preserves ring operations -/
 abbrev Rat.equivRat_ring : Rat ≃+* ℚ where
   toEquiv := equivRat
