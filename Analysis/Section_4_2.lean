@@ -1068,8 +1068,16 @@ abbrev Rat.equivRat : Rat ≃ ℚ where
     exact b.nonzero
     )
   invFun := fun n: ℚ ↦ (n:Rat)
-  left_inv n := sorry
-  right_inv n := sorry
+  left_inv n := by
+    simp_all
+    sorry
+  right_inv n := by
+    simp_all
+    norm_cast
+    rw [Rat.eq_iff_mul_eq_mul]
+    have h: RatCast.ratCast n = n.num // n.den := by
+      simp_all [RatCast.ratCast]
+    simp [h]
 
 /-- Not in textbook: equivalence preserves order -/
 abbrev Rat.equivRat_order : Rat ≃o ℚ where
