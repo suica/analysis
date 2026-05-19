@@ -1093,7 +1093,14 @@ abbrev Rat.equivRat_order : Rat ≃o ℚ where
 abbrev Rat.equivRat_ring : Rat ≃+* ℚ where
   toEquiv := equivRat
   map_add' := by
-    sorry
+    intro a b
+
+    obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
+    obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
+
+    simp_all [Rat.add_eq]
+    field_simp
+
   map_mul' := by
     sorry
 
