@@ -875,8 +875,10 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
                 observe: (a * d - b * c) * l < 0
                 observe: (a * d - b * c) < 0
                 exact this
-                all_goals (omega)
-                sorry
+
+                . exact Int.mul_ne_zero hd hb
+                positivity
+                positivity
               contradiction
               all_goals (simp_all)
             have : a * d ≤ b * c := by
