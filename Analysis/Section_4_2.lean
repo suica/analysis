@@ -690,12 +690,23 @@ theorem Rat.not_gt_and_lt (x y:Rat) : ¬ (x > y ∧ x < y):= by
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.not_gt_and_eq (x y:Rat) : ¬ (x > y ∧ x = y):= by
-  intro h
-  sorry
+  simp_all [lt_iff]
+  intro h heq
+  apply not_zero_and_neg (y-x)
+  constructor
+  . rw [heq]
+    ring_nf
+  exact h
 
 /-- Proposition 4.2.9(a) (order trichotomy) / Exercise 4.2.5 -/
 theorem Rat.not_lt_and_eq (x y:Rat) : ¬ (x < y ∧ x = y):= by
-  sorry
+  simp_all [lt_iff]
+  intro h heq
+  apply not_zero_and_neg (x-y)
+  constructor
+  . rw [heq]
+    ring_nf
+  exact h
 
 /-- Proposition 4.2.9(b) (order is anti-symmetric) / Exercise 4.2.5 -/
 theorem Rat.antisymm (x y:Rat) : x < y ↔ y > x := by
