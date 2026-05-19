@@ -1044,7 +1044,15 @@ instance Rat.instIsStrictOrderedRing : IsStrictOrderedRing Rat where
 
 /-- Exercise 4.2.6 -/
 theorem Rat.mul_lt_mul_right_of_neg (x y z:Rat) (hxy: x < y) (hz: z.isNeg) : x * z > y * z := by
-  sorry
+  rw [gt_iff_lt]
+  rcases hz with ⟨w, wpos, hw⟩
+  observe h1: x * w < y * w
+  observe hw: w = -z
+  rw [hw] at h1
+  ring_nf at h1
+  have := add_lt_add_right ((x*z) + (y*z)) h1
+  ring_nf at this
+  linarith
 
 
 /--
@@ -1053,7 +1061,12 @@ theorem Rat.mul_lt_mul_right_of_neg (x y z:Rat) (hxy: x < y) (hz: z.isNeg) : x *
 -/
 abbrev Rat.equivRat : Rat ≃ ℚ where
   toFun := Quotient.lift (fun ⟨ a, b, h ⟩ ↦ a / b) (by
-    sorry)
+    intro a b h
+    simp [Rat.intCast_div_eq_divInt]
+    rw [Rat.divInt_eq_divInt_iff, h]
+    exact a.nonzero
+    exact b.nonzero
+    )
   invFun := fun n: ℚ ↦ (n:Rat)
   left_inv n := sorry
   right_inv n := sorry
