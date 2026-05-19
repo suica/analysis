@@ -847,7 +847,45 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
           | isFalse h =>
             apply isFalse
             intro hh
-            sorry
+            rw [Rat.le_iff] at hh
+            rcases hh with h | h
+            . rw [Rat.lt_iff, Rat.sub_eq, Rat.neg_eq, Rat.add_eq] at h
+              ring_nf at h
+              have : a * d ≤ b * c := by
+                rw [Int.le_iff_eq_or_lt]
+                right
+                rcases h with ⟨w, ⟨wpos, h⟩⟩
+                rcases wpos with ⟨k, ⟨l, _,_, hl⟩⟩
+                have hl: w = k // l := by
+                  simp [Rat.coe_Int_eq, div_eq, inv_eq] at hl
+                  rw [mul_eq, one_mul, mul_one] at hl
+                  exact hl
+                  omega
+                  omega
+                rw [hl] at h
+                rw [Rat.neg_eq, eq] at h
+                have db: 0 < b * d := by
+                  positivity
+                suffices h':  a * d - b * c < 0 from by
+                  sorry
+                observe : -k < 0
+                have : -k * (b * d) < 0 := by
+                  exact Int.mul_neg_of_neg_of_pos this db
+                rw [mul_comm d b] at h
+                observe: (a * d - b * c) * l < 0
+                observe: (a * d - b * c) < 0
+                exact this
+                all_goals (omega)
+                sorry
+              contradiction
+              all_goals (simp_all)
+            have : a * d ≤ b * c := by
+              rw [Int.le_iff_eq_or_lt]
+              left
+              rw [eq] at h
+              linarith
+              repeat omega
+            contradiction
       | isFalse hbd =>
         cases (b * c).decLe (a * d) with
           | isTrue h =>
