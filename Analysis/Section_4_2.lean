@@ -1087,6 +1087,24 @@ abbrev Rat.equivRat : Rat ≃ ℚ where
 abbrev Rat.equivRat_order : Rat ≃o ℚ where
   toEquiv := equivRat
   map_rel_iff' := by
+    intro a b
+
+    obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
+    obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
+    simp_all
+    constructor
+    . intro h
+      simp [Rat.intCast_div_eq_divInt] at h
+      rw [Rat.divInt_le_divInt] at h
+      rw [Rat.le_iff]
+      rw [Int.le_iff_eq_or_lt] at h
+      rcases h with h | h
+      . right
+        rw [eq]
+        linarith
+        repeat omega
+      left
+      sorry
     sorry
 
 /-- Not in textbook: equivalence preserves ring operations -/
@@ -1102,7 +1120,13 @@ abbrev Rat.equivRat_ring : Rat ≃+* ℚ where
     field_simp
 
   map_mul' := by
-    sorry
+    intro a b
+
+    obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
+    obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
+
+    simp_all [Rat.mul_eq]
+    field_simp
 
 /--
   (Not from textbook) The textbook rationals are isomorphic (as a field) to the Mathlib rationals.
