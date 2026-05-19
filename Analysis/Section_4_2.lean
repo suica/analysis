@@ -804,9 +804,54 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
         cases (a * d).decLe (b * c) with
           | isTrue h =>
             apply isTrue
-            sorry
+            simp [Rat.le_iff]
+            rw [Int.le_iff_eq_or_lt] at h
+            rcases h with h1 | h1
+            . right
+              simp [Quotient.eq]
+              linarith
+            left
+            rw [lt_iff]
+            use ((b*c - a*d)//(b*d))
+            constructor
+            . use (b*c - a * d)
+              use b*d
+              repeat constructor
+              linarith
+              constructor
+              rw [Int.le_iff_eq_or_lt] at hbd
+              rcases hbd with h' | h'
+              . positivity
+              positivity
+              simp_all [Rat.coe_Int_eq]
+              field_simp; ring_nf
+              simp_all [Rat.inv_eq, Rat.sub_eq]
+              field_simp; ring_nf
+              rw [Rat.sub_eq, mul_eq]
+              repeat rw [mul_eq]
+              field_simp; ring_nf
+              simp_all [Rat.sub_eq, Rat.neg_eq, Rat.add_eq]
+              rw [eq]
+              ring_nf
+              all_goals (simp_all)
+            ring_nf
+            refine
+              sub_neg ⟦{ numerator := c, denominator := d, nonzero := hd }⟧
+                ⟦{ numerator := a, denominator := b, nonzero := hb }⟧ (-(b * c - a * d) // (b * d))
+                ?_
+            ring_nf
+            rw [sub_eq]
+            have : ⟦{ numerator := c, denominator := d, nonzero := hd }⟧ = c//d:= by
+              simp_all [formalDiv]
+            have : ⟦{ numerator := a, denominator := b, nonzero := hb }⟧= a // b := by
+              simp_all [formalDiv]
+            simp_all
+            rw [Rat.neg_eq, add_eq, eq]
+            ring_nf
+            all_goals (simp_all)
           | isFalse h =>
             apply isFalse
+            intro hh
             sorry
       | isFalse hbd =>
         cases (b * c).decLe (a * d) with
