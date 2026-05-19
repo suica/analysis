@@ -801,6 +801,11 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
     -- It may be more convenient to avoid formal division and work directly with `Quotient.mk`.
     cases (0:ℤ).decLe (b*d) with
       | isTrue hbd =>
+        have : ⟦{ numerator := c, denominator := d, nonzero := hd }⟧ = c//d:= by
+          simp_all [formalDiv]
+        have : ⟦{ numerator := a, denominator := b, nonzero := hb }⟧= a // b := by
+          simp_all [formalDiv]
+        simp_all
         cases (a * d).decLe (b * c) with
           | isTrue h =>
             apply isTrue
@@ -808,7 +813,7 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
             rw [Int.le_iff_eq_or_lt] at h
             rcases h with h1 | h1
             . right
-              simp [Quotient.eq]
+              simp_all [Quotient.eq]
               linarith
             left
             rw [lt_iff]
@@ -835,18 +840,8 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
               ring_nf
               all_goals (simp_all)
             ring_nf
-            refine
-              sub_neg ⟦{ numerator := c, denominator := d, nonzero := hd }⟧
-                ⟦{ numerator := a, denominator := b, nonzero := hb }⟧ (-(b * c - a * d) // (b * d))
-                ?_
-            ring_nf
             rw [sub_eq]
-            have : ⟦{ numerator := c, denominator := d, nonzero := hd }⟧ = c//d:= by
-              simp_all [formalDiv]
-            have : ⟦{ numerator := a, denominator := b, nonzero := hb }⟧= a // b := by
-              simp_all [formalDiv]
-            simp_all
-            rw [Rat.neg_eq, add_eq, eq]
+            rw [Rat.neg_eq, add_eq, neg_eq]
             ring_nf
             all_goals (simp_all)
           | isFalse h =>
