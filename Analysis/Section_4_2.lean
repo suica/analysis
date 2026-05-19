@@ -900,9 +900,62 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
 
 /-- (Not from textbook) Rat has the structure of a linear ordering. -/
 instance Rat.instLinearOrder : LinearOrder Rat where
-  le_refl := sorry
-  le_trans := sorry
-  lt_iff_le_not_ge := sorry
+  le_refl := by
+    intro a
+    right
+    rfl
+  le_trans := by
+    intro a b c h1 h2
+    simp_all [le_iff]
+    rcases h1 with h1 | h1
+    <;> rcases h2 with h2 | h2
+    . left
+      apply lt_trans h1 h2
+    . left
+      rw [<- h2]
+      exact h1
+
+    . left
+      rw [h1]
+      exact h2
+    . right
+      simp_all
+  lt_iff_le_not_ge := by
+    intro a b
+    constructor
+    . intro h
+      constructor
+      . left
+        exact h
+      intro h'
+      rcases h' with h1 | h1
+      .
+        sorry
+      rw [h1] at h
+      simp_all [lt_iff]
+      obtain ⟨w, wpos, hw⟩ := h
+      observe: w = 0
+      rw [this] at wpos
+
+      obtain ⟨k, ⟨i, _, _ , hi⟩⟩ := wpos
+      simp [coe_Int_eq, div_eq, of_Nat_eq, inv_eq] at hi
+      rw [mul_eq] at hi
+      rw [eq] at hi
+      ring_nf at hi
+      repeat omega
+
+    intro ⟨aleb, nblea⟩
+    rw [le_iff] at aleb
+    obtain altb | heq := aleb
+    . exact altb
+    rw [heq] at nblea
+    exfalso
+    have : b ≤ b := by
+      rw [le_iff]
+      right
+      rfl
+    contradiction
+
   le_antisymm := sorry
   le_total := sorry
   toDecidableLE := decidableRel
