@@ -647,7 +647,8 @@ lemma sub_neg(a b c: Rat) : a - b = -c → b - a = c := by
   rw [<- this]
   ring_nf at *
 
-lemma pos_or_neg'(a b: Rat): (a).isPos ↔  (-a).isNeg := by
+lemma pos_or_neg'{a: Rat}: (a).isPos ↔  (-a).isNeg := by
+  let b: Rat := 0
   observe h: (a + b) - b = a
   have h1:= pos_or_neg (a+b) b
   ring_nf at h1
@@ -917,7 +918,27 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
             all_goals (positivity)
           | isFalse h =>
             apply isFalse
-            sorry
+            intro h'
+            rcases h' with h' | h'
+            . simp_all
+              have h1: a // b > c // d := by
+                rw [gt_iff]
+                rw [sub_eq, neg_eq, add_eq]
+                use (b*c - a*d), (-b*d)
+                simp_all
+                . simp [coe_Int_eq, sub_eq, div_eq, inv_eq]
+                  repeat rw [mul_eq]
+                  rw [neg_eq, add_eq, mul_eq, neg_eq, eq]
+                  ring_nf
+                  all_goals (try positivity)
+                all_goals (try positivity)
+              apply not_gt_and_lt (a//b) (c//d)
+              simp_all
+            rw [eq] at h'
+            rw [h', mul_comm] at h
+            observe : c*b ≤ c*b
+            contradiction
+            all_goals (positivity)
   exact Quotient.recOnSubsingleton₂ n m this
 
 /-- (Not from textbook) Rat has the structure of a linear ordering. -/
