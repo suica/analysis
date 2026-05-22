@@ -1131,24 +1131,96 @@ example : Rat ≃o ℚ where
   toEquiv := Rat.equivRat
   map_rel_iff' := by
     intro a b
+
     obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
     obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
     simp_all
-    constructor
     norm_cast
-    . intro h
-      rw [le_iff_lt_or_eq] at h
-      rcases h with h | h
-      swap
-      . right
-        rw [Rat.eq]
-        rw [Rat.divInt_eq_divInt_iff] at h
-        linarith
-        all_goals positivity
-      left
-      sorry
-    intro h
+
+    constructor
     sorry
+
+    -- . intro h
+
+      -- rcases h with
+      -- by_cases h1: x2 > 0
+      -- by_cases h2: y2 > 0
+      -- . simp_all
+      --   -- x2 > 0 and y2 > 0
+      --   rw [Rat.divInt_le_divInt] at h
+      --   . sorry
+      --   all_goals (try positivity)
+      -- . -- x2 > 0 and y2 < 0
+      --   have h2: y2 < 0 := by
+      --     omega
+
+      --   sorry
+
+    sorry
+
+lemma formalDiv_neg_den (a b : ℤ) (hb : b ≠ 0) : a // b = (-a) // (-b) := by
+  rw [Rat.eq]
+  . simp_all
+  omega
+  omega
+
+lemma le_iff_mul_le_mul {a b c d : ℤ} (hb : 0 < b) (hd : 0 < d) :
+    a // b ≤ c // d ↔ a * d ≤ c * b := by
+  constructor
+  . intro h
+    rw [Rat.le_iff] at h
+    rcases h with h | h
+    . sorry
+    rw [Rat.eq] at h
+    rw [h]
+    exact Ne.symm (Int.ne_of_lt hb)
+    omega
+  intro h
+  rw [Rat.le_iff]
+  rw [Int.le_iff_eq_or_lt] at h
+  rcases h with h | h
+  . right
+    rw [Rat.eq]
+    linarith
+    omega
+    omega
+  left
+  refine (Rat.lt_iff (a // b) (c // d)).mpr ?_
+  refine (pos_or_neg (c // d) (a // b)).mp ?_
+  rw [Rat.sub_eq, Rat.neg_eq, Rat.add_eq]
+  use (c * b + d * -a), (d * b)
+  simp_all
+  constructor
+  linarith
+  field_simp; ring_nf
+
+  simp [Rat.coe_Int_eq]
+  ring_nf
+  repeat rw [Rat.mul_eq]
+  ring_nf
+  repeat rw [Rat.sub_eq, Rat.neg_eq, Rat.add_eq, Rat.eq]
+  linarith
+  all_goals (try omega;)
+  <;> have h': b * d ≠ 0 := by sorry
+  all_goals (simp_all)
+
+example (x1 x2 y1 y2 : ℤ) (hy2 : ¬y2 = 0)
+    (h : Rat.divInt x1 x2 ≤ Rat.divInt y1 y2)
+    (h1 : x2 > 0) (h2 : y2 < 0) :
+    x1 // x2 ≤ y1 // y2 := by
+  have eq_y : Rat.divInt y1 y2 = Rat.divInt (-y1) (-y2) := by
+    exact Eq.symm (Rat.neg_divInt_neg y1 y2)
+  rw [eq_y] at h
+  have h_int : x1 * (-y2) ≤ (-y1) * x2 := by
+    rw [Rat.divInt_le_divInt] at h
+    linarith
+    omega
+    omega
+  rw [formalDiv_neg_den y1 y2 hy2]
+  apply (le_iff_mul_le_mul _ _).mpr
+  . linarith
+  omega
+  omega
 
 /-- Not in textbook: equivalence preserves order -/
 abbrev Rat.equivRat_order : Rat ≃o ℚ where
