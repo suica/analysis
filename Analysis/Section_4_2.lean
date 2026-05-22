@@ -1252,6 +1252,67 @@ example (x1 x2 y1 y2 : ℤ) (hy2 : ¬y2 = 0)
 abbrev Rat.equivRat_order : Rat ≃o ℚ where
   toEquiv := equivRat
   map_rel_iff' := by
+    intro a b
+    obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
+    obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
+    simp_all
+    norm_cast
+    constructor
+    . intro h
+      by_cases h1: x2 > 0
+      <;> by_cases h2: y2 > 0
+      . simp_all
+        rw [Rat.divInt_le_divInt] at h
+        apply (le_iff_mul_le_mul _ _).mpr
+        exact h
+        repeat omega
+      . have eq_y : Rat.divInt y1 y2 = Rat.divInt (-y1) (-y2) := by
+          exact Eq.symm (Rat.neg_divInt_neg y1 y2)
+        rw [eq_y] at h
+        have h_int : x1 * (-y2) ≤ (-y1) * x2 := by
+          rw [Rat.divInt_le_divInt] at h
+          linarith
+          omega
+          omega
+        rw [formalDiv_neg_den y1 y2 hy2]
+        apply (le_iff_mul_le_mul _ _).mpr
+        . linarith
+        omega
+        omega
+      . have eq_x : Rat.divInt x1 x2 = Rat.divInt (-x1) (-x2) := by
+          exact Eq.symm (Rat.neg_divInt_neg _ _)
+        rw [eq_x] at h
+
+        have h_int : x1 * (-y2) ≤ (-y1) * x2 := by
+          rw [Rat.divInt_le_divInt] at h
+          linarith
+          omega
+          omega
+
+        rw [formalDiv_neg_den x1 x2 hx2]
+        apply (le_iff_mul_le_mul _ _).mpr
+        linarith
+        omega
+        omega
+      . have eq_x : Rat.divInt x1 x2 = Rat.divInt (-x1) (-x2) := by
+          exact Eq.symm (Rat.neg_divInt_neg _ _)
+        have eq_y : Rat.divInt y1 y2 = Rat.divInt (-y1) (-y2) := by
+          exact Eq.symm (Rat.neg_divInt_neg _ _)
+        rw [eq_x, eq_y] at h
+
+        have h_int : (-x1) * (-y2) ≤ (-y1) * (-x2) := by
+          rw [Rat.divInt_le_divInt] at h
+          linarith
+          omega
+          omega
+
+        rw [formalDiv_neg_den x1 x2 hx2]
+        rw [formalDiv_neg_den y1 y2 hy2]
+        apply (le_iff_mul_le_mul _ _).mpr
+        omega
+        omega
+        omega
+    
     sorry
 
 /-- Not in textbook: equivalence preserves ring operations -/
