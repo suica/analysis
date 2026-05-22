@@ -972,8 +972,9 @@ instance Rat.instLinearOrder : LinearOrder Rat where
         exact h
       intro h'
       rcases h' with h1 | h1
-      . 
-        sorry
+      . have := not_gt_and_lt a b
+        apply this
+        simp_all
       rw [h1] at h
       simp_all [lt_iff]
       obtain ⟨w, wpos, hw⟩ := h
