@@ -1127,42 +1127,19 @@ abbrev Rat.equivRat : Rat ≃ ℚ where
       simp_all [RatCast.ratCast]
     simp [h]
 
-example : Rat ≃o ℚ where
-  toEquiv := Rat.equivRat
-  map_rel_iff' := by
-    intro a b
-
-    obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
-    obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
-    simp_all
-    norm_cast
-
-    constructor
-    sorry
-
-    -- . intro h
-
-      -- rcases h with
-      -- by_cases h1: x2 > 0
-      -- by_cases h2: y2 > 0
-      -- . simp_all
-      --   -- x2 > 0 and y2 > 0
-      --   rw [Rat.divInt_le_divInt] at h
-      --   . sorry
-      --   all_goals (try positivity)
-      -- . -- x2 > 0 and y2 < 0
-      --   have h2: y2 < 0 := by
-      --     omega
-
-      --   sorry
-
-    sorry
-
 lemma formalDiv_neg_den (a b : ℤ) (hb : b ≠ 0) : a // b = (-a) // (-b) := by
   rw [Rat.eq]
   . simp_all
   omega
   omega
+
+@[simp]
+lemma nzero_mul_nzero (a b: ℤ) (_:a>0) (_: b>0): a*b≠0:= by
+  refine Int.mul_ne_zero_iff.mpr ?_
+  constructor
+  omega
+  omega
+
 
 lemma le_iff_mul_le_mul {a b c d : ℤ} (hb : 0 < b) (hd : 0 < d) :
     a // b ≤ c // d ↔ a * d ≤ c * b := by
@@ -1170,7 +1147,55 @@ lemma le_iff_mul_le_mul {a b c d : ℤ} (hb : 0 < b) (hd : 0 < d) :
   . intro h
     rw [Rat.le_iff] at h
     rcases h with h | h
-    . sorry
+    . rw [Rat.lt_iff] at h
+
+      rw [le_iff_eq_or_lt]
+      right
+      rw [Rat.sub_eq, Rat.neg_eq, Rat.add_eq] at h
+      rcases h with ⟨k, kpos , Hk⟩
+      observe : -(a * d + b * -c) // (b * d) = k
+      observe h': -(a * d + b * -c) // (b * d) * ((b*d) // 1) = k * ((b*d) // 1)
+      rw [Rat.neg_eq] at this
+      have :(k * (b * d) // 1).isPos := by
+        apply pos_mul_pos
+        exact kpos
+        use (b*d), 1
+        simp_all
+        simp [Rat.coe_Int_eq, Rat.mul_eq]
+      have : (-(a * d + b * -c) // (b * d) * ((b*d) // 1)).isPos := by
+        rw [h']
+        exact this
+      have : (-(a * d + b * -c) // (b * d) * (b * d) // 1) = (-(a * d + b * -c) // 1) := by
+        rw [Rat.neg_eq, Rat.mul_eq, Rat.neg_eq, Rat.eq]
+        linarith
+        simp_all
+        constructor
+        all_goals try omega
+        simp_all
+        constructor
+        omega
+        omega
+        refine nzero_mul_nzero b d ?_ ?_
+        omega
+        omega
+      rw [this] at h'
+      rw [Rat.neg_eq] at h'
+      have: ((-(a * d + b * -c)) // 1).isPos:= by
+        simp_all
+      rcases this with ⟨x, y, _ , _, hw⟩
+      simp [Rat.coe_Int_eq, Rat.div_eq, Rat.inv_eq] at hw
+      rw [Rat.mul_eq, Rat.eq] at hw
+      ring_nf at hw
+
+      apply Int.lt_of_mul_lt_mul_right (a:=y)
+      all_goals (try omega)
+      observe hw: b * c * y = x + a * d * y
+      ring_nf at hw ⊢
+      rw [hw]
+      (expose_names; exact Int.lt_add_of_pos_right (y * a * d) left)
+      refine nzero_mul_nzero b d ?_ ?_
+      omega
+      omega
     rw [Rat.eq] at h
     rw [h]
     exact Ne.symm (Int.ne_of_lt hb)
@@ -1201,7 +1226,8 @@ lemma le_iff_mul_le_mul {a b c d : ℤ} (hb : 0 < b) (hd : 0 < d) :
   repeat rw [Rat.sub_eq, Rat.neg_eq, Rat.add_eq, Rat.eq]
   linarith
   all_goals (try omega;)
-  <;> have h': b * d ≠ 0 := by sorry
+  <;> (have h': b * d ≠ 0 := by refine nzero_mul_nzero b d ?_ ?_; omega; omega)
+
   all_goals (simp_all)
 
 example (x1 x2 y1 y2 : ℤ) (hy2 : ¬y2 = 0)
