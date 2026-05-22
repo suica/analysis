@@ -799,13 +799,13 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
     -- at this point, the goal is morally `Decidable(a//b ≤ c//d)`, but there are technical
     -- issues due to the junk value of formal division when the denominator vanishes.
     -- It may be more convenient to avoid formal division and work directly with `Quotient.mk`.
+    have : ⟦{ numerator := c, denominator := d, nonzero := hd }⟧ = c//d:= by
+          simp_all [formalDiv]
+    have : ⟦{ numerator := a, denominator := b, nonzero := hb }⟧= a // b := by
+      simp_all [formalDiv]
+    simp_all
     cases (0:ℤ).decLe (b*d) with
       | isTrue hbd =>
-        have : ⟦{ numerator := c, denominator := d, nonzero := hd }⟧ = c//d:= by
-          simp_all [formalDiv]
-        have : ⟦{ numerator := a, denominator := b, nonzero := hb }⟧= a // b := by
-          simp_all [formalDiv]
-        simp_all
         cases (a * d).decLe (b * c) with
           | isTrue h =>
             apply isTrue
@@ -892,7 +892,29 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
         cases (b * c).decLe (a * d) with
           | isTrue h =>
             apply isTrue
-            sorry
+            rw [le_iff_eq_or_lt] at h
+            rcases h with h | h
+            . right
+              rw [eq]
+              linarith
+              omega
+              omega
+            left
+            change (a // b - c // d).isNeg
+            rw [sub_eq, neg_eq, add_eq]
+            use (b*c - a*d) // (b*d)
+            constructor
+            use (a*d - b*c), (-b*d)
+            simp_all
+            simp [coe_Int_eq, div_eq, inv_eq]
+            repeat rw [mul_eq]
+            rw [one_mul, sub_eq, neg_eq, add_eq, mul_one, one_mul, mul_eq, one_mul, neg_eq, eq]
+            ring_nf
+            simp_all
+            all_goals (try simp_all; try positivity)
+            rw [neg_eq, eq]
+            ring_nf
+            all_goals (positivity)
           | isFalse h =>
             apply isFalse
             sorry
