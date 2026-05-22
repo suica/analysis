@@ -868,7 +868,7 @@ instance Rat.decidableRel : DecidableRel (· ≤ · : Rat → Rat → Prop) := b
                 have db: 0 < b * d := by
                   positivity
                 suffices h':  a * d - b * c < 0 from by
-                  sorry
+                  linarith
                 observe : -k < 0
                 have : -k * (b * d) < 0 := by
                   exact Int.mul_neg_of_neg_of_pos this db
@@ -972,7 +972,7 @@ instance Rat.instLinearOrder : LinearOrder Rat where
         exact h
       intro h'
       rcases h' with h1 | h1
-      .
+      . 
         sorry
       rw [h1] at h
       simp_all [lt_iff]
