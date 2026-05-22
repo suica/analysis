@@ -1312,8 +1312,35 @@ abbrev Rat.equivRat_order : Rat ≃o ℚ where
         omega
         omega
         omega
-    
-    sorry
+    intro h
+    by_cases h1: x2 > 0
+    <;> by_cases h2: y2 > 0
+    . rw [Rat.divInt_le_divInt]
+      rw [le_iff_mul_le_mul] at h
+      exact h
+      omega
+      omega
+      omega
+      omega
+    . rw [<- Rat.neg_divInt_neg y1 y2]
+      rw [formalDiv_neg_den y1 y2 hy2] at h
+      rw [Rat.divInt_le_divInt]
+      refine (le_iff_mul_le_mul h1 ?_).mp h
+      omega
+      omega
+      omega
+    . rw [<- Rat.neg_divInt_neg x1 x2]
+      rw [formalDiv_neg_den x1 x2 hx2] at h
+      rw [Rat.divInt_le_divInt]
+      refine (le_iff_mul_le_mul ?_ h2).mp h
+      repeat omega
+    . rw [<- Rat.neg_divInt_neg x1 x2]
+      rw [<- Rat.neg_divInt_neg y1 y2]
+      rw [formalDiv_neg_den x1 x2 hx2] at h
+      rw [formalDiv_neg_den y1 y2 hy2] at h
+      rw [Rat.divInt_le_divInt]
+      refine (le_iff_mul_le_mul ?_ ?_).mp h
+      repeat omega
 
 /-- Not in textbook: equivalence preserves ring operations -/
 abbrev Rat.equivRat_ring : Rat ≃+* ℚ where
