@@ -1127,14 +1127,33 @@ abbrev Rat.equivRat : Rat ≃ ℚ where
       simp_all [RatCast.ratCast]
     simp [h]
 
-/-- Not in textbook: equivalence preserves order -/
-abbrev Rat.equivRat_order : Rat ≃o ℚ where
-  toEquiv := equivRat
+example : Rat ≃o ℚ where
+  toEquiv := Rat.equivRat
   map_rel_iff' := by
     intro a b
     obtain ⟨x1, x2, hx2, rfl⟩ := Rat.eq_diff a
     obtain ⟨y1, y2, hy2, rfl⟩ := Rat.eq_diff b
     simp_all
+    constructor
+    norm_cast
+    . intro h
+      rw [le_iff_lt_or_eq] at h
+      rcases h with h | h
+      swap
+      . right
+        rw [Rat.eq]
+        rw [Rat.divInt_eq_divInt_iff] at h
+        linarith
+        all_goals positivity
+      left
+      sorry
+    intro h
+    sorry
+
+/-- Not in textbook: equivalence preserves order -/
+abbrev Rat.equivRat_order : Rat ≃o ℚ where
+  toEquiv := equivRat
+  map_rel_iff' := by
     sorry
 
 /-- Not in textbook: equivalence preserves ring operations -/
