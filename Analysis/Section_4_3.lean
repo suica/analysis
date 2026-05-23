@@ -102,6 +102,7 @@ theorem dist_le (x y z:ℚ) : dist x z ≤ dist x y + dist y z := by grind
   but it is more convenient in Lean to assign a "junk" definition in this case.  But this also
   allows some relaxations of hypotheses in the lemmas that follow.
 -/
+@[simp]
 theorem close_iff (ε x y:ℚ): ε.Close x y ↔ |x - y| ≤ ε := by rfl
 
 /-- Examples 4.3.6 -/
@@ -131,7 +132,16 @@ theorem eq_if_close (x y:ℚ) : x = y ↔ ∀ ε:ℚ, ε > 0 → ε.Close x y :=
     rw [h]
     grind
   intro h
-  sorry
+  rw [<- dist_eq_zero_iff]
+  by_contra
+  have : dist x y > 0 := by grind
+  dsimp [dist] at this
+  set k := |x - y|
+  specialize h (k/2) _
+  grind
+  rw [close_iff] at h
+  simp_all
+  grind
 
 /-- Proposition 4.3.7(b) / Exercise 4.3.2 -/
 theorem close_symm (ε x y:ℚ) : ε.Close x y ↔ ε.Close y x := by
@@ -145,7 +155,8 @@ theorem close_symm (ε x y:ℚ) : ε.Close x y ↔ ε.Close y x := by
 /-- Proposition 4.3.7(c) / Exercise 4.3.2 -/
 theorem close_trans {ε δ x y z:ℚ} (hxy: ε.Close x y) (hyz: δ.Close y z) :
     (ε + δ).Close x z := by
-      sorry
+      simp_all
+      grind
 
 /-- Proposition 4.3.7(d) / Exercise 4.3.2 -/
 theorem add_close {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
