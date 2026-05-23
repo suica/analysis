@@ -241,31 +241,53 @@ theorem close_mul_mul' {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z 
     grind
 
 /-- Definition 4.3.9 (exponentiation).  Here we use the Mathlib definition.-/
+@[simp]
 lemma pow_zero (x:ℚ) : x^0 = 1 := _root_.pow_zero x
 
 example : (0:ℚ)^0 = 1 := pow_zero 0
 
 /-- Definition 4.3.9 (exponentiation).  Here we use the Mathlib definition.-/
+@[simp]
 lemma pow_succ (x:ℚ) (n:ℕ) : x^(n+1) = x^n * x := _root_.pow_succ x n
 
 /-- Proposition 4.3.10(a) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_add (x:ℚ) (m n:ℕ) : x^n * x^m = x^(n+m) := by
-  sorry
+  induction m with
+  | zero => simp
+  | succ i ih =>
+    simp
+    ring
 
 /-- Proposition 4.3.10(a) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_mul (x:ℚ) (m n:ℕ) : (x^n)^m = x^(n*m) := by
-  sorry
+  induction m with
+  | zero => simp
+  | succ i ih =>
+    simp
+    ring
 
 /-- Proposition 4.3.10(a) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem mul_pow (x y:ℚ) (n:ℕ) : (x*y)^n = x^n * y^n := by
-  sorry
+  induction n with
+  | zero => simp
+  | succ i ih =>
+    simp
+    ring
 
 /-- Proposition 4.3.10(b) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_eq_zero (x:ℚ) (n:ℕ) (hn : 0 < n) : x^n = 0 ↔ x = 0 := by
-  sorry
+  constructor
+  . intro h
+    simp at h
+    exact h.left
+  intro h
+  rw [h]
+  simp
+  grind
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_nonneg {x:ℚ} (n:ℕ) (hx: x ≥ 0) : x^n ≥ 0 := by
+  
   sorry
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
