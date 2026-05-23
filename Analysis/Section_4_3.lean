@@ -161,27 +161,37 @@ theorem close_trans {ε δ x y z:ℚ} (hxy: ε.Close x y) (hyz: δ.Close y z) :
 /-- Proposition 4.3.7(d) / Exercise 4.3.2 -/
 theorem add_close {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
     (ε + δ).Close (x+z) (y+w) := by
-    sorry
+    simp_all
+    grind
 
 /-- Proposition 4.3.7(d) / Exercise 4.3.2 -/
 theorem sub_close {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
     (ε + δ).Close (x-z) (y-w) := by
-    sorry
+    simp_all
+    grind
 
 /-- Proposition 4.3.7(e) / Exercise 4.3.2, slightly strengthened -/
 theorem close_mono {ε ε' x y:ℚ} (hxy: ε.Close x y) (hε: ε' ≥  ε) :
     ε'.Close x y := by
-    sorry
+    simp_all
+    grind
 
 /-- Proposition 4.3.7(f) / Exercise 4.3.2 -/
 theorem close_between {ε x y z w:ℚ} (hxy: ε.Close x y) (hxz: ε.Close x z)
   (hbetween: (y ≤ w ∧ w ≤ z) ∨ (z ≤ w ∧ w ≤ y)) : ε.Close x w := by
-  sorry
+    simp_all
+    grind
 
 /-- Proposition 4.3.7(g) / Exercise 4.3.2 -/
 theorem close_mul_right {ε x y z:ℚ} (hxy: ε.Close x y) :
     (ε*|z|).Close (x * z) (y * z) := by
-    sorry
+    simp_all
+    suffices h: |(x - y) * z| ≤ ε * |z| from by
+      grind
+    rw [abs_mul]
+    apply Rat.mul_le_mul_of_nonneg_right
+    . exact hxy
+    grind
 
 /-- Proposition 4.3.7(h) / Exercise 4.3.2 -/
 theorem close_mul_mul {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
@@ -209,7 +219,26 @@ theorem close_mul_mul {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w
 in some later exercises. -/
 theorem close_mul_mul' {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
     (ε*|z|+δ*|y|).Close (x * z) (y * w) := by
-    sorry
+    simp_all
+    have h1: |x * z - y * z| ≤ ε * |z| := by
+      calc
+        _ = |(x-y) * z| := by grind
+        _ = |x-y| * |z| := by grind
+        _ ≤ ε * |z| := by
+          apply mul_le_mul_of_nonneg
+          all_goals (grind)
+    have h2: |y * z - y * w| ≤ |y| * δ  := by
+      calc
+        _ = |y*(z-w)| := by grind
+        _ = |y| * |z-w| := by grind
+        _ ≤ |y| * δ := by
+          apply mul_le_mul_of_nonneg
+          all_goals (grind)
+    have h3: |x*z - y*w| ≤ |x * z - y * z| +  |y * z - y * w| := by
+      calc
+        _ = |x * z - y * z + (y * z - y * w)| := by grind
+        _ ≤ |x * z - y * z| +  |y * z - y * w| := abs_add _ _
+    grind
 
 /-- Definition 4.3.9 (exponentiation).  Here we use the Mathlib definition.-/
 lemma pow_zero (x:ℚ) : x^0 = 1 := _root_.pow_zero x
