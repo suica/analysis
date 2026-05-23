@@ -287,11 +287,18 @@ theorem pow_eq_zero (x:ℚ) (n:ℕ) (hn : 0 < n) : x^n = 0 ↔ x = 0 := by
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_nonneg {x:ℚ} (n:ℕ) (hx: x ≥ 0) : x^n ≥ 0 := by
-  
-  sorry
+  induction n with
+  | zero =>
+    simp
+  | succ i ih =>
+    simp at *
+    rw [<- zero_mul 0]
+    apply mul_le_mul
+    repeat grind
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_pos {x:ℚ} (n:ℕ) (hx: x > 0) : x^n > 0 := by
+  
   sorry
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
