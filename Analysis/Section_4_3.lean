@@ -53,7 +53,7 @@ theorem abs_of_zero : abs 0 = 0 := rfl
   Henceforth we use the Mathlib absolute value.
 -/
 theorem abs_eq_abs (x: ℚ) : abs x = |x| := by
-  sorry
+  grind
 
 abbrev dist (x y : ℚ) := |x - y|
 
@@ -64,38 +64,38 @@ abbrev dist (x y : ℚ) := |x - y|
 theorem dist_eq (x y: ℚ) : dist x y = |x-y| := rfl
 
 /-- Proposition 4.3.3(a) / Exercise 4.3.1 -/
-theorem abs_nonneg (x: ℚ) : |x| ≥ 0 := by sorry
+theorem abs_nonneg (x: ℚ) : |x| ≥ 0 := by grind
 
 /-- Proposition 4.3.3(a) / Exercise 4.3.1 -/
-theorem abs_eq_zero_iff (x: ℚ) : |x| = 0 ↔ x = 0 := by sorry
+theorem abs_eq_zero_iff (x: ℚ) : |x| = 0 ↔ x = 0 := by grind
 
 /-- Proposition 4.3.3(b) / Exercise 4.3.1 -/
-theorem abs_add (x y:ℚ) : |x + y| ≤ |x| + |y| := by sorry
+theorem abs_add (x y:ℚ) : |x + y| ≤ |x| + |y| := by grind
 
 /-- Proposition 4.3.3(c) / Exercise 4.3.1 -/
-theorem abs_le_iff (x y:ℚ) : -y ≤ x ∧ x ≤ y ↔ |x| ≤ y := by sorry
+theorem abs_le_iff (x y:ℚ) : -y ≤ x ∧ x ≤ y ↔ |x| ≤ y := by grind
 
 /-- Proposition 4.3.3(c) / Exercise 4.3.1 -/
-theorem le_abs (x:ℚ) : -|x| ≤ x ∧ x ≤ |x| := by sorry
+theorem le_abs (x:ℚ) : -|x| ≤ x ∧ x ≤ |x| := by grind
 
 /-- Proposition 4.3.3(d) / Exercise 4.3.1 -/
-theorem abs_mul (x y:ℚ) : |x * y| = |x| * |y| := by sorry
+theorem abs_mul (x y:ℚ) : |x * y| = |x| * |y| := by grind
 
 /-- Proposition 4.3.3(d) / Exercise 4.3.1 -/
-theorem abs_neg (x:ℚ) : |-x| = |x| := by sorry
+theorem abs_neg (x:ℚ) : |-x| = |x| := by grind
 
 /-- Proposition 4.3.3(e) / Exercise 4.3.1 -/
-theorem dist_nonneg (x y:ℚ) : dist x y ≥ 0 := by sorry
+theorem dist_nonneg (x y:ℚ) : dist x y ≥ 0 := by grind
 
 /-- Proposition 4.3.3(e) / Exercise 4.3.1 -/
 theorem dist_eq_zero_iff (x y:ℚ) : dist x y = 0 ↔ x = y := by
-  sorry
+  grind
 
 /-- Proposition 4.3.3(f) / Exercise 4.3.1 -/
-theorem dist_symm (x y:ℚ) : dist x y = dist y x := by sorry
+theorem dist_symm (x y:ℚ) : dist x y = dist y x := by grind
 
 /-- Proposition 4.3.3(f) / Exercise 4.3.1 -/
-theorem dist_le (x y z:ℚ) : dist x z ≤ dist x y + dist y z := by sorry
+theorem dist_le (x y z:ℚ) : dist x z ≤ dist x y + dist y z := by grind
 
 /--
   Definition 4.3.4 (eps-closeness).  In the text the notion is undefined for ε zero or negative,
@@ -105,25 +105,47 @@ theorem dist_le (x y z:ℚ) : dist x z ≤ dist x y + dist y z := by sorry
 theorem close_iff (ε x y:ℚ): ε.Close x y ↔ |x - y| ≤ ε := by rfl
 
 /-- Examples 4.3.6 -/
-example : (0.1:ℚ).Close (0.99:ℚ) (1.01:ℚ) := by sorry
+example : (0.1:ℚ).Close (0.99:ℚ) (1.01:ℚ) := by
+  rw [close_iff]
+  grind
 
 /-- Examples 4.3.6 -/
-example : ¬ (0.01:ℚ).Close (0.99:ℚ) (1.01:ℚ) := by sorry
+example : ¬ (0.01:ℚ).Close (0.99:ℚ) (1.01:ℚ) := by
+  rw [close_iff]
+  grind
 
 /-- Examples 4.3.6 -/
-example (ε : ℚ) (hε : ε > 0) : ε.Close 2 2 := by sorry
+example (ε : ℚ) (hε : ε > 0) : ε.Close 2 2 := by
+  rw [close_iff]
+  grind
 
-theorem close_refl (x:ℚ) : (0:ℚ).Close x x := by sorry
+theorem close_refl (x:ℚ) : (0:ℚ).Close x x := by
+  rw [close_iff]
+  grind
 
 /-- Proposition 4.3.7(a) / Exercise 4.3.2 -/
-theorem eq_if_close (x y:ℚ) : x = y ↔ ∀ ε:ℚ, ε > 0 → ε.Close x y := by sorry
+theorem eq_if_close (x y:ℚ) : x = y ↔ ∀ ε:ℚ, ε > 0 → ε.Close x y := by
+  constructor
+  . intro h e he
+    rw [close_iff]
+    rw [h]
+    grind
+  intro h
+  sorry
 
 /-- Proposition 4.3.7(b) / Exercise 4.3.2 -/
-theorem close_symm (ε x y:ℚ) : ε.Close x y ↔ ε.Close y x := by sorry
+theorem close_symm (ε x y:ℚ) : ε.Close x y ↔ ε.Close y x := by
+  simp_all [close_iff]
+  constructor
+  . intro h
+    grind
+  intro h
+  grind
 
 /-- Proposition 4.3.7(c) / Exercise 4.3.2 -/
 theorem close_trans {ε δ x y z:ℚ} (hxy: ε.Close x y) (hyz: δ.Close y z) :
-    (ε + δ).Close x z := by sorry
+    (ε + δ).Close x z := by
+      sorry
 
 /-- Proposition 4.3.7(d) / Exercise 4.3.2 -/
 theorem add_close {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
