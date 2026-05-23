@@ -298,15 +298,32 @@ theorem pow_nonneg {x:ℚ} (n:ℕ) (hx: x ≥ 0) : x^n ≥ 0 := by
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_pos {x:ℚ} (n:ℕ) (hx: x > 0) : x^n > 0 := by
-  
-  sorry
+  simp_all
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_ge_pow (x y:ℚ) (n:ℕ) (hxy: x ≥ y) (hy: y ≥ 0) : x^n ≥ y^n := by
-  sorry
+  induction n with
+  | zero =>
+    simp
+  | succ i ih =>
+    simp at *
+    apply mul_le_mul
+    repeat grind
+    observe: 0 ≤ y ^ i
+    grind
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_gt_pow (x y:ℚ) (n:ℕ) (hxy: x > y) (hy: y ≥ 0) (hn: n > 0) : x^n > y^n := by
+  -- induction n with
+  -- | zero =>
+  --   contradiction
+  -- | succ i ih =>
+  --   simp at *
+  --   by_cases hi: 0 < i
+  --   . specialize ih hi
+  --     apply mul_lt_mul
+  --     exact ih
+  --     repeat grind
   sorry
 
 /-- Proposition 4.3.10(d) (Properties of exponentiation, I) / Exercise 4.3.3 -/
