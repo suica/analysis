@@ -407,6 +407,9 @@ theorem zpow_add (x:ℚ) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by
   | pred i ih =>
     simp_all
 
+#eval 1/0
+#eval (0: ℚ)^(-1: ℤ)
+
 lemma zero_pow (n: ℤ) (h: n≠0): (0:ℚ)^n = 0 := by
   induction n with
   | zero =>
@@ -414,7 +417,17 @@ lemma zero_pow (n: ℤ) (h: n≠0): (0:ℚ)^n = 0 := by
   | succ i ih =>
     norm_cast
   | pred i ih =>
-    sorry
+    by_cases hi: i = 0
+    . rw [hi]
+      simp
+    specialize ih _
+    grind
+    rw [sub_eq_add_neg]
+    change 0 ^ (-(i:ℤ) + -1) = 0
+    have : -((i:ℤ) + 1) = (-(i:ℤ) + -1) := by grind
+    rw [<- this, <- Nat.cast_add_one]
+    rw [zpow_neg]
+    simp
 
 lemma pow_neq_zero {x: ℚ} {n: ℤ} (h: n≠0): x^n = 0 ↔ x = 0 := by
   constructor
