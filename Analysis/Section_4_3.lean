@@ -621,12 +621,16 @@ theorem zpow_ge_zpow_ofneg {x y:ℚ} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n <
     grind
     grind
 
-lemma lemma1 {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n ≤ y^n) : x ≤ y := by
+lemma lemma1 {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n > 0) (hxy: x^n ≤ y^n) : x ≤ y := by
   induction n with
   | zero =>
     simp_all
   | succ i ih =>
+    norm_cast at *
     simp_all
+    by_cases hi: i = 0
+    simp_all
+    apply ih
     sorry
   | pred i ih =>
     simp_all
@@ -638,19 +642,28 @@ theorem zpow_inj {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: 
   . by_cases hn: n < 0
     . refine Rat.le_antisymm_iff.mpr ?_
       simp_all
-      apply lemma1 (n:=n)
+      apply lemma1 (n:=-n)
       repeat grind
+      rw [show -n = 0-n from by grind]
+      simp_all
     refine Rat.le_antisymm_iff.mpr ?_
     simp_all
     apply lemma1 (n:=n)
     repeat grind
-  . refine Rat.le_antisymm_iff.mpr ?_
+  . by_cases hn: n < 0
+    . refine Rat.le_antisymm_iff.mpr ?_
+      constructor
+      grind
+      apply lemma1 (n:=-n)
+      repeat grind
+      rw [show -n = 0-n from by grind]
+      simp_all
+    refine Rat.le_antisymm_iff.mpr ?_
     simp_all
     constructor
     grind
     apply lemma1 (n:=n)
     repeat grind
-
 
 /-- Proposition 4.3.12(d) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_abs (x:ℚ) (n:ℤ) : |x|^n = |x^n| := by
