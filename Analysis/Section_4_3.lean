@@ -502,7 +502,44 @@ theorem zpow_mul (x:ℚ) (n m:ℤ) : (x^n)^m = x^(n*m) := by
     exact hn
 
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
-theorem mul_zpow (x y:ℚ) (n:ℤ) : (x*y)^n = x^n * y^n := by sorry
+theorem mul_zpow (x y:ℚ) (n:ℤ) : (x*y)^n = x^n * y^n := by
+  by_cases hn: n = 0
+  . rw [hn]
+    simp
+  by_cases hx: x = 0
+  . rw [hx]
+    simp
+    rw [zero_pow]
+    simp
+    grind
+  by_cases hy: y = 0
+  . rw [hy]
+    simp
+    rw [zero_pow]
+    simp
+    grind
+  induction n with
+  | zero => simp
+  | succ i ih =>
+    norm_cast
+    simp_all
+    field_simp
+    by_cases hi : i = 0
+    . rw [hi]
+      simp
+    grind
+  | pred i ih =>
+    norm_cast
+    by_cases hi: i = 0
+    . rw [hi]
+      simp
+      grind
+    field_simp
+    have h: -(i:ℤ) - 1  = - (↑(i + 1)) := by grind
+    repeat rw [zpow_sub_one₀]
+    rw [ih]
+    ring_nf
+    repeat grind
 
 /-- Proposition 4.3.12(b) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_pos {x:ℚ} (n:ℤ) (hx: x > 0) : x^n > 0 := by sorry
