@@ -543,11 +543,45 @@ theorem mul_zpow (x y:ℚ) (n:ℤ) : (x*y)^n = x^n * y^n := by
 
 /-- Proposition 4.3.12(b) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_pos {x:ℚ} (n:ℤ) (hx: x > 0) : x^n > 0 := by
-  sorry
+  induction n with
+  | zero =>
+    simp
+  | succ i ih =>
+    norm_cast
+    simp_all
+  | pred i ih =>
+    simp_all
+    rw [zpow_sub_one₀]
+    simp_all
+    grind
 
 /-- Proposition 4.3.12(b) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_ge_zpow {x y:ℚ} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n > 0): x^n ≥ y^n := by
-  sorry
+  induction n with
+  | zero =>
+    simp
+  | succ i ih =>
+    norm_cast
+    simp_all
+    by_cases hi: i = 0
+    . rw [hi]
+      simp
+      grind
+    specialize ih (by grind)
+    apply mul_le_mul
+    repeat grind
+    refine pow_nonneg i ?_
+    grind
+  | pred i ih =>
+    norm_cast
+    by_cases hi: i = 0
+    . rw [hi]
+      simp
+      grind
+    specialize ih (by grind)
+    rw [zpow_sub_one₀, zpow_sub_one₀]
+    apply mul_le_mul
+    repeat grind
 
 theorem zpow_ge_zpow_ofneg {x y:ℚ} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n < 0) : x^n ≤ y^n := by
   sorry
