@@ -363,7 +363,6 @@ theorem pow_eq_zpow (x:ℚ) (n:ℕ): x^(n:ℤ) = x^n := zpow_natCast x n
 
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_add (x:ℚ) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by
-  #check zpow_add_one₀
   have zpow_add_one₀ {a: ℚ} (ha: a≠0) : ∀ m:ℤ,  a^(m+1) = a^m * a := by
     intro m
     induction m with
@@ -406,9 +405,6 @@ theorem zpow_add (x:ℚ) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by
     simp_all
   | pred i ih =>
     simp_all
-
-#eval 1/0
-#eval (0: ℚ)^(-1: ℤ)
 
 lemma zero_pow (n: ℤ) (h: n≠0): (0:ℚ)^n = 0 := by
   induction n with
@@ -454,9 +450,6 @@ lemma pow_neq_zero {x: ℚ} {n: ℤ} (h: n≠0): x^n = 0 ↔ x = 0 := by
   rw [h]
   rw [zero_pow]
   grind
-
-
-#eval (0:ℚ)^(-1:ℤ)
 
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_mul (x:ℚ) (n m:ℤ) : (x^n)^m = x^(n*m) := by
