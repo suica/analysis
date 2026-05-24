@@ -407,10 +407,85 @@ theorem zpow_add (x:ℚ) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by
   | pred i ih =>
     simp_all
 
+lemma zero_pow (n: ℤ) (h: n≠0): (0:ℚ)^n = 0 := by
+  induction n with
+  | zero =>
+    contradiction
+  | succ i ih =>
+    norm_cast
+  | pred i ih =>
+    sorry
+
+#eval 0^0
+
+lemma pow_neq_zero {x: ℚ} {n: ℤ} (h: n≠0): x^n = 0 ↔ x = 0 := by
+  constructor
+  . intro h1
+    induction n with
+    | zero =>
+      simp_all
+    | succ i ih =>
+      norm_cast at *
+      rw [pow_succ] at h1
+      rw [mul_eq_zero] at h1
+      rcases h1 with h1 | h1
+      simp_all
+      exact h1
+    | pred i ih =>
+      norm_cast
+      simp_all
+      by_cases hx: x = 0
+      . exact hx
+      rw [zpow_sub₀] at h1
+      simp_all
+      grind
+  sorry
+
+
+#eval (0:ℚ)^(-1:ℤ)
+
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_mul (x:ℚ) (n m:ℤ) : (x^n)^m = x^(n*m) := by
-  
-  sorry
+  by_cases hx : x = 0
+  . rw [hx]
+    by_cases hn: n = 0
+    . simp [hn]
+    rw [zero_pow]
+    by_cases hm: m = 0
+    . rw [hm]
+      simp
+    rw [zero_pow]
+    rw [zero_pow]
+    . exact Int.mul_ne_zero hn hm
+    grind
+    grind
+  induction m with
+  | zero =>
+    simp
+  | succ i ih =>
+    norm_cast
+    simp_all
+    rw [zpow_add]
+    grind
+    grind
+  | pred i ih =>
+    by_cases hi: i = 0
+    . rw [hi]
+      simp_all
+    by_cases hn: n = 0
+    . rw [hn]
+      simp
+    rw [zpow_sub₀, ih]
+    field_simp; ring_nf
+    rw [zpow_sub₀]
+    field_simp; ring_nf
+    simp_all
+    field_simp; ring_nf
+    grind
+    intro h
+    rw [pow_neq_zero] at h
+    contradiction
+    exact hn
 
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem mul_zpow (x y:ℚ) (n:ℤ) : (x*y)^n = x^n * y^n := by sorry
