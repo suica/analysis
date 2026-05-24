@@ -660,8 +660,16 @@ theorem zpow_inj {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: 
 
 /-- Proposition 4.3.12(d) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_abs (x:ℚ) (n:ℤ) : |x|^n = |x^n| := by
-  sorry
+  simp_all
 
 /-- Exercise 4.3.5 -/
 theorem two_pow_geq (N:ℕ) : 2^N ≥ N := by
-  sorry
+  simp_all
+  induction N with
+  | zero =>
+    simp_all
+  | succ i ih =>
+    have : 2 ^ (i + 1) = 2 ^ i + 2 ^ i := by grind
+    rw [this]
+    have h1: 1 ≤ 2 ^ i := by grind
+    exact Nat.add_le_add ih h1
