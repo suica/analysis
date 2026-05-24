@@ -416,8 +416,6 @@ lemma zero_pow (n: ℤ) (h: n≠0): (0:ℚ)^n = 0 := by
   | pred i ih =>
     sorry
 
-#eval 0^0
-
 lemma pow_neq_zero {x: ℚ} {n: ℤ} (h: n≠0): x^n = 0 ↔ x = 0 := by
   constructor
   . intro h1
@@ -439,7 +437,10 @@ lemma pow_neq_zero {x: ℚ} {n: ℤ} (h: n≠0): x^n = 0 ↔ x = 0 := by
       rw [zpow_sub₀] at h1
       simp_all
       grind
-  sorry
+  intro h
+  rw [h]
+  rw [zero_pow]
+  grind
 
 
 #eval (0:ℚ)^(-1:ℤ)
