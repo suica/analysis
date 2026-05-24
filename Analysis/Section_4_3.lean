@@ -314,18 +314,36 @@ theorem pow_ge_pow (x y:ℚ) (n:ℕ) (hxy: x ≥ y) (hy: y ≥ 0) : x^n ≥ y^n 
 
 /-- Proposition 4.3.10(c) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_gt_pow (x y:ℚ) (n:ℕ) (hxy: x > y) (hy: y ≥ 0) (hn: n > 0) : x^n > y^n := by
-  -- induction n with
-  -- | zero =>
-  --   contradiction
-  -- | succ i ih =>
-  --   simp at *
-  --   by_cases hi: 0 < i
-  --   . specialize ih hi
-  --     apply mul_lt_mul
-  --     exact ih
-  --     repeat grind
-  sorry
-
+  by_cases hy': y = 0
+  . rw [hy']
+    have : (0: ℚ) ^ n = 0 := by
+      induction n with
+      | zero =>
+        simp_all
+      | succ i ih =>
+        simp
+    rw [this]
+    apply pow_pos
+    grind
+  induction n using Nat.strong_induction_on with
+  | h n a =>
+    cases n with
+    | zero =>
+      simp_all
+    | succ i =>
+      simp_all
+      specialize a i (by grind)
+      by_cases hi: i = 0
+      . simp_all
+      specialize a (by grind)
+      apply mul_lt_mul
+      . grind
+      grind
+      grind
+      have : x^i >0 := by
+        apply pow_pos
+        grind
+      grind
 /-- Proposition 4.3.10(d) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_abs (x:ℚ) (n:ℕ) : |x|^n = |x^n| := by
   induction n with
