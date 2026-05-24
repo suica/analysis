@@ -325,25 +325,22 @@ theorem pow_gt_pow (x y:ℚ) (n:ℕ) (hxy: x > y) (hy: y ≥ 0) (hn: n > 0) : x^
     rw [this]
     apply pow_pos
     grind
-  induction n using Nat.strong_induction_on with
-  | h n a =>
-    cases n with
-    | zero =>
-      simp_all
-    | succ i =>
-      simp_all
-      specialize a i (by grind)
-      by_cases hi: i = 0
-      . simp_all
-      specialize a (by grind)
-      apply mul_lt_mul
-      . grind
+  induction n with
+  | zero =>
+    simp_all
+  | succ i ih =>
+    simp_all
+    by_cases hi: i = 0
+    . simp_all
+    specialize ih (by grind)
+    apply mul_lt_mul
+    . grind
+    grind
+    grind
+    have : x^i > 0 := by
+      apply pow_pos
       grind
-      grind
-      have : x^i >0 := by
-        apply pow_pos
-        grind
-      grind
+    grind
 /-- Proposition 4.3.10(d) (Properties of exponentiation, I) / Exercise 4.3.3 -/
 theorem pow_abs (x:ℚ) (n:ℕ) : |x|^n = |x^n| := by
   induction n with
