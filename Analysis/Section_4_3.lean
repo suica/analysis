@@ -583,8 +583,44 @@ theorem zpow_ge_zpow {x y:ℚ} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n > 0): x
     apply mul_le_mul
     repeat grind
 
+lemma le_inv {x y:ℚ} (hxy: x ≥ y) (hy: y>0) :  x⁻¹ ≤ y⁻¹:= by
+  refine inv_anti₀ ?_ hxy
+  grind
+
 theorem zpow_ge_zpow_ofneg {x y:ℚ} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n < 0) : x^n ≤ y^n := by
-  sorry
+  induction n with
+  | zero =>
+    simp
+  | succ i ih =>
+    norm_cast
+  | pred i ih =>
+    by_cases hi: i = 0
+    . rw [hi]
+      apply le_inv
+      grind
+      grind
+    norm_cast
+    by_cases hi: i = 0
+    . rw [hi]
+      simp
+      grind
+    specialize ih (by grind)
+    rw [zpow_sub_one₀, zpow_sub_one₀]
+    apply mul_le_mul
+    repeat grind
+    . apply le_inv
+      grind
+      grind
+    . simp
+      grind
+    . rw [zpow_neg]
+      have h: y ^(-i:ℤ) ≥ 0:= by
+        refine Rat.zpow_nonneg ?_
+        grind
+      simp_all
+    grind
+    grind
+
 
 /-- Proposition 4.3.12(c) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_inj {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n = y^n) : x = y := by
