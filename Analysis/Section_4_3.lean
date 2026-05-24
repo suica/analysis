@@ -621,10 +621,36 @@ theorem zpow_ge_zpow_ofneg {x y:ℚ} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n <
     grind
     grind
 
+lemma lemma1 {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n ≤ y^n) : x ≤ y := by
+  induction n with
+  | zero =>
+    simp_all
+  | succ i ih =>
+    simp_all
+    sorry
+  | pred i ih =>
+    simp_all
+    sorry
 
 /-- Proposition 4.3.12(c) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_inj {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n = y^n) : x = y := by
-  sorry
+  by_cases hxyr: x ≥ y
+  . by_cases hn: n < 0
+    . refine Rat.le_antisymm_iff.mpr ?_
+      simp_all
+      apply lemma1 (n:=n)
+      repeat grind
+    refine Rat.le_antisymm_iff.mpr ?_
+    simp_all
+    apply lemma1 (n:=n)
+    repeat grind
+  . refine Rat.le_antisymm_iff.mpr ?_
+    simp_all
+    constructor
+    grind
+    apply lemma1 (n:=n)
+    repeat grind
+
 
 /-- Proposition 4.3.12(d) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_abs (x:ℚ) (n:ℤ) : |x|^n = |x^n| := by
