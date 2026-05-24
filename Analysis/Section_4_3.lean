@@ -363,18 +363,44 @@ theorem pow_eq_zpow (x:ℚ) (n:ℕ): x^(n:ℤ) = x^n := zpow_natCast x n
 
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_add (x:ℚ) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by
+  #check zpow_add_one₀
+  have zpow_add_one₀ {a: ℚ} (ha: a≠0) : ∀ m:ℤ,  a^(m+1) = a^m * a := by
+    intro m
+    induction m with
+    | zero => simp
+    | succ i ih =>
+      norm_cast
+      simp
+    | pred i ih =>
+      norm_cast
+      rw [zpow_sub_one₀]
+      rw [sub_eq_add_neg, add_assoc, add_comm (-1) 1, <- add_assoc, <- sub_eq_add_neg, zpow_sub_one₀, ih]
+      ring_nf
+      grind
+      grind
   have zpow_add₀ {a: ℚ} (ha : a ≠ 0) (m n : ℤ) : a ^ (m + n) = a ^ m * a ^ n := by
     induction n with
     | zero =>
       simp
     | succ i ih =>
       simp_all
-      
+      norm_cast
+      simp_all
+      rw [<- add_assoc, zpow_add_one₀, ih]
+      ring_nf
+      exact ha
     | pred i ih =>
       simp_all
+      rw [<- add_sub_assoc, zpow_sub_one₀, ih]
+      field_simp
+      change 1 = a ^ i * a * a ^ (-(i: ℤ) - 1)
+      observe: (-(i: ℤ) - 1) = (-((i: ℤ) + 1))
+      rw [this]
+      observe: (i: ℤ) + 1 = (↑(i + 1))
+      rw [this, zpow_neg]
+      field_simp; repeat grind
   induction m with
   | zero =>
-    #check zpow_add₀
     simp_all
   | succ i ih =>
     simp_all
@@ -382,7 +408,9 @@ theorem zpow_add (x:ℚ) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by
     simp_all
 
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
-theorem zpow_mul (x:ℚ) (n m:ℤ) : (x^n)^m = x^(n*m) := by sorry
+theorem zpow_mul (x:ℚ) (n m:ℤ) : (x^n)^m = x^(n*m) := by
+  
+  sorry
 
 /-- Proposition 4.3.12(a) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem mul_zpow (x y:ℚ) (n:ℤ) : (x*y)^n = x^n * y^n := by sorry
