@@ -621,20 +621,13 @@ theorem zpow_ge_zpow_ofneg {x y:ℚ} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n <
     grind
     grind
 
-lemma lemma1 {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n > 0) (hxy: x^n ≤ y^n) : x ≤ y := by
-  induction n with
-  | zero =>
-    simp_all
-  | succ i ih =>
-    norm_cast at *
-    simp_all
-    by_cases hi: i = 0
-    simp_all
-    apply ih
-    sorry
-  | pred i ih =>
-    simp_all
-    sorry
+lemma lemma1 {x y:ℚ} {n:ℤ} (hy : y > 0) (hn: n > 0) (hxy: x^n ≤ y^n) : x ≤ y := by
+  lift n to ℕ
+  grind
+  have := pow_gt_pow x y n
+  contrapose! this
+  simp_all
+  grind
 
 /-- Proposition 4.3.12(c) (Properties of exponentiation, II) / Exercise 4.3.4 -/
 theorem zpow_inj {x y:ℚ} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n = y^n) : x = y := by
