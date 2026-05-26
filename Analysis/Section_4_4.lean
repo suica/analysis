@@ -136,9 +136,22 @@ def Rat.pos_infinite_descent : Decidable (∃ a:ℕ → {x: ℚ // 0 < x}, ∀ n
 #check odd_iff_exists_bit1
 
 theorem Nat.even_or_odd'' (n:ℕ) : Even n ∨ Odd n := by
-  sorry
+  induction n with
+  | zero =>
+    simp
+  | succ i ih =>
+    rcases ih with h | h
+    . right
+      rcases h with ⟨w, hw⟩
+      use w
+      grind
+    left
+    rcases h with ⟨w, hw⟩
+    use w+1
+    grind
 
 theorem Nat.not_even_and_odd (n:ℕ) : ¬ (Even n ∧ Odd n) := by
+  push_neg
   sorry
 
 #exit
