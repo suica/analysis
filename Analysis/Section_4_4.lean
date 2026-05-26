@@ -79,7 +79,29 @@ theorem Rat.exists_between_rat {x y:ℚ} (h: x < y) : ∃ z:ℚ, x < z ∧ z < y
 
 /-- Exercise 4.4.2 (a) -/
 theorem Nat.no_infinite_descent : ¬ ∃ a:ℕ → ℕ, ∀ n, a (n+1) < a n := by
-  sorry
+  by_contra
+  rcases this with ⟨a, h⟩
+  set a0 := a 0
+  have h1 : ∀ (n : ℕ), a (n + 1) + 1 ≤ a n := by
+    intro n
+    specialize h n
+    grind
+  have h : ∀ (n : ℕ), a (n) + n ≤ a 0 := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ i ih =>
+      specialize h1 i
+      have := add_le_add_left h1 i
+      grind
+  have h2 := h (a0)
+  have h0: a a0 = 0 := by
+    grind
+  observe : a (a0 + 1) < 0
+  apply Nat.not_lt_zero (a (a0 + 1))
+  exact this
+
+#exit
 
 /-- Exercise 4.4.2 (b) -/
 def Int.infinite_descent : Decidable (∃ a:ℕ → ℤ, ∀ n, a (n+1) < a n) := by
