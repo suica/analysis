@@ -102,7 +102,6 @@ theorem dist_le (x y z:ℚ) : dist x z ≤ dist x y + dist y z := by grind
   but it is more convenient in Lean to assign a "junk" definition in this case.  But this also
   allows some relaxations of hypotheses in the lemmas that follow.
 -/
-@[simp]
 theorem close_iff (ε x y:ℚ): ε.Close x y ↔ |x - y| ≤ ε := by rfl
 
 /-- Examples 4.3.6 -/
@@ -155,37 +154,37 @@ theorem close_symm (ε x y:ℚ) : ε.Close x y ↔ ε.Close y x := by
 /-- Proposition 4.3.7(c) / Exercise 4.3.2 -/
 theorem close_trans {ε δ x y z:ℚ} (hxy: ε.Close x y) (hyz: δ.Close y z) :
     (ε + δ).Close x z := by
-      simp_all
+      simp_all [close_iff]
       grind
 
 /-- Proposition 4.3.7(d) / Exercise 4.3.2 -/
 theorem add_close {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
     (ε + δ).Close (x+z) (y+w) := by
-    simp_all
+    simp_all [close_iff]
     grind
 
 /-- Proposition 4.3.7(d) / Exercise 4.3.2 -/
 theorem sub_close {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
     (ε + δ).Close (x-z) (y-w) := by
-    simp_all
+    simp_all [close_iff]
     grind
 
 /-- Proposition 4.3.7(e) / Exercise 4.3.2, slightly strengthened -/
 theorem close_mono {ε ε' x y:ℚ} (hxy: ε.Close x y) (hε: ε' ≥  ε) :
     ε'.Close x y := by
-    simp_all
+    simp_all [close_iff]
     grind
 
 /-- Proposition 4.3.7(f) / Exercise 4.3.2 -/
 theorem close_between {ε x y z w:ℚ} (hxy: ε.Close x y) (hxz: ε.Close x z)
   (hbetween: (y ≤ w ∧ w ≤ z) ∨ (z ≤ w ∧ w ≤ y)) : ε.Close x w := by
-    simp_all
+    simp_all [close_iff]
     grind
 
 /-- Proposition 4.3.7(g) / Exercise 4.3.2 -/
 theorem close_mul_right {ε x y z:ℚ} (hxy: ε.Close x y) :
     (ε*|z|).Close (x * z) (y * z) := by
-    simp_all
+    simp_all [close_iff]
     suffices h: |(x - y) * z| ≤ ε * |z| from by
       grind
     rw [abs_mul]
@@ -219,7 +218,7 @@ theorem close_mul_mul {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w
 in some later exercises. -/
 theorem close_mul_mul' {ε δ x y z w:ℚ} (hxy: ε.Close x y) (hzw: δ.Close z w) :
     (ε*|z|+δ*|y|).Close (x * z) (y * w) := by
-    simp_all
+    simp_all [close_iff]
     have h1: |x * z - y * z| ≤ ε * |z| := by
       calc
         _ = |(x-y) * z| := by grind
