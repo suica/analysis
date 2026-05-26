@@ -152,9 +152,21 @@ theorem Nat.even_or_odd'' (n:ℕ) : Even n ∨ Odd n := by
 
 theorem Nat.not_even_and_odd (n:ℕ) : ¬ (Even n ∧ Odd n) := by
   push_neg
-  sorry
-
-#exit
+  intro
+  by_contra h
+  induction n with
+  | zero =>
+    simp_all
+  | succ i ih =>
+    rcases h with ⟨k, hk⟩
+    observe: i = 2 * k
+    have : Even i := by
+      use k
+      grind
+    have : Odd i := by
+      use k
+      grind
+    grind
 
 #check Nat.rec
 
