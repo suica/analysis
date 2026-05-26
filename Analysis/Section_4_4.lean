@@ -199,8 +199,7 @@ theorem Rat.not_exist_sqrt_two : ¬ ∃ x:ℚ, x^2 = 2 := by
         have h2: (2 * k)^2 ≤ q^2 := by
           exact Nat.pow_le_pow_left h 2
         rw [this] at h2
-        ring_nf at h2
-        have : k^2=0 := by grind
+        have : k^2 = 0 := by grind
         have : q^2 = 0 := by grind
         observe : q = 0
         linarith
