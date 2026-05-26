@@ -94,7 +94,7 @@ theorem Nat.no_infinite_descent : ¬ ∃ a:ℕ → ℕ, ∀ n, a (n+1) < a n := 
       specialize h1 i
       have := add_le_add_left h1 i
       grind
-  have h2 := h (a0)
+  have := h (a0)
   have h0: a a0 = 0 := by
     grind
   observe : a (a0 + 1) < 0
