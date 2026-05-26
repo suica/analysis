@@ -26,7 +26,27 @@ Users of the companion who have completed the exercises in this section are welc
 
 /-- Proposition 4.4.1 (Interspersing of integers by rationals) / Exercise 4.4.1 -/
 theorem Rat.between_int (x:ℚ) : ∃! n:ℤ, n ≤ x ∧ x < n+1 := by
-  sorry
+  use (x.floor)
+  simp_all
+  constructor
+  . constructor
+    apply x.floor_le
+    norm_cast
+    apply x.lt_floor_add_one
+  intro y h1 h2
+  rw [x.floor_def]
+  norm_cast at *
+  obtain ⟨a, b, c⟩ := x
+  simp [Rat.le_iff, Rat.lt_iff] at *
+  apply le_antisymm_iff.mpr
+  norm_cast at *
+  constructor
+  . rw [Int.le_ediv_iff_mul_le (by grind)]
+    exact h1
+  ring_nf at h2
+  rw [Int.ediv_le_iff_le_mul]
+  linarith
+  grind
 
 theorem Nat.exists_gt (x:ℚ) : ∃ n:ℕ, n > x := by
   sorry
