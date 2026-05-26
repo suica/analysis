@@ -197,7 +197,12 @@ theorem Rat.not_exist_sqrt_two : ¬ ∃ x:ℚ, x^2 = 2 := by
       . sorry
       exact ⟨ hpos, k, by linarith [hPp.1], this ⟩
     have h1 : Odd (p^2) := by
-      sorry
+      rw [odd_iff_exists_bit1]
+      rcases hp with ⟨w, hw⟩
+      have: p ^ 2 = 2*(w ^ 2 * 2 + w * 2) + 1 := by
+        rw [hw]
+        ring_nf
+      use (w ^ 2 * 2 + w * 2)
     have h2 : Even (p^2) := by
       choose q hpos hq using hPp.2
       rw [even_iff_exists_two_mul]
