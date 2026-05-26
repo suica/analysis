@@ -175,11 +175,57 @@ example : (0.1:ℚ).Steady ((fun n:ℕ ↦ (10:ℚ) ^ (-(n:ℤ)-1) ):Sequence) :
 Example 5.1.5: The sequence 0.1, 0.01, 0.001, ... is not 0.01-steady. Left as an exercise.
 -/
 example : ¬(0.01:ℚ).Steady ((fun n:ℕ ↦ (10:ℚ) ^ (-(n:ℤ)-1) ):Sequence) := by
-  sorry
+  intro h
+  set a := ((fun n:ℕ ↦ (10:ℚ) ^ (-(n:ℤ)-1)): Sequence)
+  specialize h a.n₀ (by grind) (a.n₀ + 3) (by grind)
+  simp_all [Rat.Close, a]
+  grind
 
 /-- Example 5.1.5: The sequence 1, 2, 4, 8, ... is not ε-steady for any ε. Left as an exercise.
 -/
 example (ε:ℚ) : ¬ ε.Steady ((fun n:ℕ ↦ (2 ^ (n+1):ℚ) ):Sequence) := by
+  intro h
+  set a := ((fun n:ℕ ↦ (2 ^ (n+1):ℚ)):Sequence)
+  specialize h a.n₀ (by grind)
+  simp_all [a, Rat.Close]
+  wlog he: ε ≥ 0
+  . specialize this (-ε)
+    grind
+  have : ∀ (m : ℕ), |(2:ℚ) - 2 ^ m * 2| ≤ ε := by
+    intro m
+    specialize h m (by grind)
+    apply h
+  have : ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε := by
+    intro m
+    specialize this m
+    have : 2 ^ m ≥ 1 := by
+      grind
+    have : 2 ^ m * 2 ≥ 2 := by
+      grind
+    have : 2 ^ m * 2 - 2 ≥ 0 := by
+      grind
+    have : 2 ^ m * 2 - 2 = |2 ^ m * 2 - (2:ℚ)|:= by
+      norm_cast
+    have :  |2 ^ m * 2 - (2:ℚ)| = |(2:ℚ) - 2 ^ m * 2| := by
+      grind
+    simp_all
+  have : ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε.ceil := by
+    intro m
+    apply le_trans (this m)
+    exact Rat.le_ceil
+  have : ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε.ceil.natAbs := by
+    intro m
+    apply le_trans (this m)
+    sorry
+
+  specialize this (ε.ceil.natAbs)
+  have ceil_pos: 0 ≤ ε.ceil := by
+    have := ε.le_ceil
+    have := le_trans he this
+    exact_mod_cast this
+  
+
+
   sorry
 
 /-- Example 5.1.5:The sequence 2, 2, 2, ... is ε-steady for any ε > 0.
