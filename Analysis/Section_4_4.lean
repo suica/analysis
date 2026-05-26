@@ -49,7 +49,20 @@ theorem Rat.between_int (x:ℚ) : ∃! n:ℤ, n ≤ x ∧ x < n+1 := by
   grind
 
 theorem Nat.exists_gt (x:ℚ) : ∃ n:ℕ, n > x := by
-  sorry
+  obtain ⟨n, ⟨⟨_, h1⟩⟩⟩ := x.between_int
+  rcases Int.lt_trichotomy 0 n with h | h | h
+  . lift n to ℕ using (by grind)
+    use n+1
+    norm_cast at *
+  . use 1
+    rw [<- h] at h1; simp at h1
+    grind
+  . use 1
+    norm_cast at *
+    have : ((n: ℚ) + 1) < 1 := by
+      norm_cast
+      grind
+    grind
 
 /-- Proposition 4.4.3 (Interspersing of rationals) -/
 theorem Rat.exists_between_rat {x y:ℚ} (h: x < y) : ∃ z:ℚ, x < z ∧ z < y := by
