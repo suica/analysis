@@ -101,17 +101,36 @@ theorem Nat.no_infinite_descent : ¬ ∃ a:ℕ → ℕ, ∀ n, a (n+1) < a n := 
   apply Nat.not_lt_zero (a (a0 + 1))
   exact this
 
-#exit
-
 /-- Exercise 4.4.2 (b) -/
 def Int.infinite_descent : Decidable (∃ a:ℕ → ℤ, ∀ n, a (n+1) < a n) := by
-  -- the first line of this construction should be either `apply isTrue` or `apply isFalse`.
-  sorry
+  apply isTrue
+  use (fun n ↦ -(n: ℤ))
+  intro n
+  simp_all
 
 /-- Exercise 4.4.2 (b) -/
 def Rat.pos_infinite_descent : Decidable (∃ a:ℕ → {x: ℚ // 0 < x}, ∀ n, a (n+1) < a n) := by
   -- the first line of this construction should be either `apply isTrue` or `apply isFalse`.
-  sorry
+  apply isTrue
+  set a : ℕ → {x : ℚ // 0 < x} :=
+    Nat.rec
+      ⟨1, by positivity⟩
+      (fun n prev =>
+        ⟨prev.1 / 2, by
+          have h : (0 : ℚ) < prev.1 := prev.2
+          positivity
+        ⟩)
+  have {n: ℕ}: (a n).val > 0 := by
+    induction n
+    . simp [a]
+    simp [a]
+    grind
+  have h (n: ℕ): (a (n + 1)) < a n := by
+    cases n
+    . simp [a]
+      grind
+    simp_all [a]
+  use a
 
 #check even_iff_exists_two_mul
 #check odd_iff_exists_bit1
@@ -121,6 +140,8 @@ theorem Nat.even_or_odd'' (n:ℕ) : Even n ∨ Odd n := by
 
 theorem Nat.not_even_and_odd (n:ℕ) : ¬ (Even n ∧ Odd n) := by
   sorry
+
+#exit
 
 #check Nat.rec
 
