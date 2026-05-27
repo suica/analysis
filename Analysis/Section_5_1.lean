@@ -366,7 +366,37 @@ noncomputable def Sequence.sqrt_two : Sequence := (fun n:ℕ ↦ ((⌊ (Real.sqr
   Example 5.1.10. (This requires extensive familiarity with Mathlib's API for the real numbers.)
 -/
 theorem Sequence.ex_5_1_10_a : (1:ℚ).Steady sqrt_two := by
-  sorry
+  unfold Rat.Steady
+  intro n hn m hm
+  simp_all [sqrt_two, Rat.Close]
+  wlog h: n ≤ m
+  . specialize this m n (by grind) (by grind) (by grind)
+    grind
+  lift n to ℕ using hn
+  lift m to ℕ using hm
+  simp_all
+  rw [le_iff_eq_or_lt]
+  right
+  have floor_eq_one: ∀ n: ℕ, ⌊sqrt_two.seq n⌋ = 1 := by
+    intro i
+    rw [Int.floor_eq_iff]
+    simp_all [sqrt_two]
+    constructor
+    . field_simp
+      norm_cast
+      rw [Int.le_floor]
+      simp_all
+    field_simp; norm_cast
+    simp_all
+    rw [Int.floor_lt]
+    simp_all
+    field_simp
+    have := Real.sqrt_two_lt_three_halves
+    grind
+  have : ⌊sqrt_two.seq n⌋ = ⌊sqrt_two.seq m⌋ := by
+    rw [floor_eq_one, floor_eq_one]
+  have := Int.abs_sub_lt_one_of_floor_eq_floor this
+  simp_all [sqrt_two]
 
 /--
   Example 5.1.10. (This requires extensive familiarity with Mathlib's API for the real numbers.)
