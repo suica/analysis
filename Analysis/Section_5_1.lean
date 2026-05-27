@@ -398,11 +398,90 @@ theorem Sequence.ex_5_1_10_a : (1:ℚ).Steady sqrt_two := by
   have := Int.abs_sub_lt_one_of_floor_eq_floor this
   simp_all [sqrt_two]
 
+lemma Sequence.ex_5_1_10_b' :
+  let sqrt_two :=(fun n:ℕ ↦ ((⌊ (Real.sqrt 2)*10^n ⌋ / 10^n * 10):ℚ): Sequence)
+ (1:ℚ).Steady (sqrt_two.from 1) := by
+  unfold Rat.Steady
+  intro sqrt_two n hn m hm
+  simp_all [Rat.Close]
+  lift n to ℕ using (by grind)
+  lift m to ℕ using (by grind)
+  rw [le_iff_eq_or_lt]
+  right
+  have sqrt_monotone: ∀ n: ℕ, n ≥ 1 -> sqrt_two.seq (n+1) ≥ sqrt_two.seq n := by
+    intro i hi
+    sorry
+  have floor_eq_one: ∀ n: ℕ, n ≥ 1 -> ⌊sqrt_two.seq n⌋ = 14 := by
+    intro i hi
+    rw [Int.floor_eq_iff]
+    constructor
+    .
+      have : sqrt_two.seq 1 ≤ sqrt_two.seq i := by
+        induction i with
+        | zero => contradiction
+        | succ i ih =>
+          by_cases hi: i = 0
+          . simp_all
+          simp_all
+          have := sqrt_monotone i (by grind)
+          specialize ih (by grind)
+          apply le_trans ih
+          exact_mod_cast this
+      have : 14 ≤ sqrt_two.seq 1 := by
+        simp [sqrt_two]
+        norm_cast
+        rw [Int.le_floor]
+        have : 14 / 10 ≤ √2 := by
+          refine (Real.le_sqrt' ?_).mpr ?_
+          grind
+          grind
+        grind
+      grind
+    simp_all [sqrt_two]
+    field_simp; norm_cast
+    simp_all
+    have h1 := Int.floor_le (√2 * 10 ^ i)
+    suffices _: √2 * 10 ^ i * 10 < 10 ^ i * 15
+    . have h := calc
+        ⌊√2 * 10 ^ i⌋ * 10 ≤ √2 * 10 ^ i * 10 := by grind
+        _ < 10 ^ i * 15 := by grind
+      exact_mod_cast h
+    field_simp
+    have := Real.sqrt_two_lt_three_halves
+    grind
+  have : ⌊sqrt_two.seq n⌋ = ⌊sqrt_two.seq m⌋ := by
+    rw [floor_eq_one, floor_eq_one]
+    grind
+    grind
+  have := Int.abs_sub_lt_one_of_floor_eq_floor this
+  simp_all [sqrt_two]
+
 /--
   Example 5.1.10. (This requires extensive familiarity with Mathlib's API for the real numbers.)
 -/
 theorem Sequence.ex_5_1_10_b : (0.1:ℚ).Steady (sqrt_two.from 1) := by
-  sorry
+  intro n hn m hm
+  -- lift n to ℕ using (by grind)
+  -- lift m to ℕ using (by grind)
+  simp_all [Rat.Close]
+  suffices h: |sqrt_two.seq n - sqrt_two.seq m| * 10 ≤ 1 from by
+    sorry
+  simp_all [sqrt_two]
+  field_simp
+  rw [show (10:ℚ) = |10| by decide, <- abs_mul]
+  have h0 := Sequence.ex_5_1_10_a
+  simp [Rat.Steady] at h0
+  specialize h0 (n+1) ?_ (m-1) ?_
+  . simp_all [sqrt_two]
+  . simp_all [sqrt_two]
+  simp_all [Rat.Close, sqrt_two]
+  field_simp at h0
+  have _: 0 ≤ n + 1 := by grind
+  have _: 0 ≤ m + 1 := by grind
+  simp_all
+  field_simp at h0
+
+#exit
 
 theorem Sequence.ex_5_1_10_c : (0.1:ℚ).EventuallySteady sqrt_two := by
   rw [Rat.eventuallySteady_def]
