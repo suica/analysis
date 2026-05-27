@@ -233,7 +233,6 @@ example (ε:ℚ) : ¬ ε.Steady ((fun n:ℕ ↦ (2 ^ (n+1):ℚ) ):Sequence) := b
   specialize h1 1 (by grind)
   contradiction
 
-#exit
 /-- Example 5.1.5:The sequence 2, 2, 2, ... is ε-steady for any ε > 0.
 -/
 example (ε:ℚ) (hε: ε>0) : ε.Steady ((fun _:ℕ ↦ (2:ℚ) ):Sequence) := by
@@ -311,7 +310,17 @@ The sequence 10, 0, 0, ... is eventually ε-steady for every ε > 0. Left as an 
 -/
 lemma Sequence.ex_5_1_7_d {ε:ℚ} (hε:ε>0) :
     ε.EventuallySteady ((fun n:ℕ ↦ if n=0 then (10:ℚ) else (0:ℚ) ):Sequence) := by
-      sorry
+  rw [Rat.eventuallySteady_def]
+  use 1
+  constructor
+  . simp_all
+  intro n hn m hm
+  simp_all
+  split_ifs
+  <;> try grind
+  simp_all
+  dsimp [Rat.Close]
+  grind
 
 abbrev Sequence.IsCauchy (a:Sequence) : Prop := ∀ ε > (0:ℚ), ε.EventuallySteady a
 
@@ -366,7 +375,14 @@ theorem Sequence.ex_5_1_10_b : (0.1:ℚ).Steady (sqrt_two.from 1) := by
   sorry
 
 theorem Sequence.ex_5_1_10_c : (0.1:ℚ).EventuallySteady sqrt_two := by
-  sorry
+  rw [Rat.eventuallySteady_def]
+  use (max sqrt_two.n₀ 1)
+  simp_all
+  have h1:= Sequence.ex_5_1_10_b
+  unfold Sequence.from at *
+  observe: max sqrt_two.n₀ (max sqrt_two.n₀ 1) = (max sqrt_two.n₀ 1)
+  rw [this]
+  exact h1
 
 /-- Proposition 5.1.11. The harmonic sequence, defined as a₁ = 1, a₂ = 1/2, ... is a Cauchy sequence. -/
 theorem Sequence.IsCauchy.harmonic : (mk' 1 (fun n ↦ (1:ℚ)/n)).IsCauchy := by
