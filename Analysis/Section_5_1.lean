@@ -644,6 +644,22 @@ lemma IsBounded.finite {n:ℕ} (a: Fin n → ℚ) : ∃ M ≥ 0,  BoundedBy a M 
 
 /-- Lemma 5.1.15 (Cauchy sequences are bounded) / Exercise 5.1.1 -/
 lemma Sequence.isBounded_of_isCauchy {a:Sequence} (h: a.IsCauchy) : a.IsBounded := by
+  simp_all [isCauchy_def, IsBounded, BoundedBy]
+  use 1
+  simp_all
+  specialize h 2 (by grind)
+  simp_all [Rat.EventuallySteady, Rat.Steady]
+  rcases h with ⟨N, hn, hsteady⟩
+  intro n
+  specialize hsteady n _ _ n ?_ ?_
+  . sorry
+  . sorry
+  . sorry
+  . sorry
+  unfold Rat.Close at hsteady
+  have: |a.seq n - a.seq n| ≤ |a.seq n + a.seq n| := by
+    grind
+  simp_all [Rat.Close]
   sorry
 
 /-- Exercise 5.1.2 -/
