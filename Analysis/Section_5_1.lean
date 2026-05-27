@@ -227,7 +227,8 @@ example (ε:ℚ) : ¬ ε.Steady ((fun n:ℕ ↦ (2 ^ (n+1):ℚ) ):Sequence) := b
     intro m
     apply le_trans (this m)
     have := Int.le_natAbs (a:=ε.ceil)
-    sorry
+    simp_all
+    norm_cast at *
   by_cases hm: ε.ceil.natAbs ≥ 1
   . specialize h' (ε.ceil.natAbs)
     specialize h1 (ε.ceil.natAbs) ?_
