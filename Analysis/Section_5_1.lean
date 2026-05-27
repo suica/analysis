@@ -195,58 +195,45 @@ example (ε:ℚ) : ¬ ε.Steady ((fun n:ℕ ↦ (2 ^ (n+1):ℚ) ):Sequence) := b
     intro m
     specialize h m (by grind)
     apply h
-  have : ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε := by
-    intro m
-    specialize this m
-    have : 2 ^ m ≥ 1 := by
-      grind
-    have : 2 ^ m * 2 ≥ 2 := by
-      grind
-    have : 2 ^ m * 2 - 2 ≥ 0 := by
-      grind
-    have : 2 ^ m * 2 - 2 = |2 ^ m * 2 - (2:ℚ)|:= by
-      norm_cast
-    have :  |2 ^ m * 2 - (2:ℚ)| = |(2:ℚ) - 2 ^ m * 2| := by
-      grind
-    simp_all
-  have : ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε.ceil := by
-    intro m
-    apply le_trans (this m)
-    exact Rat.le_ceil
-  have h1: ∀ (m : ℕ), (h: m ≥ 1) -> 2 ^ m * 2 - (2:ℚ) > m := by
+  have h1: ∀ (m : ℕ), m ≥ 1 -> |(2:ℚ) - 2 ^ m * 2| > m := by
     intro m h
+    simp_all
+    rw [<- abs_neg]
+    simp_all
+    rw [lt_abs]
+    left
     induction m with
     | zero =>
-      contradiction
+      simp_all
     | succ i ih =>
-      by_cases h: i = 0
-      . simp_all
+      by_cases hi: i = 0
+      . rw [hi]
         grind
       grind
-  have h': ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε.ceil.natAbs := by
-    intro m
-    apply le_trans (this m)
-    have := Int.le_natAbs (a:=ε.ceil)
+  set g := ε.ceil.natAbs
+  by_cases hg : g ≥ 1
+  . specialize h1 g (by grind)
+    specialize h g (by grind)
+    simp at h
+    have : ε ≤ g := by
+      have := ε.le_ceil
+      apply le_trans this
+      simp [g]
+      have := le_abs_self ε.ceil
+      exact_mod_cast this
+    grind
+  have : ε = 0 := by
+    apply le_antisymm_iff.mpr
     simp_all
-    norm_cast at *
-  by_cases hm: ε.ceil.natAbs ≥ 1
-  . specialize h' (ε.ceil.natAbs)
-    specialize h1 (ε.ceil.natAbs) ?_
-    grind
-    grind
-  have ceil_pos: 0 ≤ ε.ceil := by
+    simp [g] at hg
     have := ε.le_ceil
-    have := le_trans he this
+    rw [hg] at this
     exact_mod_cast this
   simp_all
-  have h2: ε = 0 := by
-    have := ε.le_ceil
-    rw [hm] at this
-    grind
-  simp_all
-  specialize this 1
-  grind
+  specialize h1 1 (by grind)
+  contradiction
 
+#exit
 /-- Example 5.1.5:The sequence 2, 2, 2, ... is ε-steady for any ε > 0.
 -/
 example (ε:ℚ) (hε: ε>0) : ε.Steady ((fun _:ℕ ↦ (2:ℚ) ):Sequence) := by
