@@ -213,20 +213,38 @@ example (ε:ℚ) : ¬ ε.Steady ((fun n:ℕ ↦ (2 ^ (n+1):ℚ) ):Sequence) := b
     intro m
     apply le_trans (this m)
     exact Rat.le_ceil
-  have : ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε.ceil.natAbs := by
+  have h1: ∀ (m : ℕ), (h: m ≥ 1) -> 2 ^ m * 2 - (2:ℚ) > m := by
+    intro m h
+    induction m with
+    | zero =>
+      contradiction
+    | succ i ih =>
+      by_cases h: i = 0
+      . simp_all
+        grind
+      grind
+  have h': ∀ (m : ℕ), 2 ^ m * 2 - (2:ℚ) ≤ ε.ceil.natAbs := by
     intro m
     apply le_trans (this m)
+    have := Int.le_natAbs (a:=ε.ceil)
     sorry
-
-  specialize this (ε.ceil.natAbs)
+  by_cases hm: ε.ceil.natAbs ≥ 1
+  . specialize h' (ε.ceil.natAbs)
+    specialize h1 (ε.ceil.natAbs) ?_
+    grind
+    grind
   have ceil_pos: 0 ≤ ε.ceil := by
     have := ε.le_ceil
     have := le_trans he this
     exact_mod_cast this
-  
-
-
-  sorry
+  simp_all
+  have h2: ε = 0 := by
+    have := ε.le_ceil
+    rw [hm] at this
+    grind
+  simp_all
+  specialize this 1
+  grind
 
 /-- Example 5.1.5:The sequence 2, 2, 2, ... is ε-steady for any ε > 0.
 -/
