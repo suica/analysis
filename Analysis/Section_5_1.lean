@@ -588,7 +588,28 @@ example : BoundedBy ![1,-2,3,-4] 4 := by intro i; fin_cases i <;> norm_num
 
 /-- Example 5.1.13 -/
 example : ¬((fun n:ℕ ↦ (-1)^n * (n+1:ℚ)):Sequence).IsBounded := by
-  sorry
+  rw [Sequence.isBounded_def]
+  push_neg
+  intro M hm h
+  simp_all [Sequence.BoundedBy]
+  specialize h (M.ceil)
+  have : 0 ≤ M.ceil
+  . have := le_trans hm M.le_ceil
+    exact_mod_cast this
+  simp_all
+  rw [abs_le] at h
+  have h1 := M.le_ceil
+  have h := h.right
+  norm_cast at *
+  have h2: M.ceil.toNat + 1 ≥ M.ceil + 1 := by
+    grind
+  have : M.ceil + 1 ≤ M.ceil:= by
+    rw [ge_iff_le] at h2
+    apply le_trans h2
+    have := le_trans h h1
+    exact_mod_cast this
+  have : 1≤ 0 := by grind
+  contradiction
 
 /-- Example 5.1.13 -/
 example : ((fun n:ℕ ↦ (-1:ℚ)^n):Sequence).IsBounded := by
