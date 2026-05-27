@@ -507,25 +507,19 @@ lemma Sequence.ex_5_1_10_b' :
 -/
 theorem Sequence.ex_5_1_10_b : (0.1:ℚ).Steady (sqrt_two.from 1) := by
   intro n hn m hm
-  -- lift n to ℕ using (by grind)
-  -- lift m to ℕ using (by grind)
   simp_all [Rat.Close]
   suffices h: |sqrt_two.seq n - sqrt_two.seq m| * 10 ≤ 1 from by
-    sorry
-  simp_all [sqrt_two]
-  field_simp
-  rw [show (10:ℚ) = |10| by decide, <- abs_mul]
-  have h0 := Sequence.ex_5_1_10_a
-  simp [Rat.Steady] at h0
-  specialize h0 (n+1) ?_ (m-1) ?_
-  . simp_all [sqrt_two]
-  . simp_all [sqrt_two]
-  simp_all [Rat.Close, sqrt_two]
-  field_simp at h0
-  have _: 0 ≤ n + 1 := by grind
-  have _: 0 ≤ m + 1 := by grind
+    grind
+  have h0 := Sequence.ex_5_1_10_b'
+  specialize h0 n
   simp_all
-  field_simp at h0
+  specialize h0 m (by grind)
+  have : 0 ≤ n
+  . grind
+  simp_all [Rat.Close, sqrt_two]
+  rw [show (10: ℚ) = |10| by decide,<- abs_mul]
+  ring_nf at h0 ⊢
+  exact h0
 
 theorem Sequence.ex_5_1_10_c : (0.1:ℚ).EventuallySteady sqrt_two := by
   rw [Rat.eventuallySteady_def]
