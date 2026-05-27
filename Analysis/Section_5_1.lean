@@ -408,9 +408,55 @@ lemma Sequence.ex_5_1_10_b' :
   lift m to ℕ using (by grind)
   rw [le_iff_eq_or_lt]
   right
+
+  have hfloor (n: ℕ):
+      ⌊Real.sqrt 2 * 10^n⌋ * 10 ≤ ⌊Real.sqrt 2 * 10^(n+1)⌋ := by
+    set a:= ⌊Real.sqrt 2 * 10^n⌋
+    dsimp [a]
+
+    have h :
+        (a : ℝ) ≤ Real.sqrt 2 * 10^n := by
+      exact Int.floor_le (Real.sqrt 2 * 10^n)
+
+    have hmul :
+        ((a : ℝ) * 10) ≤ Real.sqrt 2 * 10^(n+1) := by
+      norm_cast at *
+      norm_cast at *
+      simp_all [a]
+      have h1: ↑⌊√2 * 10 ^ n⌋ * 10 ≤ √2 * 10 ^ n * 10
+      . nlinarith [h]
+      observe: 10 ^ n * 10 = 10^ (n+1)
+      rw [mul_assoc] at h1
+      rw_mod_cast [this] at h1
+      push_cast at h1
+      exact_mod_cast h1
+
+
+    dsimp [a] at hmul
+    norm_cast at *
+    exact_mod_cast Int.le_floor.mpr hmul
+
   have sqrt_monotone: ∀ n: ℕ, n ≥ 1 -> sqrt_two.seq (n+1) ≥ sqrt_two.seq n := by
     intro i hi
-    sorry
+    norm_cast
+    simp_all [sqrt_two]
+    have : 0 ≤ (i: ℤ) + 1
+    . grind
+    simp_all
+    field_simp
+    induction i with
+    | zero =>
+      simp_all
+    | succ i ih =>
+      simp_all
+      by_cases hi: i = 0
+      . simp_all
+        specialize hfloor 1
+        simp_all
+        exact_mod_cast hfloor
+      specialize ih (by grind) (by grind)
+      norm_cast
+      simp_all
   have floor_eq_one: ∀ n: ℕ, n ≥ 1 -> ⌊sqrt_two.seq n⌋ = 14 := by
     intro i hi
     rw [Int.floor_eq_iff]
@@ -480,8 +526,6 @@ theorem Sequence.ex_5_1_10_b : (0.1:ℚ).Steady (sqrt_two.from 1) := by
   have _: 0 ≤ m + 1 := by grind
   simp_all
   field_simp at h0
-
-#exit
 
 theorem Sequence.ex_5_1_10_c : (0.1:ℚ).EventuallySteady sqrt_two := by
   rw [Rat.eventuallySteady_def]
