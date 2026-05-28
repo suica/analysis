@@ -521,6 +521,59 @@ theorem Sequence.ex_5_1_10_b : (0.1:ℚ).Steady (sqrt_two.from 1) := by
   ring_nf at h0 ⊢
   exact h0
 
+theorem Sequence.ex_5_1_10_b_good : (0.1:ℚ).Steady (sqrt_two.from 1) := by
+  intro n hn m hm
+  simp_all [Rat.Close]
+  lift n to ℕ using (by grind)
+  lift m to ℕ using (by grind)
+  have h0: |(⌊(15 / 10: ℚ) * (10 ^ n)⌋) / 10 ^ n - (⌊(14 / 10: ℚ) * 10 ^ n⌋: ℚ) / 10 ^ n| ≤ 0.1 := by
+    field_simp
+    simp_all
+    wlog hnm: n≤m
+    . sorry
+    rw [le_iff_exists_add] at hnm
+    obtain ⟨w, hw⟩ := hnm
+    simp_all
+    cases n
+    . simp_all
+    expose_names
+    simp_all
+    -- rw [pow_add]
+    field_simp
+    rw_mod_cast [Int.floor_natCast]
+    rw_mod_cast [Int.floor_natCast]
+    simp_all
+    have h3: |Rat.divInt (10 ^ n) (10 ^ n * 10)| = Rat.divInt (10 ^ n) (10 ^ n * 10) := by
+      apply abs_eq_self.mpr
+      rw [Rat.divInt_eq_div]
+      positivity
+    ring_nf
+    rw [h3]
+    simp_all
+    rw [le_iff_eq_or_lt]
+    left
+    rw [Rat.divInt_eq_div]
+    field_simp; ring_nf
+    norm_cast
+  suffices h: |((⌊ (15/10: ℚ)*10^n ⌋ / 10^n): ℚ) -((⌊ (14/10: ℚ)*10^n ⌋ / 10^n): ℚ)| ≤ 0.1 from by
+    have h1: (⌊(15 / 10: ℚ) * 10 ^ n⌋) / 10 ^ n ≥ sqrt_two.seq n := by
+      sorry
+    have h2: (⌊(14 / 10: ℚ) * 10 ^ m⌋) / 10 ^ m ≤ sqrt_two.seq m := by
+      sorry
+    have h3: (⌊(15 / 10: ℚ) * 10 ^ n⌋) / 10 ^ n - ((⌊(14 / 10: ℚ) * 10 ^ m⌋) / 10 ^ m) ≥ sqrt_two.seq n - sqrt_two.seq m := by
+      linarith
+    have h4: |(⌊(15 / 10: ℚ) * 10 ^ n⌋) / (10 ^ n: ℚ) - ((⌊(14 / 10: ℚ) * 10 ^ m⌋) / 10 ^ m)| ≥ |sqrt_two.seq n - sqrt_two.seq m| := by
+      sorry
+    #check abs_le_abs_of_nonneg
+    simp at h4
+    apply le_trans h4
+    norm_cast at *
+    exact_mod_cast h0
+  -- norm_cast at *
+  exact_mod_cast h0
+
+
+
 theorem Sequence.ex_5_1_10_c : (0.1:ℚ).EventuallySteady sqrt_two := by
   rw [Rat.eventuallySteady_def]
   use (max sqrt_two.n₀ 1)
