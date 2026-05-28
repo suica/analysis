@@ -695,14 +695,69 @@ lemma Sequence.isBounded_of_isCauchy {a:Sequence} (h: a.IsCauchy) : a.IsBounded 
 /-- Exercise 5.1.2 -/
 theorem Sequence.isBounded_add {a b:ℕ → ℚ} (ha: (a:Sequence).IsBounded) (hb: (b:Sequence).IsBounded):
     (a + b:Sequence).IsBounded := by
-      sorry
+      simp [Sequence.isBounded_def] at *
+      simp_all
+      obtain ⟨ma,_,hma⟩ := ha
+      obtain ⟨mb,_,hmb⟩ := hb
+      use |ma| + |mb|
+      constructor
+      . grind
+      simp_all [Sequence.boundedBy_def]
+      intro n
+      specialize hma n
+      specialize hmb n
+      by_cases hn : 0≤n
+      . simp_all
+        grind
+      simp_all
+      grind
 
 theorem Sequence.isBounded_sub {a b:ℕ → ℚ} (ha: (a:Sequence).IsBounded) (hb: (b:Sequence).IsBounded):
     (a - b:Sequence).IsBounded := by
-      sorry
+      simp [Sequence.isBounded_def] at *
+      simp_all
+      obtain ⟨ma,_,hma⟩ := ha
+      obtain ⟨mb,_,hmb⟩ := hb
+      use |ma| + |mb|
+      constructor
+      . grind
+      simp_all [Sequence.boundedBy_def]
+      intro n
+      specialize hma n
+      specialize hmb n
+      by_cases hn : 0≤n
+      . simp_all
+        grind
+      simp_all
+      grind
 
 theorem Sequence.isBounded_mul {a b:ℕ → ℚ} (ha: (a:Sequence).IsBounded) (hb: (b:Sequence).IsBounded):
     (a * b:Sequence).IsBounded := by
-      sorry
+      simp [Sequence.isBounded_def] at *
+      simp_all
+      obtain ⟨ma,_,hma⟩ := ha
+      obtain ⟨mb,_,hmb⟩ := hb
+      use |ma| * |mb|
+      have: ma ≤ |ma|
+      . apply le_abs_self
+      have: mb ≤ |mb|
+      . apply le_abs_self
+      constructor
+      . positivity
+      simp_all [Sequence.boundedBy_def]
+      intro n
+      specialize hma n
+      specialize hmb n
+      by_cases hn : 0≤n
+      . simp_all
+        have: |a n.toNat| * |b n.toNat| ≤ ma * mb := by
+          apply mul_le_mul
+          repeat grind
+        have : ma * mb ≤ |ma| * |mb|:= by
+          apply mul_le_mul
+          repeat grind
+        grind
+      simp_all [show ¬0 ≤ n by grind]
+      positivity
 
 end Chapter5
