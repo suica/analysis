@@ -645,22 +645,52 @@ lemma IsBounded.finite {n:ℕ} (a: Fin n → ℚ) : ∃ M ≥ 0,  BoundedBy a M 
 /-- Lemma 5.1.15 (Cauchy sequences are bounded) / Exercise 5.1.1 -/
 lemma Sequence.isBounded_of_isCauchy {a:Sequence} (h: a.IsCauchy) : a.IsBounded := by
   simp_all [isCauchy_def, IsBounded, BoundedBy]
-  use 1
-  simp_all
-  specialize h 2 (by grind)
-  simp_all [Rat.EventuallySteady, Rat.Steady]
-  rcases h with ⟨N, hn, hsteady⟩
-  intro n
-  specialize hsteady n _ _ n ?_ ?_
-  . sorry
-  . sorry
-  . sorry
-  . sorry
-  unfold Rat.Close at hsteady
-  have: |a.seq n - a.seq n| ≤ |a.seq n + a.seq n| := by
+  have : ∀ ε: ℚ, ε > 0 -> a.IsBounded := by
+    intro ε hε
+    have hs: ε.EventuallySteady a := h ε (hε)
+    simp [Rat.eventuallySteady_def] at *
+    obtain ⟨N, hN, hsteady⟩ := hs
+    have h_bounded_from_N: (a.from N).IsBounded := by
+      set M := ε + |a.seq N|
+      use M
+      simp_all
+      constructor
+      . norm_cast
+        grind
+      rw [Rat.steady_def] at hsteady
+      simp [Rat.Close] at hsteady
+      rw [Sequence.boundedBy_def]
+      simp_all
+      specialize hsteady N (by grind) (by grind)
+      intro n
+      grind
+    obtain ⟨M_tail, _, hM1⟩ := h_bounded_from_N
+    set M_head := ((Finset.Icc a.n₀ N).image fun x=> |a.seq x|).max' (by simp [hN])
+    use (max (max M_tail 0) M_head)
+    constructor
+    . grind
+    rw [Sequence.boundedBy_def]
+    intro n
+    rw [le_max_iff]
+    by_cases hn0: n<a.n₀
+    . left
+      rw [le_max_iff]
+      right
+      have : a.seq n = 0 := by
+        apply a.vanish
+        grind
+      grind
+    by_cases hn : n ≤ N
+    . right
+      simp [M_head]
+      simp_all
+      apply Finset.le_max'
+      simp_all
+      use n
+    left
     grind
-  simp_all [Rat.Close]
-  sorry
+  apply this
+  
 
 /-- Exercise 5.1.2 -/
 theorem Sequence.isBounded_add {a b:ℕ → ℚ} (ha: (a:Sequence).IsBounded) (hb: (b:Sequence).IsBounded):
