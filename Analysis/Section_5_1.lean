@@ -564,7 +564,7 @@ theorem Sequence.ex_5_1_10_b_good : (0.1:ℚ).Steady (sqrt_two.from 1) := by
       linarith
     have h4: |(⌊(15 / 10: ℚ) * 10 ^ n⌋) / (10 ^ n: ℚ) - ((⌊(14 / 10: ℚ) * 10 ^ m⌋) / 10 ^ m)| ≥ |sqrt_two.seq n - sqrt_two.seq m| := by
       sorry
-    #check abs_le_abs_of_nonneg
+    sorry
     simp at h4
     apply le_trans h4
     norm_cast at *
