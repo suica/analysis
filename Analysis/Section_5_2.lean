@@ -304,11 +304,14 @@ theorem Sequence.isBounded_of_eventuallyClose {ε:ℚ} {a b: ℕ → ℚ} (hab: 
             have h2: |a n - (a n - b n)| ≤ |a n| + |(a n - b n)| := by
               apply abs_sub
             apply le_trans h2
-            simp [M1]
-            gcongr
-            rw [boundedBy_def] at hM
-            specialize hM n
-            simp_all
+            have h3: |a n| + |a n - b n| ≤ M1 := by
+              simp [M1]
+              gcongr
+              rw [boundedBy_def] at hM
+              specialize hM n
+              simp at hM
+              exact hM
+            exact h3
           . simp [M]
             right
             simp_all
