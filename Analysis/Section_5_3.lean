@@ -115,7 +115,14 @@ theorem CauchySequence.equiv_iff (a b: CauchySequence) : a ≈ b ↔ Sequence.Eq
 
 /-- Every constant sequence is Cauchy. -/
 theorem Sequence.IsCauchy.const (a:ℚ) : ((fun _:ℕ ↦ a):Sequence).IsCauchy := by
-  sorry
+  rw [isCauchy_def]
+  intro ε hε
+  simp_all [Rat.eventuallySteady_def, Rat.steady_def]
+  use 0
+  simp_all
+  intro n hn m hm
+  simp_all [Rat.Close]
+  linarith
 
 instance CauchySequence.instZero : Zero CauchySequence where
   zero := CauchySequence.mk' (a := fun _: ℕ ↦ 0) (Sequence.IsCauchy.const (0:ℚ))
@@ -214,7 +221,66 @@ theorem Real.LIM_add {a b:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) (hb: (b:Seque
 /-- Proposition 5.3.10 (Product of Cauchy sequences is Cauchy) -/
 theorem Sequence.IsCauchy.mul {a b:ℕ → ℚ}  (ha: (a:Sequence).IsCauchy) (hb: (b:Sequence).IsCauchy) :
     (a * b:Sequence).IsCauchy := by
-  sorry
+  obtain ⟨Ma, _, hMa⟩ := Sequence.isBounded_of_isCauchy ha
+  obtain ⟨Mb, _, hMb⟩ := Sequence.isBounded_of_isCauchy hb
+  simp_all [boundedBy_def]
+  by_cases h: Ma = 0
+  . rw [isCauchy_def]
+    intro ε hε
+    rw [Rat.eventuallySteady_def]
+    use 0
+    simp_all
+    rw [Rat.steady_def]
+    intro n _ m _
+    rw [Rat.Close]
+    simp_all
+    linarith
+  by_cases h: Mb = 0
+  . intro ε hε
+    rw [Rat.eventuallySteady_def]
+    use 0
+    simp_all
+    rw [Rat.steady_def]
+    intro n _ m _
+    rw [Rat.Close]
+    simp_all
+    linarith
+  simp [isCauchy_def] at *
+  intro ε hε
+  specialize ha (ε/2/Mb) (by positivity)
+  specialize hb (ε/2/Ma) (by positivity)
+  simp_all [Rat.eventuallySteady_def]
+  obtain ⟨Na, _, ha⟩ := ha
+  obtain ⟨Nb, _, hb⟩ := hb
+  use (max Na Nb)
+  simp_all
+  simp_all [Rat.steady_def]
+  intro n _ _ m _ _
+  have : 0 ≤ n:= by grind
+  have : 0 ≤ m:= by grind
+  lift n to ℕ using (by grind)
+  lift m to ℕ using (by grind)
+  have h1 := ha n (by grind) m (by grind)
+  have h3 := hb n (by grind) m (by grind)
+  simp_all [Rat.Close]
+
+  calc
+    |a n * b n - a m * b m|
+     = |(a n * (b n - b m)) + ((a n - a m) * b m)| := by ring_nf
+     _ ≤ |(a n * (b n - b m))| + |((a n - a m) * b m)| := abs_add_le _ _
+     _ ≤ |a n| * |b n - b m| + |a n - a m| * |b m| := ?_
+     _ ≤ Ma *|b n - b m| + |a n - a m| * Mb := ?_
+     _ ≤ Ma * (ε/2/Ma) + (ε/2/Mb) * Mb := ?_
+     _ ≤ ε := ?_
+  . gcongr
+    grind
+    grind
+  . gcongr
+    exact hMa n
+    exact hMb m
+  . gcongr
+  . field_simp
+    linarith
 
 /-- Proposition 5.3.10 (Product of equivalent sequences is equivalent) / Exercise 5.3.2 -/
 theorem Sequence.mul_equiv_left {a a':ℕ → ℚ} (b:ℕ → ℚ) (hb : (b:Sequence).IsCauchy) (haa': Equiv a a') :
