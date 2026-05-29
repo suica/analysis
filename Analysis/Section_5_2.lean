@@ -136,7 +136,29 @@ lemma Sequence.equiv_def (a b: ℕ → ℚ) :
 
 /-- Definition 5.2.6 (Equivalent sequences) -/
 lemma Sequence.equiv_iff (a b: ℕ → ℚ) : Equiv a b ↔ ∀ ε > 0, ∃ N, ∀ n ≥ N, |a n - b n| ≤ ε := by
-  sorry
+  simp [equiv_def, Rat.eventuallyClose_def] at *
+  constructor
+  . intro h ε hε
+    specialize h ε hε
+    simp [Rat.eventuallyClose_def, Rat.closeSeq_def] at *
+    obtain ⟨N, hclose⟩ := h
+    simp_all
+    dsimp [Rat.Close] at *
+    use N.toNat
+    intro n hn
+    specialize hclose n (by grind) (by grind)
+    exact hclose
+  intro h ε hε
+  rw [Rat.eventuallyClose_def]
+  specialize h ε hε
+  obtain ⟨N ,hn⟩ := h
+  use N
+  simp [Rat.closeSeq_def]
+  intro n _
+  have : 0 ≤ n := by grind
+  simp_all
+  specialize hn n.toNat (by grind)
+  exact hn
 
 /-- Proposition 5.2.8 -/
 lemma Sequence.equiv_example :
@@ -176,11 +198,139 @@ lemma Sequence.equiv_example :
 /-- Exercise 5.2.1 -/
 theorem Sequence.isCauchy_of_equiv {a b: ℕ → ℚ} (hab: Equiv a b) :
     (a:Sequence).IsCauchy ↔ (b:Sequence).IsCauchy := by
-      sorry
+      have equiv_symm {a b : ℕ->ℚ}: Equiv a b -> Equiv b a := by
+        intro h
+        simp only [Equiv] at *
+        intro ε hε
+        specialize h ε hε
+        rw [Rat.eventuallyClose_def] at *
+        obtain ⟨N, h0⟩ := h
+        use N
+        rw [Rat.closeSeq_def] at *
+        intro n h1 h2
+        specialize h0 n h1 h2
+        rw [Rat.Close] at *
+        grind
+      have a_to_b {a b: ℕ → ℚ} (hab: Equiv a b) :
+    (a:Sequence).IsCauchy -> (b:Sequence).IsCauchy := by
+        intro h
+        simp only [isCauchy_def] at *
+        intro ε hε
+        simp only [Rat.eventuallySteady_def] at *
+        set g:= ε/3
+        specialize h g (by grind)
+        obtain ⟨N1, _, ha⟩ := h
+        rw [Equiv] at hab
+        specialize hab g (by grind)
+        rw [Rat.eventuallyClose_def] at hab
+        obtain ⟨N2, hb⟩ := hab
+        rw [Rat.closeSeq_def] at hb
+        -- specialize hba g (by grind)
+        -- rw [Rat.eventuallyClose_def] at hba
+        -- obtain ⟨N3, hbb⟩ := hba
+        -- rw [Rat.closeSeq_def] at hbb
+        set N := max N1 (max N2 0)
+        use N
+        simp_all
+        rw [Rat.steady_def] at *
+        simp_all
+        constructor
+        . grind
+        intro n h0 h1 m h2 h3
+        have : ((a: Sequence).from N).n₀ = ((b: Sequence).from N).n₀ := by
+          simp_all
+        specialize ha n (by grind) m (by grind)
+        have hbb := hb m (by grind) (by grind)
+        specialize hb n (by grind) (by grind)
+        have: 0 ≤ n := by grind
+        have: 0 ≤ m := by grind
+        simp_all
+
+        rw [Rat.Close] at *
+        lift n to ℕ using (by grind)
+        lift m to ℕ using (by grind)
+        simp_all
+
+        have h2 := add_le_add (add_le_add hb ha) hbb
+        ring_nf at h2
+        have h1: |b n - b m| ≤ |a n - b n| + |a n - a m| + |a m - b m|  := by
+          simp [<- abs_neg (a n - b n)]
+          have : b n - b m = (b n - a n) + (a n - a m) + (a m - b m) := by
+            ring_nf
+          rw [this]
+          grind
+        simp [g] at h2
+        exact le_trans h1 h2
+      constructor
+      . exact a_to_b hab
+      exact a_to_b (equiv_symm hab)
 
 /-- Exercise 5.2.2 -/
 theorem Sequence.isBounded_of_eventuallyClose {ε:ℚ} {a b: ℕ → ℚ} (hab: ε.EventuallyClose a b) :
     (a:Sequence).IsBounded ↔ (b:Sequence).IsBounded := by
-      sorry
+      have h {ε:ℚ} {a b: ℕ → ℚ} (hab: ε.EventuallyClose a b) :
+    (a:Sequence).IsBounded -> (b:Sequence).IsBounded := by
+        intro ha
+        rcases ha with ⟨M1', _, hM⟩
+        simp [Rat.eventuallyClose_def] at hab
+        obtain ⟨N, hN⟩ := hab
+        rw [Rat.closeSeq_def] at hN
+        rw [isBounded_def]
+        set M2 := if 0 ≤ N then ((Finset.Icc 0 N.toNat).image fun x => |b x|).max' (by simp) else 0
+        by_cases hε: ε ≥ 0
+        swap
+        . set k := max ((a: Sequence).from N).n₀ ((b: Sequence).from N).n₀
+          specialize hN k (by grind) (by grind)
+          rw [Rat.Close] at hN
+          -- |·| ≤ ε < 0, hence impossible
+          grind
+        set M1 := M1' + ε
+        set M := max M1 M2
+        use M
+        constructor
+        . grind
+        intro n
+        simp_all
+        split_ifs
+        . by_cases hn: N ≤ n
+          . simp [M]
+            left
+            have h1 := hN n (by grind) (by grind)
+            rw [Rat.Close] at h1
+            lift n to ℕ using (by grind)
+            simp_all
+            have h1: |b n| = |a n - (a n - b n)| := by grind
+            rw [h1]
+            have h2: |a n - (a n - b n)| ≤ |a n| + |(a n - b n)| := by
+              apply abs_sub
+            apply le_trans h2
+            simp [M1]
+            gcongr
+            rw [boundedBy_def] at hM
+            specialize hM n
+            simp_all
+          . simp [M]
+            right
+            simp_all
+            have: 0 ≤ N := by grind
+            simp_all
+            simp [M2]
+            simp_all
+            apply Finset.le_max'
+            simp_all
+            use n.toNat
+            simp_all
+            grind
+        grind
+      constructor
+      . revert a b ε
+        exact h
+      have hba: ε.EventuallyClose ↑b ↑a := by
+        simp_all [Rat.eventuallyClose_def, Rat.closeSeq_def, Rat.Close]
+        rcases hab with ⟨N, hN⟩
+        use N
+        intro n hn0 hnN
+        simpa [abs_sub_comm] using hN n hn0 hnN
+      exact h hba
 
 end Chapter5
