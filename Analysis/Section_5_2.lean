@@ -39,15 +39,27 @@ lemma Rat.closeSeq_def (ε: ℚ) (a b: Sequence) :
 /-- Example 5.2.2 -/
 example : (0.1:ℚ).CloseSeq ((fun n:ℕ ↦ ((-1)^n:ℚ)):Sequence)
 ((fun n:ℕ ↦ ((1.1:ℚ) * (-1)^n)):Sequence) := by
-  sorry
+  rw [Rat.closeSeq_def]
+  simp_all
+  intro n hn
+  rw [Rat.Close]
+  field_simp; norm_num
 
 /-- Example 5.2.2 -/
 example : ¬ (0.1:ℚ).Steady ((fun n:ℕ ↦ ((-1)^n:ℚ)):Sequence) := by
-  sorry
+  intro h
+  simp_all [Rat.steady_def]
+  specialize h 1 (by grind) 2 (by grind)
+  simp_all [Rat.Close]
+  linarith
 
 /-- Example 5.2.2 -/
 example : ¬ (0.1:ℚ).Steady ((fun n:ℕ ↦ ((1.1:ℚ) * (-1)^n)):Sequence) := by
-  sorry
+  intro h
+  simp_all [Rat.steady_def]
+  specialize h 1 (by grind) 2 (by grind)
+  simp_all [Rat.Close]
+  linarith
 
 /-- Definition 5.2.3 (Eventually ε-close sequences) -/
 lemma Rat.eventuallyClose_def (ε: ℚ) (a b: Sequence) :
@@ -56,20 +68,63 @@ lemma Rat.eventuallyClose_def (ε: ℚ) (a b: Sequence) :
 /-- Definition 5.2.3 (Eventually ε-close sequences) -/
 lemma Rat.eventuallyClose_iff (ε: ℚ) (a b: ℕ → ℚ) :
     ε.EventuallyClose (a:Sequence) (b:Sequence) ↔ ∃ N, ∀ n ≥ N, |a n - b n| ≤ ε := by
-      sorry
+      simp_all [eventuallyClose_def]
+      constructor
+      . intro h
+        rcases h with ⟨N, hn⟩
+        use N.toNat
+        intro n h'
+        simp_all [closeSeq_def, Rat.Close]
+        grind
+      intro h
+      rcases h with ⟨N, h0⟩
+      use N
+      simp_all [closeSeq_def, Rat.Close]
+      grind
 
 /-- Example 5.2.5 -/
 example : ¬ (0.1:ℚ).CloseSeq ((fun n:ℕ ↦ (1:ℚ)+10^(-(n:ℤ)-1)):Sequence)
   ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by
-    sorry
+    intro h
+    simp_all [Rat.closeSeq_def, Rat.Close]
+    specialize h 0 (by grind)
+    grind
 
 example : (0.1:ℚ).EventuallyClose ((fun n:ℕ ↦ (1:ℚ)+10^(-(n:ℤ)-1)):Sequence)
   ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by
-    sorry
+    simp_all [Rat.closeSeq_def, Rat.Close, Rat.eventuallyClose_def]
+    use 1
+    intro n _ hn
+    field_simp; ring_nf
+    rw [abs_mul]
+    field_simp; ring_nf
+
+    have : |(10: ℚ)^ (-1 - n)| ≤ |(10: ℚ) ^ (-2: ℤ)| := by
+      have := pow_nonneg (show 0 ≤ 10 by grind)
+      simp_all
+      rw [show 100⁻¹=(10: ℚ)^(-2: ℤ) by grind]
+      refine (zpow_le_zpow_iff_right₀ rfl).mpr ?_
+      grind
+    have : |(10: ℚ)^ (-2: ℤ)| * 20 < 1 := by
+      norm_num
+    grind
 
 example : (0.01:ℚ).EventuallyClose ((fun n:ℕ ↦ (1:ℚ)+10^(-(n:ℤ)-1)):Sequence)
   ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by
-    sorry
+    simp_all [Rat.closeSeq_def, Rat.Close, Rat.eventuallyClose_def]
+    use 2
+    intro n _ hn
+    field_simp; ring_nf
+    have : (10: ℚ)^ (-1 - n) * 2 > 0 := by positivity
+    simp_all
+    have h1: (10: ℚ) ^ (-1 - n) * 2 ≤ (10: ℚ) ^ (-3: ℤ) * 2 := by
+      gcongr
+      . grind
+      grind
+    have h2: (10: ℚ) ^ (-3: ℤ) * 2 ≤ 100⁻¹ := by
+      rw [show 100⁻¹=(10: ℚ)^(-2: ℤ) by grind]
+      grind
+    apply le_trans h1 h2
 
 /-- Definition 5.2.6 (Equivalent sequences) -/
 abbrev Sequence.Equiv (a b: ℕ → ℚ) : Prop :=
