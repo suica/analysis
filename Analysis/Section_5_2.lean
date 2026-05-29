@@ -268,7 +268,7 @@ theorem Sequence.isCauchy_of_equiv {a b: ℕ → ℚ} (hab: Equiv a b) :
 /-- Exercise 5.2.2 -/
 theorem Sequence.isBounded_of_eventuallyClose {ε:ℚ} {a b: ℕ → ℚ} (hab: ε.EventuallyClose a b) :
     (a:Sequence).IsBounded ↔ (b:Sequence).IsBounded := by
-      have h {ε:ℚ} {a b: ℕ → ℚ} (hab: ε.EventuallyClose a b) :
+      have bound_of_bound {ε:ℚ} {a b: ℕ → ℚ} (hab: ε.EventuallyClose a b) :
     (a:Sequence).IsBounded -> (b:Sequence).IsBounded := by
         intro ha
         rcases ha with ⟨M1', _, hM⟩
@@ -299,19 +299,14 @@ theorem Sequence.isBounded_of_eventuallyClose {ε:ℚ} {a b: ℕ → ℚ} (hab: 
             rw [Rat.Close] at h1
             lift n to ℕ using (by grind)
             simp_all
-            have h1: |b n| = |a n - (a n - b n)| := by grind
-            rw [h1]
-            have h2: |a n - (a n - b n)| ≤ |a n| + |(a n - b n)| := by
-              apply abs_sub
-            apply le_trans h2
-            have h3: |a n| + |a n - b n| ≤ M1 := by
-              simp [M1]
-              gcongr
-              rw [boundedBy_def] at hM
-              specialize hM n
-              simp at hM
-              exact hM
-            exact h3
+            calc
+              |b n| = |a n - (a n - b n)| := by ring_nf
+              _ ≤ |a n| + |a n - b n| := abs_sub _ _
+              _ ≤ M1' + ε := by
+                    gcongr
+                    specialize hM n
+                    simp at hM
+                    exact hM
           . simp [M]
             right
             simp_all
@@ -327,13 +322,13 @@ theorem Sequence.isBounded_of_eventuallyClose {ε:ℚ} {a b: ℕ → ℚ} (hab: 
         grind
       constructor
       . revert a b ε
-        exact h
+        exact bound_of_bound
       have hba: ε.EventuallyClose ↑b ↑a := by
         simp_all [Rat.eventuallyClose_def, Rat.closeSeq_def, Rat.Close]
         rcases hab with ⟨N, hN⟩
         use N
         intro n hn0 hnN
         simpa [abs_sub_comm] using hN n hn0 hnN
-      exact h hba
+      exact bound_of_bound hba
 
 end Chapter5
