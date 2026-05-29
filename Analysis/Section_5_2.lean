@@ -38,13 +38,16 @@ lemma Rat.closeSeq_def (ε: ℚ) (a b: Sequence) :
 
 /-- Example 5.2.2 -/
 example : (0.1:ℚ).CloseSeq ((fun n:ℕ ↦ ((-1)^n:ℚ)):Sequence)
-((fun n:ℕ ↦ ((1.1:ℚ) * (-1)^n)):Sequence) := by sorry
+((fun n:ℕ ↦ ((1.1:ℚ) * (-1)^n)):Sequence) := by
+  sorry
 
 /-- Example 5.2.2 -/
-example : ¬ (0.1:ℚ).Steady ((fun n:ℕ ↦ ((-1)^n:ℚ)):Sequence) := by sorry
+example : ¬ (0.1:ℚ).Steady ((fun n:ℕ ↦ ((-1)^n:ℚ)):Sequence) := by
+  sorry
 
 /-- Example 5.2.2 -/
-example : ¬ (0.1:ℚ).Steady ((fun n:ℕ ↦ ((1.1:ℚ) * (-1)^n)):Sequence) := by sorry
+example : ¬ (0.1:ℚ).Steady ((fun n:ℕ ↦ ((1.1:ℚ) * (-1)^n)):Sequence) := by
+  sorry
 
 /-- Definition 5.2.3 (Eventually ε-close sequences) -/
 lemma Rat.eventuallyClose_def (ε: ℚ) (a b: Sequence) :
@@ -52,17 +55,21 @@ lemma Rat.eventuallyClose_def (ε: ℚ) (a b: Sequence) :
 
 /-- Definition 5.2.3 (Eventually ε-close sequences) -/
 lemma Rat.eventuallyClose_iff (ε: ℚ) (a b: ℕ → ℚ) :
-    ε.EventuallyClose (a:Sequence) (b:Sequence) ↔ ∃ N, ∀ n ≥ N, |a n - b n| ≤ ε := by sorry
+    ε.EventuallyClose (a:Sequence) (b:Sequence) ↔ ∃ N, ∀ n ≥ N, |a n - b n| ≤ ε := by
+      sorry
 
 /-- Example 5.2.5 -/
 example : ¬ (0.1:ℚ).CloseSeq ((fun n:ℕ ↦ (1:ℚ)+10^(-(n:ℤ)-1)):Sequence)
-  ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by sorry
+  ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by
+    sorry
 
 example : (0.1:ℚ).EventuallyClose ((fun n:ℕ ↦ (1:ℚ)+10^(-(n:ℤ)-1)):Sequence)
-  ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by sorry
+  ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by
+    sorry
 
 example : (0.01:ℚ).EventuallyClose ((fun n:ℕ ↦ (1:ℚ)+10^(-(n:ℤ)-1)):Sequence)
-  ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by sorry
+  ((fun n:ℕ ↦ (1:ℚ)-10^(-(n:ℤ)-1)):Sequence) := by
+    sorry
 
 /-- Definition 5.2.6 (Equivalent sequences) -/
 abbrev Sequence.Equiv (a b: ℕ → ℚ) : Prop :=
@@ -95,7 +102,8 @@ lemma Sequence.equiv_example :
     have hN' (N:ℕ) : 2 * (10:ℚ)^(-(N:ℤ)-1) ≤ 2/(N+1) := calc
       _ = 2 / (10:ℚ)^(N+1) := by
         field_simp
-        simp [←Section_4_3.pow_eq_zpow, ←zpow_add₀ (show 10 ≠ (0:ℚ) by norm_num)]
+        rw [←Section_4_3.pow_eq_zpow]
+        simp [←zpow_add₀ (show 10 ≠ (0:ℚ) by norm_num)]
       _ ≤ _ := by
         gcongr
         apply le_trans _ (pow_le_pow_left₀ (show 0 ≤ (2:ℚ) by norm_num)
@@ -112,10 +120,12 @@ lemma Sequence.equiv_example :
 
 /-- Exercise 5.2.1 -/
 theorem Sequence.isCauchy_of_equiv {a b: ℕ → ℚ} (hab: Equiv a b) :
-    (a:Sequence).IsCauchy ↔ (b:Sequence).IsCauchy := by sorry
+    (a:Sequence).IsCauchy ↔ (b:Sequence).IsCauchy := by
+      sorry
 
 /-- Exercise 5.2.2 -/
 theorem Sequence.isBounded_of_eventuallyClose {ε:ℚ} {a b: ℕ → ℚ} (hab: ε.EventuallyClose a b) :
-    (a:Sequence).IsBounded ↔ (b:Sequence).IsBounded := by sorry
+    (a:Sequence).IsBounded ↔ (b:Sequence).IsBounded := by
+      sorry
 
 end Chapter5
