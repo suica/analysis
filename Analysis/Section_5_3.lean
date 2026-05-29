@@ -285,7 +285,27 @@ theorem Sequence.IsCauchy.mul {a b:ℕ → ℚ}  (ha: (a:Sequence).IsCauchy) (hb
 /-- Proposition 5.3.10 (Product of equivalent sequences is equivalent) / Exercise 5.3.2 -/
 theorem Sequence.mul_equiv_left {a a':ℕ → ℚ} (b:ℕ → ℚ) (hb : (b:Sequence).IsCauchy) (haa': Equiv a a') :
   Equiv (a * b) (a' * b) := by
-  sorry
+  rw [equiv_def] at *
+  choose Mb _ hMb using isBounded_of_isCauchy hb
+  intro ε hε
+  specialize haa' (ε/(Mb+1))
+  rw [Rat.eventuallyClose_def] at *
+  choose N haa' using haa' (by positivity)
+  simp [Rat.closeSeq_def] at *
+  use N
+  peel 5 haa' with n hn hN _ _ haa'
+  simp [hn, hN, Rat.Close] at *
+  calc
+    |a n.toNat * b n.toNat - a' n.toNat * b n.toNat|
+    = |(a n.toNat - a' n.toNat) * b n.toNat| := by ring_nf
+    _ ≤ |(a n.toNat - a' n.toNat)| * (|b n.toNat| + 1) := ?_
+    _ ≤ (ε/(Mb+1)) * (Mb+1) := ?_
+  . grind
+  . gcongr
+    rw [boundedBy_def] at hMb
+    exact hMb (n.toNat)
+  . field_simp
+    linarith
 
 /--Proposition 5.3.10 (Product of equivalent sequences is equivalent) / Exercise 5.3.2 -/
 theorem Sequence.mul_equiv_right {b b':ℕ → ℚ} (a:ℕ → ℚ)  (ha : (a:Sequence).IsCauchy)  (hbb': Equiv b b') :
