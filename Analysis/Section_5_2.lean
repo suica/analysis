@@ -225,11 +225,7 @@ theorem Sequence.isCauchy_of_equiv {a b: ℕ → ℚ} (hab: Equiv a b) :
         rw [Rat.eventuallyClose_def] at hab
         obtain ⟨N2, hb⟩ := hab
         rw [Rat.closeSeq_def] at hb
-        -- specialize hba g (by grind)
-        -- rw [Rat.eventuallyClose_def] at hba
-        -- obtain ⟨N3, hbb⟩ := hba
-        -- rw [Rat.closeSeq_def] at hbb
-        set N := max N1 (max N2 0)
+        set N := max N1 N2
         use N
         simp_all
         rw [Rat.steady_def] at *
