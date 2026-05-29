@@ -82,10 +82,11 @@ theorem Sequence.equiv_trans {a b c:ℕ → ℚ} (hab: Equiv a b) (hbc: Equiv b 
     lift n to ℕ using (by grind)
     simp_all
     calc
-      |a n - c n| = |(a n - b n) + (b n - c n)| := by ring_nf
+      |a n - c n|
+        = |(a n - b n) + (b n - c n)| := by ring_nf
       _ ≤ |a n - b n| + |b n - c n| := abs_add_le _ _
       _ ≤ ε/2 + ε/2 := by gcongr
-      _ = ε := by grind
+      _ = ε := by ring_nf
 
 /-- Proposition 5.3.3 / Exercise 5.3.1 -/
 instance CauchySequence.instSetoid : Setoid CauchySequence where
