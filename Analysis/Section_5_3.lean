@@ -65,7 +65,27 @@ theorem CauchySequence.coe_coe {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) : mk'
 
 /-- Proposition 5.3.3 / Exercise 5.3.1 -/
 theorem Sequence.equiv_trans {a b c:ℕ → ℚ} (hab: Equiv a b) (hbc: Equiv b c) :
-  Equiv a c := by sorry
+  Equiv a c := by
+    simp_all [Equiv]
+    intro ε hε
+    specialize hab (ε/2) (by grind)
+    specialize hbc (ε/2) (by grind)
+    simp_all [Rat.eventuallyClose_def]
+    obtain ⟨N1, h1⟩ := hab
+    obtain ⟨N2, h2⟩ := hbc
+    use (max N1 N2)
+    simp_all [Rat.closeSeq_def]
+    intro n hn _ _
+    specialize h1 n (by grind) (by grind)
+    specialize h2 n (by grind) (by grind)
+    simp_all [Rat.Close]
+    lift n to ℕ using (by grind)
+    simp_all
+    calc
+      |a n - c n| = |(a n - b n) + (b n - c n)| := by ring_nf
+      _ ≤ |a n - b n| + |b n - c n| := abs_add_le _ _
+      _ ≤ ε/2 + ε/2 := by gcongr
+      _ = ε := by grind
 
 /-- Proposition 5.3.3 / Exercise 5.3.1 -/
 instance CauchySequence.instSetoid : Setoid CauchySequence where
