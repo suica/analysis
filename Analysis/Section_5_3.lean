@@ -373,6 +373,8 @@ instance Real.instNatCast : NatCast Real where
 @[simp]
 theorem Real.LIM.zero : LIM (fun _ ↦ (0:ℚ)) = 0 := by rw [←ratCast_def 0]; rfl
 
+theorem Real.LIM.one : LIM (fun _ ↦ (1:ℚ)) = 1 := by rw [←ratCast_def 1]; rfl
+
 instance Real.instIntCast : IntCast Real where
   intCast n := ((n:ℚ):Real)
 
@@ -750,13 +752,90 @@ noncomputable instance Real.instCommRing : CommRing Real where
 abbrev Real.ratCast_hom : ℚ →+* Real where
   toFun := RatCast.ratCast
   map_zero' := by
-    sorry
+    simp [RatCast.ratCast]
+    rw [<- LIM.zero]
+    rw [LIM_def]
   map_one' := by
-    sorry
+    simp [RatCast.ratCast]
+    rw [<- LIM.one]
+    rw [LIM_def]
   map_add' := by
-    sorry
+    intro x y
+    obtain ⟨ax, hax, lax⟩ := eq_lim x
+    obtain ⟨ay, hay, lay⟩ := eq_lim y
+    have h: ((ax + ay): Sequence).IsCauchy := by
+      apply Sequence.IsCauchy.add
+      exact hax
+      exact hay
+    simp only [lax, lay]
+    rw [LIM_add]
+    apply Quotient.sound
+    rw [CauchySequence.equiv_iff]
+    rw [<- LIM_eq_LIM]
+    simp_all
+    rw [dif_pos h]
+    simp_all
+
+    calc
+      (LIM fun n ↦ x + y)
+      = (x + y) := by
+        simp [Real.ratCast_def]
+        rw [LIM_add]
+        congr
+        apply Sequence.IsCauchy.const
+        apply Sequence.IsCauchy.const
+      _ = LIM ax + LIM ay := by
+        simp [lax, lay]
+      _ = LIM ((fun n ↦ ax n)+ fun n ↦ ay n) := by
+        rw [LIM_add]
+        repeat simpa
+      _ = LIM fun n ↦ ax n + ay n := by
+        congr
+    . simp_all
+      apply Sequence.IsCauchy.const
+    . simp_all
+      rw [dif_pos h]
+      simp_all
+      exact h
+    repeat simpa
   map_mul' := by
-    sorry
+    intro x y
+    obtain ⟨ax, hax, lax⟩ := eq_lim x
+    obtain ⟨ay, hay, lay⟩ := eq_lim y
+    have h: ((ax * ay): Sequence).IsCauchy := by
+      apply Sequence.IsCauchy.mul
+      <;> simpa
+    simp [lax, lay]
+    rw [LIM_mul]
+    apply Quotient.sound
+    rw [CauchySequence.equiv_iff]
+    rw [<- LIM_eq_LIM]
+    simp_all
+    rw [dif_pos h]
+    simp_all
+    calc
+      (LIM fun n ↦ x * y)
+        = (x * y) := by
+        simp [ratCast_def]
+        rw [LIM_mul]
+        congr
+        apply Sequence.IsCauchy.const
+        apply Sequence.IsCauchy.const
+      _ = LIM ax * LIM ay := by
+        simp [lax, lay]
+      _ = LIM ((fun n ↦ ax n) * fun n ↦ ay n) := by
+        rw [LIM_mul]
+        <;> simpa
+      _ = LIM fun n ↦ ax n * ay n := by
+        congr
+    . simp_all
+      apply Sequence.IsCauchy.const
+    . simp_all
+      rw [dif_pos h]
+      simp_all
+      exact h
+    . simpa
+    . simpa
 
 /--
   Definition 5.3.12 (sequences bounded away from zero). Sequences are indexed to start from zero
