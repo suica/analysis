@@ -652,19 +652,100 @@ noncomputable instance Real.instCommMonoid : CommMonoid Real where
 /-- Proposition 5.3.11 (laws of algebra) -/
 noncomputable instance Real.instCommRing : CommRing Real where
   left_distrib := by
-    sorry
+    intro a b c
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    obtain ⟨sb, hb, lb⟩ := eq_lim b
+    obtain ⟨sc, hc, lc⟩ := eq_lim c
+    simp only [la, lb, lc]
+    rw [LIM_add, LIM_mul]
+    ring_nf
+    rw [<- LIM_add, <- LIM_mul, <- LIM_mul]
+    all_goals
+      try simpa
+    . apply Sequence.IsCauchy.mul
+      repeat simpa
+    . apply Sequence.IsCauchy.mul
+      repeat simpa
+    . apply Sequence.IsCauchy.add
+      repeat simpa
   right_distrib := by
-    sorry
+    intro a b c
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    obtain ⟨sb, hb, lb⟩ := eq_lim b
+    obtain ⟨sc, hc, lc⟩ := eq_lim c
+    simp only [la, lb, lc]
+    rw [LIM_add, LIM_mul]
+    ring_nf
+    rw [<- LIM_add, <- LIM_mul, <- LIM_mul]
+    all_goals
+      try simpa
+    . apply Sequence.IsCauchy.mul
+      repeat simpa
+    . apply Sequence.IsCauchy.mul
+      repeat simpa
+    . apply Sequence.IsCauchy.add
+      repeat simpa
   zero_mul := by
-    sorry
+    intro a
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    simp only [la]
+    rw [<- LIM.zero]
+    rw [LIM_mul]
+    congr
+    . ext n
+      simp
+    . apply Sequence.IsCauchy.const
+    . exact ha
   mul_zero := by
-    sorry
+    intro a
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    simp only [la]
+    rw [<- LIM.zero]
+    rw [LIM_mul]
+    congr
+    . ext n
+      simp
+    . exact ha
+    apply Sequence.IsCauchy.const
   mul_assoc := by
-    sorry
+    intro a b c
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    obtain ⟨sb, hb, lb⟩ := eq_lim b
+    obtain ⟨sc, hc, lc⟩ := eq_lim c
+    simp only [la, lb, lc]
+    rw [LIM_mul, LIM_mul, LIM_mul]
+    rw [mul_assoc]
+    rw [<- LIM_mul, <- LIM_mul]
+    all_goals
+      try simpa
+    . apply Sequence.IsCauchy.mul
+      repeat simpa
+    . apply Sequence.IsCauchy.mul
+      repeat simpa
   natCast_succ := by
-    sorry
+    intro n
+    change (((n + 1: ℕ): ℚ):Real) = ((n: ℚ): Real) + 1
+    simp_all
+    rw [ratCast_def, ratCast_def]
+    have : LIM (fun _ ↦ (1:ℚ)) = 1:= by
+      rw [<- ratCast_def]
+      rfl
+    rw [<- this, LIM_add]
+    congr
+    apply Sequence.IsCauchy.const
+    apply Sequence.IsCauchy.const
   intCast_negSucc := by
-    sorry
+    intro n
+    change IntCast.intCast (Int.negSucc n) = -(↑(↑(n + 1): ℚ): Real)
+    simp [IntCast.intCast]
+    rw [ratCast_def, ratCast_def]
+    rw [neg_LIM]
+    ring_nf
+    congr
+    ext
+    simp_all
+    ring_nf
+    apply Sequence.IsCauchy.const
 
 abbrev Real.ratCast_hom : ℚ →+* Real where
   toFun := RatCast.ratCast
