@@ -346,7 +346,23 @@ theorem Real.ratCast_def (q:ℚ) : (q:Real) = LIM (fun _ ↦ q) := by rw [LIM_de
 /-- Exercise 5.3.3 -/
 @[simp]
 theorem Real.ratCast_inj (q r:ℚ) : (q:Real) = (r:Real) ↔ q = r := by
-  sorry
+  simp [Real.ratCast_def]
+  constructor
+  . intro h
+    rw [Real.LIM_eq_LIM] at h
+    . rw [Sequence.Equiv] at h
+      rw [Section_4_3.eq_if_close]
+      peel h with ε hε h
+      simp_all [Rat.eventuallyClose_def]
+      specialize h ε (by grind)
+      obtain ⟨N, h⟩:= h
+      simp_all [Rat.closeSeq_def]
+      specialize h N.toNat (by grind) (by grind)
+      exact h
+    apply Sequence.IsCauchy.const
+    apply Sequence.IsCauchy.const
+  intro h
+  rw [h]
 
 instance Real.instOfNat {n:ℕ} : OfNat Real n where
   ofNat := ((n:ℚ):Real)
