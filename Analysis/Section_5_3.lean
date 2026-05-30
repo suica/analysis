@@ -851,10 +851,20 @@ theorem bounded_away_zero_def (a:ℕ → ℚ) : BoundedAwayZero a ↔
 example : BoundedAwayZero (fun n ↦ (-1)^n) := by use 1; simp
 
 /-- Examples 5.3.13 -/
-example : ¬ BoundedAwayZero (fun n ↦ 10^(-(n:ℤ)-1)) := by sorry
+example : ¬ BoundedAwayZero (fun n ↦ 10^(-(n:ℤ)-1)) := by
+  by_contra h
+  rw [bounded_away_zero_def] at h
+  obtain ⟨ c, hc, h ⟩ := h
+  have : ∀ c:ℚ, c > 0 → ∃ n: ℕ, |(1/10)^(n:ℤ)| < c := by
+    intro c hc
+    sorry
+  have : ¬ (∀ n: ℕ, |10^(-(n:ℤ)-1)| ≥ c) := by
+    sorry
+  contradiction
 
 /-- Examples 5.3.13 -/
-example : ¬ BoundedAwayZero (fun n ↦ 1 - 10^(-(n:ℤ))) := by sorry
+example : ¬ BoundedAwayZero (fun n ↦ 1 - 10^(-(n:ℤ))) := by
+  sorry
 
 /-- Examples 5.3.13 -/
 example : BoundedAwayZero (fun n ↦ 10^(n+1)) := by
@@ -864,7 +874,8 @@ example : BoundedAwayZero (fun n ↦ 10^(n+1)) := by
   gcongr <;> grind
 
 /-- Examples 5.3.13 -/
-example : ¬ ((fun (n:ℕ) ↦ (10:ℚ)^(n+1)):Sequence).IsBounded := by sorry
+example : ¬ ((fun (n:ℕ) ↦ (10:ℚ)^(n+1)):Sequence).IsBounded := by
+  sorry
 
 /-- Lemma 5.3.14 -/
 theorem Real.boundedAwayZero_of_nonzero {x:Real} (hx: x ≠ 0) :
@@ -893,7 +904,8 @@ theorem Real.boundedAwayZero_of_nonzero {x:Real} (hx: x ≠ 0) :
 -/
 theorem Real.lim_of_boundedAwayZero {a:ℕ → ℚ} (ha: BoundedAwayZero a)
   (ha_cauchy: (a:Sequence).IsCauchy) :
-    LIM a ≠ 0 := by sorry
+    LIM a ≠ 0 := by
+    sorry
 
 theorem Real.nonzero_of_boundedAwayZero {a:ℕ → ℚ} (ha: BoundedAwayZero a) (n: ℕ) : a n ≠ 0 := by
    choose c hc ha using ha; specialize ha n; contrapose! ha; simp [ha, hc]
