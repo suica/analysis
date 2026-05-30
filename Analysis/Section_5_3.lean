@@ -557,21 +557,97 @@ theorem Sequence.IsCauchy.sub {a b:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) (hb:
 
 /-- {name}`LIM` distributes over subtraction -/
 theorem Real.LIM_sub {a b:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) (hb: (b:Sequence).IsCauchy) :
-  LIM a - LIM b = LIM (a - b) := by sorry
+  LIM a - LIM b = LIM (a - b) := by
+  rw [sub_eq_add_neg, neg_LIM, LIM_add, LIM_eq_LIM, Sequence.Equiv]
+  intro ε hε
+  rw [Rat.eventuallyClose_def]
+  use 0
+  rw [Rat.closeSeq_def]
+  intro n _ _
+  rw [Rat.Close]
+  simp_all
+  grind
+  all_goals
+    try simpa
+  . apply Sequence.IsCauchy.add
+    simpa
+    apply Sequence.IsCauchy.neg
+    simpa
+  . apply Sequence.IsCauchy.sub
+    repeat simpa
+  apply Sequence.IsCauchy.neg
+  simpa
 
 /-- {name (full := RatCast.ratCast)}`ratCast` distributes over subtraction -/
-theorem Real.ratCast_sub (a b:ℚ) : (a:Real) - (b:Real) = (a-b:ℚ) := by sorry
+theorem Real.ratCast_sub (a b:ℚ) : (a:Real) - (b:Real) = (a-b:ℚ) := by
+  simp [Real.ratCast_def]
+  rw [LIM_sub]
+  congr
+  apply Sequence.IsCauchy.const
+  apply Sequence.IsCauchy.const
 
 /-- Proposition 5.3.11 (laws of algebra) -/
 noncomputable instance Real.instAddCommGroup : AddCommGroup Real where
-  add_comm := by sorry
+  add_comm := by
+    intro a b
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    obtain ⟨sb, hb, lb⟩ := eq_lim b
+    simp only [la, lb]
+    rw [LIM_add, LIM_add]
+    rw [add_comm]
+    repeat simpa
 
 /-- Proposition 5.3.11 (laws of algebra) -/
 noncomputable instance Real.instCommMonoid : CommMonoid Real where
-  mul_comm := by sorry
-  mul_assoc := by sorry
-  one_mul := by sorry
-  mul_one := by sorry
+  mul_comm := by
+    intro a b
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    obtain ⟨sb, hb, lb⟩ := eq_lim b
+    simp only [la, lb]
+    rw [LIM_mul, LIM_mul]
+    ring_nf
+    repeat simpa
+  mul_assoc := by
+    intro a b c
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    obtain ⟨sb, hb, lb⟩ := eq_lim b
+    obtain ⟨sc, hc, lc⟩ := eq_lim c
+    simp only [la, lb, lc]
+    rw [LIM_mul, LIM_mul, LIM_mul]
+    rw [mul_assoc]
+    rw [<- LIM_mul]
+    all_goals
+      try simpa
+    all_goals
+      apply Sequence.IsCauchy.mul
+      repeat simpa
+  one_mul := by
+    intro a
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    have : LIM (fun _ ↦ (1:ℚ)) = 1:= by
+      rw [<- ratCast_def]
+      rfl
+    rw [<- this, la]
+    rw [LIM_mul]
+    congr
+    . ext n
+      simp
+    . apply Sequence.IsCauchy.const
+    . exact ha
+  mul_one := by
+    intro a
+    obtain ⟨sa, ha, la⟩ := eq_lim a
+    have : LIM (fun _ ↦ (1:ℚ)) = 1:= by
+      rw [<- ratCast_def]
+      rfl
+    rw [<- this, la]
+    rw [LIM_mul]
+    congr
+    . ext n
+      simp
+    . exact ha
+    . apply Sequence.IsCauchy.const
+
 
 /-- Proposition 5.3.11 (laws of algebra) -/
 noncomputable instance Real.instCommRing : CommRing Real where
