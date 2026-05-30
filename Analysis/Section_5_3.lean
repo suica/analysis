@@ -523,7 +523,37 @@ noncomputable instance Real.addGroup_inst : AddGroup Real :=
 theorem Real.sub_eq_add_neg (x y:Real) : x - y = x + (-y) := rfl
 
 theorem Sequence.IsCauchy.sub {a b:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) (hb: (b:Sequence).IsCauchy) :
-    ((a-b:ℕ → ℚ):Sequence).IsCauchy := by sorry
+    ((a-b:ℕ → ℚ):Sequence).IsCauchy := by
+    simp [Sequence.isCauchy_def] at *
+    intro ε hε
+    simp [Rat.eventuallySteady_def] at *
+    specialize ha (ε/2) (by grind)
+    specialize hb (ε/2) (by grind)
+    obtain ⟨Na, _, ha⟩ := ha
+    obtain ⟨Nb, _, hb⟩ := hb
+    rw [Rat.steady_def] at ha hb
+    set N := max Na Nb
+    use N
+    constructor
+    . positivity
+    simp_all
+    rw [Rat.steady_def]
+    intro e _ f _
+    lift e to ℕ using (by grind)
+    lift f to ℕ using (by grind)
+    simp_all
+    calc
+      |a e - b e - (a f - b f)|
+        = |a e - a f + (b f - b e)| := by ring_nf
+      _ ≤ |a e - a f| + |b f - b e| := abs_add_le _ _
+      _ ≤ (ε/2) + (ε/2) := ?_
+      _ ≤ ε := by simp
+    specialize ha e (by grind) f (by grind)
+    specialize hb e (by grind) f (by grind)
+    rw [Rat.Close] at *
+    simp at ha hb
+    gcongr
+    grind
 
 /-- {name}`LIM` distributes over subtraction -/
 theorem Real.LIM_sub {a b:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) (hb: (b:Sequence).IsCauchy) :
