@@ -651,20 +651,31 @@ noncomputable instance Real.instCommMonoid : CommMonoid Real where
 
 /-- Proposition 5.3.11 (laws of algebra) -/
 noncomputable instance Real.instCommRing : CommRing Real where
-  left_distrib := by sorry
-  right_distrib := by sorry
-  zero_mul := by sorry
-  mul_zero := by sorry
-  mul_assoc := by sorry
-  natCast_succ := by sorry
-  intCast_negSucc := by sorry
+  left_distrib := by
+    sorry
+  right_distrib := by
+    sorry
+  zero_mul := by
+    sorry
+  mul_zero := by
+    sorry
+  mul_assoc := by
+    sorry
+  natCast_succ := by
+    sorry
+  intCast_negSucc := by
+    sorry
 
 abbrev Real.ratCast_hom : ℚ →+* Real where
   toFun := RatCast.ratCast
-  map_zero' := by sorry
-  map_one' := by sorry
-  map_add' := by sorry
-  map_mul' := by sorry
+  map_zero' := by
+    sorry
+  map_one' := by
+    sorry
+  map_add' := by
+    sorry
+  map_mul' := by
+    sorry
 
 /--
   Definition 5.3.12 (sequences bounded away from zero). Sequences are indexed to start from zero
