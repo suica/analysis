@@ -424,19 +424,6 @@ theorem Real.neg_ratCast (a:ℚ) : -(a:Real) = (-a:ℚ) := by
   norm_num
   grind
 
--- lemma const_sequence_iscauchy(a: ℚ): ((fun _: ℕ => a): Sequence).IsCauchy := by
---   rw [Sequence.isCauchy_def]
---   intro ε hε
---   rw [Rat.eventuallySteady_def]
---   use 1
---   simp_all
---   rw [Rat.steady_def]
---   intro n _ m _
---   rw [Rat.Close]
---   simp_all
---   split_ifs
---   <;> try grind
-
 /-- It may be possible to omit the {name (full := Sequence.IsCauchy)}`IsCauchy` hypothesis here. -/
 theorem Real.neg_LIM (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) : -LIM a = LIM (-a) := by
   rw [Neg.neg]
@@ -467,11 +454,71 @@ theorem Real.neg_LIM (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) : -LIM a = LIM 
 
 theorem Sequence.IsCauchy.neg (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) :
     ((-a:ℕ → ℚ):Sequence).IsCauchy := by
-      sorry
+    simp [Sequence.isCauchy_def] at *
+    peel ha with ε hε N _ _ n _ m _
+    simp [Rat.Close] at *
+    grind
 
 /-- Proposition 5.3.11 (laws of algebra) -/
 noncomputable instance Real.addGroup_inst : AddGroup Real :=
-  AddGroup.ofLeftAxioms (by sorry) (by sorry) (by sorry)
+  AddGroup.ofLeftAxioms (by
+      intro a b c
+      obtain ⟨sa, ha, la⟩ := eq_lim a
+      obtain ⟨sb, hb, lb⟩ := eq_lim b
+      obtain ⟨sc, hc, lc⟩ := eq_lim c
+      simp only [la, lb, lc]
+      repeat rw [LIM_add]
+      ring_nf
+      -- performance issue here! cannot decide the wnhf if use a single combination of simpa & add
+      all_goals try simpa
+      all_goals apply Sequence.IsCauchy.add
+      all_goals try simpa
+    ) (by
+      intro a
+      obtain ⟨sa, ha, la⟩ := eq_lim a
+      rw [<- Real.LIM.zero]
+      rw [la, LIM_add, LIM_eq_LIM]
+      rw [Sequence.Equiv]
+      rw [Sequence.isCauchy_def] at *
+      peel ha with ε hε ha
+      rw [Rat.eventuallySteady_def] at *
+      obtain ⟨Na, _, ha⟩ := ha
+      use Na
+      rw [Rat.closeSeq_def]
+      intro _ _ _
+      rw [Rat.Close]
+      simp_all
+      . grind
+      . apply Sequence.IsCauchy.add
+        apply Sequence.IsCauchy.const
+        exact ha
+      . exact ha
+      . apply Sequence.IsCauchy.const
+      exact ha
+    ) (by
+      intro a
+      obtain ⟨sa, ha, la⟩ := eq_lim a
+      simp only [la]
+      rw [<- Real.LIM.zero]
+      rw [neg_LIM, LIM_add, LIM_eq_LIM, Sequence.Equiv]
+      intro ε hε
+      rw [Rat.eventuallyClose_def]
+      use 0
+      rw [Rat.closeSeq_def]
+      intro n _ _
+      rw [Rat.Close]
+      simp_all
+      grind
+      all_goals
+        try simpa
+      . apply Sequence.IsCauchy.add
+        apply Sequence.IsCauchy.neg
+        simpa
+        simpa
+      . apply Sequence.IsCauchy.const
+      apply Sequence.IsCauchy.neg
+      simpa
+    )
 
 theorem Real.sub_eq_add_neg (x y:Real) : x - y = x + (-y) := rfl
 
