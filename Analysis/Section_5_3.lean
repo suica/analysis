@@ -378,22 +378,92 @@ instance Real.instIntCast : IntCast Real where
 
 /-- {name (full := RatCast.ratCast)}`ratCast` distributes over addition -/
 theorem Real.ratCast_add (a b:ℚ) : (a:Real) + (b:Real) = (a+b:ℚ) := by
-  sorry
+  simp [Real.ratCast_def]
+  rw [Real.LIM_add, Real.LIM_eq_LIM]
+  <;> try apply Sequence.IsCauchy.const
+  simp_all [Sequence.Equiv]
+  intro ε hε
+  simp_all [Rat.eventuallyClose_def]
+  use 0
+  simp_all [Rat.closeSeq_def]
+  intro n hn
+  rw [Rat.Close]
+  grind
+
 
 /-- {name (full := RatCast.ratCast)}`ratCast` distributes over multiplication -/
 theorem Real.ratCast_mul (a b:ℚ) : (a:Real) * (b:Real) = (a*b:ℚ) := by
-  sorry
+  simp [Real.ratCast_def]
+  rw [Real.LIM_mul, Real.LIM_eq_LIM]
+  <;> try apply Sequence.IsCauchy.const
+  simp_all [Sequence.Equiv]
+  intro ε hε
+  simp_all [Rat.eventuallyClose_def]
+  use 0
+  simp_all [Rat.closeSeq_def]
+  intro n hn
+  rw [Rat.Close]
+  grind
 
 noncomputable instance Real.instNeg : Neg Real where
   neg x := ((-1:ℚ):Real) * x
 
 /-- {name (full := RatCast.ratCast)}`ratCast` commutes with negation -/
 theorem Real.neg_ratCast (a:ℚ) : -(a:Real) = (-a:ℚ) := by
-  sorry
+  change ((-1 : ℚ) : Real) * (a : Real) = (-a : ℚ)
+  simp [Real.ratCast_def]
+  rw [Real.LIM_mul, Real.LIM_eq_LIM]
+  <;> try apply Sequence.IsCauchy.const
+  simp_all [Sequence.Equiv]
+  intro ε hε
+  simp_all [Rat.eventuallyClose_def]
+  use 0
+  simp_all [Rat.closeSeq_def]
+  intro n hn
+  rw [Rat.Close]
+  norm_num
+  grind
+
+-- lemma const_sequence_iscauchy(a: ℚ): ((fun _: ℕ => a): Sequence).IsCauchy := by
+--   rw [Sequence.isCauchy_def]
+--   intro ε hε
+--   rw [Rat.eventuallySteady_def]
+--   use 1
+--   simp_all
+--   rw [Rat.steady_def]
+--   intro n _ m _
+--   rw [Rat.Close]
+--   simp_all
+--   split_ifs
+--   <;> try grind
 
 /-- It may be possible to omit the {name (full := Sequence.IsCauchy)}`IsCauchy` hypothesis here. -/
 theorem Real.neg_LIM (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) : -LIM a = LIM (-a) := by
-  sorry
+  rw [Neg.neg]
+  simp [Real.instNeg, Real.ratCast_def]
+  rw [LIM_mul, LIM_eq_LIM]
+  . simp [Sequence.Equiv]
+    intro ε hε
+    use 1
+    intro n _ m
+    rw [Rat.Close]
+    simp_all
+    grind
+  . have : ((fun x:ℕ ↦ (-1: ℚ))) * a = -1 * a:= by rfl
+    rw [this]
+    apply Sequence.IsCauchy.mul
+    . change ((fun x: ℕ=>(-1: ℚ)): Sequence).IsCauchy
+      apply Sequence.IsCauchy.const
+    exact ha
+  . simp [Sequence.isCauchy_def] at *
+    peel ha with ε hε h N _ n _ m _
+    simp_all [Rat.Close]
+    grind
+  . simp [Sequence.isCauchy_def] at *
+    peel ha with ε hε h N _ n _ m _
+    simp_all [Rat.Close]
+    grind
+  exact ha
 
 theorem Sequence.IsCauchy.neg (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) :
     ((-a:ℕ → ℚ):Sequence).IsCauchy := by
