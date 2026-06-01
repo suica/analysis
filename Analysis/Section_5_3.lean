@@ -885,6 +885,26 @@ example : ¬ BoundedAwayZero (fun n ↦ 10^(-(n:ℤ)-1)) := by
 
 /-- Examples 5.3.13 -/
 example : ¬ BoundedAwayZero (fun n ↦ 1 - 10^(-(n:ℤ))) := by
+  rw [bounded_away_zero_def]
+  push_neg
+  intro c hc
+  have h0 : ∃ n : ℕ, 10 ^ ((n:ℤ)) > 1 / c := by
+    apply pow_unbounded_of_one_lt
+    grind
+  have h1 : ∃ n : ℕ, 1/|1 - 10 ^ (-(n:ℤ))| > 1 / c := by
+    obtain ⟨n, hn⟩ := h0
+    use n
+    rw [abs_of_pos] at ⊢
+    field_simp at hn ⊢
+    sorry
+    sorry
+  obtain ⟨n, hn⟩ := h1
+  use n
+  rw [abs_of_neg] at hn ⊢
+  simp_all
+  field_simp at hn ⊢
+  sorry
+  sorry
   sorry
 
 /-- Examples 5.3.13 -/
