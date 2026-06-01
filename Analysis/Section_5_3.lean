@@ -977,9 +977,22 @@ theorem Real.boundedAwayZero_of_nonzero {x:Real} (hx: x ≠ 0) :
   choose ε hε hx using hx
   choose N hb' using (Sequence.IsCauchy.coe _).mp hb _ (half_pos hε)
   choose n₀ hn₀ hx using hx N
-  have how : ∀ j ≥ N, |b j| ≥ ε/2 := by sorry
+  have how : ∀ j ≥ N, |b j| ≥ ε/2 := by
+    -- a simple grind will solve this lemma. But for practice purpose i will write the full-fledged proof
+    unfold Section_4_3.dist at hb'
+    intro j hj
+    specialize hb' j hj n₀ (by grind)
+    rw [abs_sub_comm] at hb'
+    have : |b n₀| - |b j| ≤ |b n₀ - b j| := abs_sub_abs_le_abs_sub (b n₀) (b j)
+    have : |b n₀| - |b j| ≤ ε / 2 := le_trans this hb'
+    have : |b n₀| ≤ ε / 2 + |b j| := by grind
+    have : ε ≤ ε / 2 + |b j| := by grind
+    have : ε / 2 ≤ |b j| := by
+      grind
+    exact this
   set a : ℕ → ℚ := fun n ↦ if n < n₀ then ε/2 else b n
-  have not_hard : Sequence.Equiv a b := by sorry
+  have not_hard : Sequence.Equiv a b := by
+    sorry
   have ha := (Sequence.isCauchy_of_equiv not_hard).mpr hb
   refine ⟨ a, ha, ?_, by rw [(LIM_eq_LIM ha hb).mpr not_hard] ⟩
   rw [bounded_away_zero_def]
