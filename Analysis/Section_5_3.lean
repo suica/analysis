@@ -1091,10 +1091,27 @@ theorem Real.inv_def {a:ℕ → ℚ} (h: BoundedAwayZero a) (hc: (a:Sequence).Is
 theorem Real.inv_zero : (0:Real)⁻¹ = 0 := by simp [Inv.inv]
 
 theorem Real.self_mul_inv {x:Real} (hx: x ≠ 0) : x * x⁻¹ = 1 := by
-  sorry
+  have := Real.boundedAwayZero_of_nonzero hx
+  obtain ⟨a, hcauchy, haway, hla ⟩ := this
+  have := Real.inv_def haway hcauchy
+  rw [hla]
+  rw [this]
+  rw [LIM_mul]
+  have : a * a⁻¹ = fun _ ↦ 1 := by
+    ext x
+    simp
+    grind
+  rw [this]
+  rw [<-ratCast_def]
+  . rfl
+  . simpa
+  apply Real.inv_isCauchy_of_boundedAwayZero
+  repeat simpa
 
 theorem Real.inv_mul_self {x:Real} (hx: x ≠ 0) : x⁻¹ * x = 1 := by
-  sorry
+  rw [mul_comm]
+  apply Real.self_mul_inv
+  exact hx
 
 lemma BoundedAwayZero.const {q : ℚ} (hq : q ≠ 0) : BoundedAwayZero fun _ ↦ q := by
   use |q|; simp [hq]
