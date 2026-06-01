@@ -1011,7 +1011,24 @@ theorem Real.boundedAwayZero_of_nonzero {x:Real} (hx: x ≠ 0) :
 theorem Real.lim_of_boundedAwayZero {a:ℕ → ℚ} (ha: BoundedAwayZero a)
   (ha_cauchy: (a:Sequence).IsCauchy) :
     LIM a ≠ 0 := by
-    sorry
+    contrapose! ha
+    set s_const := ((fun _:ℕ ↦ (0:ℚ)))
+    have lc : LIM s_const = 0 := by
+      rw [<- ratCast_def]
+      rfl
+    have h_eqv: Sequence.Equiv s_const a := by
+      rw [<- Real.LIM_eq_LIM]
+      rw [ha,lc]
+      apply Sequence.IsCauchy.const
+      apply ha_cauchy
+    simp [Sequence.equiv_iff] at h_eqv
+    intro c hc
+    specialize h_eqv (c/2) (by positivity)
+    obtain ⟨N, hN⟩ := h_eqv
+    use N
+    specialize hN N (by grind)
+    simp [s_const] at hN
+    grind
 
 theorem Real.nonzero_of_boundedAwayZero {a:ℕ → ℚ} (ha: BoundedAwayZero a) (n: ℕ) : a n ≠ 0 := by
    choose c hc ha using ha; specialize ha n; contrapose! ha; simp [ha, hc]
