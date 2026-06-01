@@ -1175,7 +1175,54 @@ theorem Real.mul_right_nocancel : ¬ ∀ (x y z:Real), (hz: z = 0) → (x * z = 
 
 /-- Exercise 5.3.4 -/
 theorem Real.IsBounded.equiv {a b:ℕ → ℚ} (ha: (a:Sequence).IsBounded) (hab: Sequence.Equiv a b) :
-    (b:Sequence).IsBounded := by sorry
+    (b:Sequence).IsBounded := by
+    rw [Sequence.isBounded_def] at *
+    obtain ⟨M, Mpos, hM⟩ := ha
+    set ε:= (1:ℚ)
+    rw [Sequence.equiv_iff] at hab
+    specialize hab (ε) (by grind)
+    obtain ⟨N, hN⟩ := hab
+    set M2 := if 0 ≤ N then ((Finset.Icc 0 N).image fun x => |b x|).max' (by simp) else 0
+    set M' := max (max (M+1) 1) M2
+    use M'
+    simp_all
+    constructor
+    . grind
+    rw [Sequence.boundedBy_def] at *
+    intro n
+    by_cases hn: n ≥ N
+    . lift n to ℕ using (by grind)
+      have close := hN n (by grind)
+      simp
+
+      have :|b n| ≤ ε + M := by
+        calc
+          |b n|
+            = |b n - a n + a n| := by ring_nf
+          _ ≤ |b n - a n| + |a n| := ?_
+          _ ≤ ε + M := ?_
+        . grind
+        . gcongr
+          rw [abs_sub_comm]
+          simpa
+          specialize hM n
+          simpa
+      simp [M']
+      left
+      rw [add_comm]
+      left
+      exact this
+    by_cases hn: n≥0
+    . rw [le_max_iff]
+      right
+      simp_all [M2]
+      apply Finset.le_max'
+      simp_all
+      use n.toNat
+      simp_all
+      grind
+    simp_all [if_neg]
+    grind
 
 /--
   Same as {name}`Sequence.IsCauchy.harmonic` but reindexing the sequence as a₀ = 1, a₁ = 1/2, ...
@@ -1187,6 +1234,56 @@ theorem Sequence.IsCauchy.harmonic' : ((fun n ↦ 1/((n:ℚ)+1): ℕ → ℚ):Se
   simp_all
 
 /-- Exercise 5.3.5 -/
-theorem Real.LIM.harmonic : LIM (fun n ↦ 1/((n:ℚ)+1)) = 0 := by sorry
+theorem Real.LIM.harmonic : LIM (fun n ↦ 1/((n:ℚ)+1)) = 0 := by
+  have h1: Sequence.Equiv (fun n ↦ 1 / (↑n + 1)) fun x ↦ 0 := by
+    rw [Sequence.equiv_iff]
+    have h: ((fun n:ℕ ↦ 1/((n:ℚ)+1)):Sequence).IsCauchy := by
+      apply Sequence.IsCauchy.harmonic'
+    simp [Sequence.isCauchy_def, Rat.eventuallySteady_def] at h
+    intro ε hε
+    specialize h ε hε
+    obtain ⟨N', Npos, hN⟩ := h
+    rw [Rat.steady_def] at hN
+    lift N' to ℕ using (by omega)
+    set N := max (max 1 N') (⌈1/ε⌉.natAbs)
+    use N
+    intro n hn
+    rw [sub_zero]
+    rw [abs_of_nonneg (by positivity)]
+    calc
+      1 / ((n:ℚ) + 1)
+        ≤ 1 / ((N:ℚ) + 1) := ?_
+      _ ≤ 1 / (N:ℚ) := ?_
+      _ ≤ ε := ?_
+    . field_simp; ring_nf
+      norm_cast
+      grind
+    . field_simp
+      norm_cast at *
+      refine (one_le_div₀ ?_).mpr ?_
+      simp [N]
+      grind
+    . simp [N]
+      field_simp
+      suffices h: 1/ε ≤ max 1 (max ↑N' |↑⌈1 / ε⌉|) by
+        field_simp at h
+        exact h
+      rw [le_max_iff]
+      right
+      rw [le_max_iff]
+      right
+      norm_cast
+      have strip_abs: |⌈1 / ε⌉| = ⌈1 / ε⌉ := by
+        simp_all
+        refine Int.ceil_nonneg ?_
+        positivity
+      rw [strip_abs]
+      exact Int.le_ceil (1 / ε)
+  rw [<- LIM.zero]
+  rw [Real.LIM_eq_LIM]
+  . exact h1
+  . rw [Sequence.isCauchy_of_equiv h1]
+    apply Sequence.IsCauchy.const
+  apply Sequence.IsCauchy.const
 
 end Chapter5
