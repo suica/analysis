@@ -883,14 +883,52 @@ example : ¬ BoundedAwayZero (fun n ↦ 10^(-(n:ℤ)-1)) := by
     linarith
   contradiction
 
+lemma unbound_pow {k: ℚ}: k > 0 -> ∃ n : ℕ, 10 ^ ((n:ℤ)) > k := by
+  intro hc
+  by_contra h
+  push_neg at h
+  specialize h ⌈k⌉.natAbs
+  have h0 {n: ℕ}: n < 10^n := by
+    induction n with
+    | zero =>
+      simp
+    | succ n ih =>
+      rw [pow_succ]
+      calc
+        n + 1
+        < 10 ^ n + 1 := by linarith
+        _ ≤ 10 ^ n * 9 + 10^n := ?_
+        _ = 10 ^ n * 10 := ?_
+      . gcongr
+        simp
+        by_cases h: n = 0
+        rw [h]
+        simp
+        grind
+      . ring_nf
+
+  specialize h0 (n:=⌈k⌉.natAbs)
+  have h1: k≤⌈k⌉.natAbs := by
+    calc
+      k
+        ≤ ⌈k⌉ := Int.le_ceil _
+      _ ≤ ⌈k⌉.natAbs := ?_
+    have := Int.le_natAbs (a:=⌈k⌉)
+    exact Rat.le_floor_iff.mp this
+  have : 10 ^ ↑⌈k⌉.natAbs ≤ ↑⌈k⌉.natAbs := by
+    exact_mod_cast calc
+      10 ^ ↑⌈k⌉.natAbs
+        ≤ k := h
+      _ ≤ ↑⌈k⌉.natAbs := h1
+  grind
+
 /-- Examples 5.3.13 -/
 example : ¬ BoundedAwayZero (fun n ↦ 1 - 10^(-(n:ℤ))) := by
   rw [bounded_away_zero_def]
   push_neg
   intro c hc
   have h0 : ∃ n : ℕ, 10 ^ ((n:ℤ)) > 1 / c := by
-    apply pow_unbounded_of_one_lt
-    grind
+    apply unbound_pow (by positivity)
   have h1 : ∃ n : ℕ, 1/|1 - 10 ^ (-(n:ℤ))| > 1 / c := by
     obtain ⟨n, hn⟩ := h0
     use n
@@ -916,7 +954,15 @@ example : BoundedAwayZero (fun n ↦ 10^(n+1)) := by
 
 /-- Examples 5.3.13 -/
 example : ¬ ((fun (n:ℕ) ↦ (10:ℚ)^(n+1)):Sequence).IsBounded := by
-  sorry
+  intro h
+  obtain ⟨ c, hc, h ⟩ := h
+  simp_all
+  rw [Sequence.boundedBy_def] at h
+  have: ¬∀ (n : ℤ), |((fun n:ℕ ↦ (10:ℚ) ^ n * 10): Sequence).seq n| ≤ c := by
+    push_neg
+
+    sorry
+  contradiction
 
 /-- Lemma 5.3.14 -/
 theorem Real.boundedAwayZero_of_nonzero {x:Real} (hx: x ≠ 0) :
