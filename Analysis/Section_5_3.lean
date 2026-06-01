@@ -1127,17 +1127,51 @@ noncomputable instance Real.instDivInvMonoid : DivInvMonoid Real where
 theorem Real.div_eq (x y:Real) : x/y = x * y⁻¹ := rfl
 
 noncomputable instance Real.instField : Field Real where
-  exists_pair_ne := by sorry
-  mul_inv_cancel := by sorry
-  inv_zero := by sorry
-  ratCast_def := by sorry
+  exists_pair_ne := by
+    use 0, 1
+    simp
+    intro h
+    change ((0:ℚ):Real) = ((1:ℚ):Real) at h
+    rw [Real.ratCast_inj] at h
+    contradiction
+  mul_inv_cancel := by
+    intro a ha
+    have := Real.self_mul_inv ha
+    rw [this]
+  inv_zero := by
+    simp [Inv.inv]
+  ratCast_def := by
+    intro q
+    simp [ratCast_def]
+    change (LIM fun x ↦ q) = ((q.num:ℚ):Real) / ((q.den:ℚ):Real)
+    simp [ratCast_def, div_eq]
+    rw [inv_def, LIM_mul]
+    congr
+    . ext x
+      simp_all
+      field_simp; ring_nf
+      simp_all only [Rat.mul_den_eq_num]
+    . apply Sequence.IsCauchy.const
+    . apply Sequence.IsCauchy.const
+    .
+      rw [bounded_away_zero_def]
+      have : |(q.den:ℤ)| > 0 := by
+        have := q.den_nz
+        grind
+      use |(q.den:ℤ)|
+      simp_all
+    . apply Sequence.IsCauchy.const
   qsmul := _
   nnqsmul := _
 
-theorem Real.mul_right_cancel₀ {x y z:Real} (hz: z ≠ 0) (h: x * z = y * z) : x = y := by sorry
+theorem Real.mul_right_cancel₀ {x y z:Real} (hz: z ≠ 0) (h: x * z = y * z) : x = y := by
+  field_simp at h
+  exact h
 
 theorem Real.mul_right_nocancel : ¬ ∀ (x y z:Real), (hz: z = 0) → (x * z = y * z) → x = y := by
-  sorry
+  intro h
+  specialize h 1 2 0 (by grind)
+  grind
 
 /-- Exercise 5.3.4 -/
 theorem Real.IsBounded.equiv {a b:ℕ → ℚ} (ha: (a:Sequence).IsBounded) (hab: Sequence.Equiv a b) :
