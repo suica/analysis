@@ -927,23 +927,8 @@ example : ¬ BoundedAwayZero (fun n ↦ 1 - 10^(-(n:ℤ))) := by
   rw [bounded_away_zero_def]
   push_neg
   intro c hc
-  have h0 : ∃ n : ℕ, 10 ^ ((n:ℤ)) > 1 / c := by
-    apply unbound_pow (by positivity)
-  have h1 : ∃ n : ℕ, 1/|1 - 10 ^ (-(n:ℤ))| > 1 / c := by
-    obtain ⟨n, hn⟩ := h0
-    use n
-    rw [abs_of_pos] at ⊢
-    field_simp at hn ⊢
-    sorry
-    sorry
-  obtain ⟨n, hn⟩ := h1
-  use n
-  rw [abs_of_neg] at hn ⊢
-  simp_all
-  field_simp at hn ⊢
-  sorry
-  sorry
-  sorry
+  use 0
+  grind
 
 /-- Examples 5.3.13 -/
 example : BoundedAwayZero (fun n ↦ 10^(n+1)) := by
@@ -958,10 +943,27 @@ example : ¬ ((fun (n:ℕ) ↦ (10:ℚ)^(n+1)):Sequence).IsBounded := by
   obtain ⟨ c, hc, h ⟩ := h
   simp_all
   rw [Sequence.boundedBy_def] at h
-  have: ¬∀ (n : ℤ), |((fun n:ℕ ↦ (10:ℚ) ^ n * 10): Sequence).seq n| ≤ c := by
-    push_neg
-
-    sorry
+  have hunbounded: ¬((fun n:ℕ ↦ (10:ℚ) ^ n * 10): Sequence).IsBounded := by
+    by_contra h
+    rw [Sequence.isBounded_def] at h
+    obtain ⟨ M, _, hM ⟩ := h
+    rw [Sequence.boundedBy_def] at hM
+    by_cases hM' : M = 0
+    . simp_all
+      specialize hM 0
+      contradiction
+    have h1 := unbound_pow (k:=M) (by grind)
+    obtain ⟨ n, hn ⟩ := h1
+    specialize hM n
+    simp_all
+    specialize h n
+    have: 10 ^ n * 10  < 10 ^ n := by
+      grind
+    grind
+  rw [Sequence.isBounded_def] at hunbounded
+  push_neg at hunbounded
+  specialize hunbounded c (by grind)
+  rw [Sequence.boundedBy_def] at hunbounded
   contradiction
 
 /-- Lemma 5.3.14 -/
