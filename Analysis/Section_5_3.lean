@@ -855,11 +855,32 @@ example : ¬ BoundedAwayZero (fun n ↦ 10^(-(n:ℤ)-1)) := by
   by_contra h
   rw [bounded_away_zero_def] at h
   obtain ⟨ c, hc, h ⟩ := h
-  have : ∀ c:ℚ, c > 0 → ∃ n: ℕ, |(1/10)^(n:ℤ)| < c := by
-    intro c hc
-    sorry
+  have h1 : ∃ n : ℕ, (10 : ℚ) ^ n > 1 / c := by
+    apply pow_unbounded_of_one_lt
+    norm_num
+  have : ∃ n: ℕ, |(1/10)^((n+1):ℤ)| < c := by
+    obtain ⟨n, hn⟩ := h1
+    use n
+    simp_all
+    field_simp at hn
+    have hn : 1 / 10^n < c := by
+      simp_all
+      field_simp
+      simpa [mul_comm]
+    have h: (10:ℚ) ^ (-1 + -(n: ℤ)) < 1 / 10 ^ (n:ℤ):= by
+      simp_all only [one_div, Int.reduceNeg, <- zpow_neg]
+      gcongr
+      grind
+      grind
+    apply lt_trans h
+    exact_mod_cast hn
   have : ¬ (∀ n: ℕ, |10^(-(n:ℤ)-1)| ≥ c) := by
-    sorry
+    push_neg
+    obtain ⟨ n, hn ⟩ := this
+    use n
+    convert hn using 2
+    simp_all
+    linarith
   contradiction
 
 /-- Examples 5.3.13 -/
