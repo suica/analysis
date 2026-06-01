@@ -992,7 +992,11 @@ theorem Real.boundedAwayZero_of_nonzero {x:Real} (hx: x ≠ 0) :
     exact this
   set a : ℕ → ℚ := fun n ↦ if n < n₀ then ε/2 else b n
   have not_hard : Sequence.Equiv a b := by
-    sorry
+    rw [Sequence.equiv_iff]
+    intro ε hε
+    use n₀ + 1
+    intro n hn
+    grind
   have ha := (Sequence.isCauchy_of_equiv not_hard).mpr hb
   refine ⟨ a, ha, ?_, by rw [(LIM_eq_LIM ha hb).mpr not_hard] ⟩
   rw [bounded_away_zero_def]
