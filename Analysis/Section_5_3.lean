@@ -1273,12 +1273,8 @@ theorem Real.LIM.harmonic : LIM (fun n ↦ 1/((n:ℚ)+1)) = 0 := by
       rw [le_max_iff]
       right
       norm_cast
-      have strip_abs: |⌈1 / ε⌉| = ⌈1 / ε⌉ := by
-        simp_all
-        refine Int.ceil_nonneg ?_
-        positivity
-      rw [strip_abs]
-      exact Int.le_ceil (1 / ε)
+      rw [abs_of_nonneg (by positivity)]
+      apply Int.le_ceil
   rw [<- LIM.zero]
   rw [Real.LIM_eq_LIM]
   . exact h1
