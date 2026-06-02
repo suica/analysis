@@ -83,8 +83,63 @@ theorem Real.isNeg_def (x:Real) :
     IsNeg x ↔ ∃ a:ℕ → ℚ, BoundedAwayNeg a ∧ (a:Sequence).IsCauchy ∧ x = LIM a := by rfl
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
-theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by sorry
+theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
+  obtain ⟨a, hcauchy, hlim⟩ := eq_lim x
+  by_cases h : LIM a = 0
+  . left
+    simp_all
+  have hb: BoundedAwayZero a := by
+    sorry
+    -- have := Real.boundedAwayZero_of_nonzero (x:=x) (by grind)
+    -- rw [bounded_away_zero_def]
+    -- sorry
+  rw [bounded_away_zero_def] at hb
+  simp_all
+  obtain ⟨c, hc, hb⟩ := hb
+  by_cases h : (LIM a).IsPos
+  . left
+    exact h
+  right
+  rw [isPos_def] at h
+  push_neg at h
+  have h2 := h a
+  set a':= fun n => |a n|
+  have hawaypos': BoundedAwayPos a' := by
+    use c
+  have hcauchy': (a':Sequence).IsCauchy := by
+    simp [a']
+    rw [Sequence.isCauchy_def]
+    simp [Rat.eventuallySteady_def]
+    intro ε hε
+    choose N hN h' using hcauchy ε hε
+    use N
+    constructor
+    have : (a:Sequence).n₀ = 0 := by
+      simp
+    rw [this] at hN
+    grind
+    peel h' with n _ m _ _
+    have : N ≤ n:= by grind
+    have : N ≤ m:= by grind
+    simp_all [Rat.Close]
+    rw [if_pos (by omega), if_pos (by omega)] at *
+    grind
+  specialize h a' hawaypos' hcauchy'
+  have : (LIM a').IsPos := by
+    use a'
+  simp_all
+  rw [Real.LIM_eq_LIM, Sequence.equiv_iff] at h
+  push_neg at h
+  simp [a'] at h
+  use (-a')
+  constructor
+  . sorry
+  constructor
+  . sorry
+  rw [Real.LIM_eq_LIM, Sequence.equiv_iff]
+  simp [a']
 
+#exit
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 theorem Real.not_zero_pos (x:Real) : ¬(x = 0 ∧ x.IsPos) := by sorry
 
