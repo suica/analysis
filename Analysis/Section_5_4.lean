@@ -25,6 +25,16 @@ Users of the companion who have completed the exercises in this section are welc
 
 namespace Chapter5
 
+theorem LIM_neg (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) : LIM (-a) = -LIM a := by
+  have h1: -a = (fun x:ℕ ↦ (-1:ℚ)) * a := by
+    ext n
+    simp
+  simp_all
+  rw [<- Real.LIM_mul, <- Real.ratCast_def]
+  simp_all
+  . apply Sequence.IsCauchy.const
+  exact ha
+
 /--
   Definition 5.4.1 (sequences bounded away from zero with sign). Sequences are indexed to start
   from zero as this is more convenient for Mathlib purposes.
@@ -144,16 +154,47 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
 theorem Real.not_zero_pos (x:Real) : ¬(x = 0 ∧ x.IsPos) := by
   rw [not_and]
   intro h
+  rw [h]
+  intro h
+  rw [isPos_def] at h
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+  obtain ⟨c, hc, hbound⟩ := hbound
+  rw [<- LIM.zero] at hlim
+  rw [LIM_eq_LIM] at hlim
+  rw [Sequence.equiv_iff] at hlim
+  specialize hlim (c/2) (by grind)
+  obtain ⟨N, hN⟩ := hlim
+  specialize hN N (by grind)
   simp_all
-  intro a x hx h acauchy
-  sorry
+  specialize hbound N
+  grind
+  apply Sequence.IsCauchy.const
+  simpa
 
 theorem Real.nonzero_of_pos {x:Real} (hx: x.IsPos) : x ≠ 0 := by
   have := not_zero_pos x
   simpa [hx] using this
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
-theorem Real.not_zero_neg (x:Real) : ¬(x = 0 ∧ x.IsNeg) := by sorry
+theorem Real.not_zero_neg (x:Real) : ¬(x = 0 ∧ x.IsNeg) := by
+  rw [not_and]
+  intro h
+  rw [h]
+  intro h
+  rw [isNeg_def] at h
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+  obtain ⟨c, hc, hbound⟩ := hbound
+  rw [<- LIM.zero] at hlim
+  rw [LIM_eq_LIM] at hlim
+  rw [Sequence.equiv_iff] at hlim
+  specialize hlim (c/2) (by grind)
+  obtain ⟨N, hN⟩ := hlim
+  specialize hN N (by grind)
+  simp_all
+  specialize hbound N
+  grind
+  apply Sequence.IsCauchy.const
+  simpa
 
 theorem Real.nonzero_of_neg {x:Real} (hx: x.IsNeg) : x ≠ 0 := by
   have := not_zero_neg x
@@ -347,16 +388,6 @@ instance Real.instLE : LE Real where
 
 theorem Real.lt_iff (x y:Real) : x < y ↔ (x-y).IsNeg := by rfl
 theorem Real.le_iff (x y:Real) : x ≤ y ↔ (x < y) ∨ (x = y) := by rfl
-
-lemma LIM_neg (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) : LIM (-a) = -LIM a := by
-  have h1: -a = (fun x:ℕ ↦ (-1:ℚ)) * a := by
-    ext n
-    simp
-  simp_all
-  rw [<- Real.LIM_mul, <- Real.ratCast_def]
-  simp_all
-  . apply Sequence.IsCauchy.const
-  exact ha
 
 theorem Real.gt_iff (x y:Real) : x > y ↔ (x-y).IsPos := by
   constructor
