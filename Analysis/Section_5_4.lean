@@ -1196,14 +1196,46 @@ theorem Real.min_mul (x y :Real) {z:Real} (hz: z.IsPos) : min (x * z) (y * z) = 
   . rfl
 
 /-- Exercise 5.4.9 -/
-theorem Real.inv_max {x y :Real} (hx:x.IsPos) (hy:y.IsPos) : (max x y)⁻¹ = min x⁻¹ y⁻¹ := by sorry
+theorem Real.inv_max {x y :Real} (hx:x.IsPos) (hy:y.IsPos) : (max x y)⁻¹ = min x⁻¹ y⁻¹ := by
+  rw [max_eq, min_eq]
+  split_ifs
+  <;> try grind
+  . expose_names
+    rcases h with h | h
+    . have := Real.inv_of_gt hx hy (by grind)
+      simp at h_1
+      grind
+    grind
+  . expose_names
+    rcases h_1 with h_1 | h_1
+    . simp at h
+      have := Real.inv_of_gt hy hx (by grind)
+      grind
+    simp_all
 
 /-- Exercise 5.4.9 -/
-theorem Real.inv_min {x y :Real} (hx:x.IsPos) (hy:y.IsPos) : (min x y)⁻¹ = max x⁻¹ y⁻¹ := by sorry
+theorem Real.inv_min {x y :Real} (hx:x.IsPos) (hy:y.IsPos) : (min x y)⁻¹ = max x⁻¹ y⁻¹ := by
+  rw [max_eq, min_eq]
+  split_ifs
+  <;> try grind
+  . expose_names
+    rcases h with h | h
+    . have := Real.inv_of_gt hy hx (by grind)
+      simp_all
+      grind
+    grind
+  . expose_names
+    rcases h_1 with h_1 | h_1
+    . simp at h
+      have := Real.inv_of_gt hx hy (by grind)
+      grind
+    simp_all
 
 /-- Not from textbook: the rationals map as an ordered ring homomorphism into the reals. -/
 abbrev Real.ratCast_ordered_hom : ℚ →+*o Real where
   toRingHom := ratCast_hom
-  monotone' := by sorry
+  monotone' := by
+    intro a b hab
+    simp_all
 
 end Chapter5
