@@ -719,7 +719,51 @@ noncomputable instance Real.instLinearOrder : LinearOrder Real where
   Show that it agrees with our earlier definition.
 -/
 theorem Real.abs_eq_abs (x:Real) : |x| = abs x := by
-  sorry
+  change max x (-x) =  x.abs
+  rw [abs]
+  rcases trichotomous x with h | h | h
+  . simp_all
+  . simp_all
+    left
+    have : -x < 0 := by
+      have hneg: (-x).IsNeg := by
+        refine (neg_iff_pos_of_neg (-x)).mpr ?_
+        simp
+        exact h
+      rw [lt_iff, isNeg_def] at *
+      simp_all
+    apply lt_trans this
+    rw [lt_iff, isPos_def] at *
+    simp_all
+  simp_all
+  have hneg: x.IsNeg := (Real.neg_iff_pos_of_neg x).mpr h
+  rw [if_neg]
+  have :-x > x :=by
+    rw [gt_iff] at *
+    simp_all [isPos_def]
+    obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+    use (a+a)
+    obtain ⟨c, cpos, hc⟩ := hbound
+    constructor
+    . rw [boundedAwayPos_def]
+      use c
+      constructor
+      grind
+      peel hc with n
+      simp_all
+      grind
+    constructor
+    . apply Sequence.IsCauchy.add
+      repeat simpa
+    rw [hlim, sub_eq_add_neg, hlim, LIM_add]
+    . repeat simpa
+    simpa
+  simp_all
+  left
+  exact this
+  intro h
+  apply not_pos_neg x
+  simp_all
 
 /-- Proposition 5.4.8 -/
 theorem Real.inv_of_pos {x:Real} (hx: x.IsPos) : x⁻¹.IsPos := by
@@ -735,7 +779,11 @@ theorem Real.inv_of_pos {x:Real} (hx: x.IsPos) : x⁻¹.IsPos := by
   have trich := trichotomous x⁻¹
   simpa [hinv_non, hnonneg] using trich
 
-theorem Real.div_of_pos {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x/y).IsPos := by sorry
+theorem Real.div_of_pos {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x/y).IsPos := by
+  rw [div_eq_mul_inv]
+  have : y⁻¹.IsPos := inv_of_pos hy
+  apply pos_mul
+  repeat simpa
 
 theorem Real.inv_of_gt {x y:Real} (hx: x.IsPos) (hy: y.IsPos) (hxy: x > y) : x⁻¹ < y⁻¹ := by
   observe hxnon: x ≠ 0
