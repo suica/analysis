@@ -92,27 +92,58 @@ theorem Real.isPos_def (x:Real) :
 theorem Real.isNeg_def (x:Real) :
     IsNeg x ↔ ∃ a:ℕ → ℚ, BoundedAwayNeg a ∧ (a:Sequence).IsCauchy ∧ x = LIM a := by rfl
 
+-- theorem Real.trichotomous_back (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
+--   by_contra! ⟨nz, hpos, hneg⟩
+--   have {a: ℕ->ℚ}: LIM a = LIM (-(-a)) := by
+--     simp only [neg_neg]
+--   obtain ⟨a, hcauchy, hlim⟩ := eq_lim x
+--   by_cases h : BoundedAwayPos a
+--   . sorry
+--   rw [boundedAwayPos_def] at h
+--   simp at h
+--   have := boundedAwayZero_of_nonzero nz
+--   obtain ⟨b, hbcauchy, hbbound, hblim⟩ := this
+--   sorry
+
+lemma LIM_abs_seq_cases {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) : LIM |a| = LIM a ∨ LIM |a| = -LIM a := by
+  by_cases h : LIM a = 0
+  . sorry
+  sorry
+
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
-  sorry
   obtain ⟨a, hcauchy, hlim⟩ := eq_lim x
   by_cases h : LIM a = 0
   . left
     simp_all
   have hb: BoundedAwayZero a := by
     sorry
-    -- have := Real.boundedAwayZero_of_nonzero (x:=x) (by grind)
-    -- rw [bounded_away_zero_def]
-    -- sorry
   rw [bounded_away_zero_def] at hb
   simp_all
   obtain ⟨c, hc, hb⟩ := hb
-  by_cases h : (LIM a).IsPos
+  by_cases h : BoundedAwayPos a
   . left
-    exact h
+    sorry
   right
-  rw [isPos_def] at h
-  push_neg at h
+  by_contra hneg
+  push_neg at hneg
+  simp_all
+
+  sorry
+  -- use a
+  -- constructor
+  -- . rw [boundedAwayNeg_def]
+  --   use c
+  --   constructor
+  --   . grind
+  --   specialize h (c/2) (by positivity)
+
+  --   intro n
+  --   specialize hb n
+  --   sorry
+  -- constructor
+  -- repeat simp
+  -- sorry
   have h2 := h a
   set a':= fun n => |a n|
   have hawaypos': BoundedAwayPos a' := by
