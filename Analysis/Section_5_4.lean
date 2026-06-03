@@ -1090,37 +1090,110 @@ theorem Real.max_eq (x y:Real) : max x y = if x ≥ y then x else y := max_def' 
 theorem Real.min_eq (x y:Real) : min x y = if x ≤ y then x else y := rfl
 
 /-- Exercise 5.4.9 -/
-theorem Real.neg_max (x y:Real) : max x y = - min (-x) (-y) := by sorry
+theorem Real.neg_max (x y:Real) : max x y = - min (-x) (-y) := by
+  rw [max_eq, min_eq]
+  simp_all
+  split_ifs
+  . simp
+  simp
 
 /-- Exercise 5.4.9 -/
-theorem Real.neg_min (x y:Real) : min x y = - max (-x) (-y) := by sorry
+theorem Real.neg_min (x y:Real) : min x y = - max (-x) (-y) := by
+  rw [max_eq, min_eq]
+  simp_all
+  split_ifs
+  . simp
+  simp
 
 /-- Exercise 5.4.9 -/
-theorem Real.max_comm (x y:Real) : max x y = max y x := by sorry
+theorem Real.max_comm (x y:Real) : max x y = max y x := by
+  simp [max_eq]
+  split_ifs
+  <;> grind
 
 /-- Exercise 5.4.9 -/
-theorem Real.max_self (x:Real) : max x x = x := by sorry
+theorem Real.max_self (x:Real) : max x x = x := by
+  rw [max_eq]
+  grind
 
 /-- Exercise 5.4.9 -/
-theorem Real.max_add (x y z:Real) : max (x + z) (y + z) = max x y + z := by sorry
+theorem Real.max_add (x y z:Real) : max (x + z) (y + z) = max x y + z := by
+  rw [max_eq]
+  grind
 
 /-- Exercise 5.4.9 -/
 theorem Real.max_mul (x y :Real) {z:Real} (hz: z.IsPos) : max (x * z) (y * z) = max x y * z := by
-  sorry
+  simp [max_eq]
+  split_ifs
+  <;> try grind
+  . have hinvz: z⁻¹.IsPos := by
+      exact inv_of_pos hz
+    expose_names
+    have h: y * z * z⁻¹ ≤ x * z * z⁻¹:= by
+      gcongr
+      have : z⁻¹>0:= by
+        rw [gt_iff] at *
+        grind
+      grind
+    ring_nf at h
+    rw [mul_assoc] at h
+    rw [Real.self_mul_inv] at h
+    simp at h
+    contradiction
+    have : z > 0 := by
+      exact (isPos_iff z).mp hz
+    grind
+  . expose_names
+    have h1: y * z ≤ x * z := by
+      gcongr
+      have : z>0:= by
+        exact (isPos_iff z).mp hz
+      grind
+    contradiction
 /- Additional exercise: What happens if z is negative? -/
 
 /-- Exercise 5.4.9 -/
-theorem Real.min_comm (x y:Real) : min x y = min y x := by sorry
+theorem Real.min_comm (x y:Real) : min x y = min y x := by
+  simp [min_eq]
+  split_ifs
+  <;> grind
 
 /-- Exercise 5.4.9 -/
-theorem Real.min_self (x:Real) : min x x = x := by sorry
+theorem Real.min_self (x:Real) : min x x = x := by
+  rw [min_eq]
+  grind
 
 /-- Exercise 5.4.9 -/
-theorem Real.min_add (x y z:Real) : min (x + z) (y + z) = min x y + z := by sorry
+theorem Real.min_add (x y z:Real) : min (x + z) (y + z) = min x y + z := by
+  rw [min_eq]
+  grind
 
 /-- Exercise 5.4.9 -/
 theorem Real.min_mul (x y :Real) {z:Real} (hz: z.IsPos) : min (x * z) (y * z) = min x y * z := by
-  sorry
+  simp [min_eq]
+  split_ifs
+  . rfl
+  . expose_names
+    have h: x * z * z⁻¹ ≤ y * z * z⁻¹ := by
+      gcongr
+      have := Real.inv_of_pos hz
+      have : z⁻¹>0:= by
+        exact (isPos_iff z⁻¹).mp this
+      grind
+    simp [mul_assoc] at h
+    rw [Real.self_mul_inv] at h
+    simp at h
+    grind
+    exact Real.nonzero_of_pos hz
+  . expose_names
+    have h1: x * z  ≤ y * z  := by
+      gcongr
+      have := Real.inv_of_pos hz
+      have : z>0:= by
+        exact (isPos_iff z).mp hz
+      grind
+    contradiction
+  . rfl
 
 /-- Exercise 5.4.9 -/
 theorem Real.inv_max {x y :Real} (hx:x.IsPos) (hy:y.IsPos) : (max x y)⁻¹ = min x⁻¹ y⁻¹ := by sorry
