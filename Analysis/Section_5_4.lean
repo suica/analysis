@@ -92,94 +92,84 @@ theorem Real.isPos_def (x:Real) :
 theorem Real.isNeg_def (x:Real) :
     IsNeg x ↔ ∃ a:ℕ → ℚ, BoundedAwayNeg a ∧ (a:Sequence).IsCauchy ∧ x = LIM a := by rfl
 
--- theorem Real.trichotomous_back (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
---   by_contra! ⟨nz, hpos, hneg⟩
---   have {a: ℕ->ℚ}: LIM a = LIM (-(-a)) := by
---     simp only [neg_neg]
---   obtain ⟨a, hcauchy, hlim⟩ := eq_lim x
---   by_cases h : BoundedAwayPos a
---   . sorry
---   rw [boundedAwayPos_def] at h
---   simp at h
---   have := boundedAwayZero_of_nonzero nz
---   obtain ⟨b, hbcauchy, hbbound, hblim⟩ := this
---   sorry
-
-lemma LIM_abs_seq_cases {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy) : LIM |a| = LIM a ∨ LIM |a| = -LIM a := by
-  by_cases h : LIM a = 0
-  . sorry
-  sorry
-
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
-  obtain ⟨a, hcauchy, hlim⟩ := eq_lim x
-  by_cases h : LIM a = 0
+  by_cases hx: x = 0
   . left
-    simp_all
-  have hb: BoundedAwayZero a := by
-    sorry
-  rw [bounded_away_zero_def] at hb
-  simp_all
-  obtain ⟨c, hc, hb⟩ := hb
-  by_cases h : BoundedAwayPos a
-  . left
-    sorry
-  right
-  by_contra hneg
-  push_neg at hneg
-  simp_all
+    exact hx
 
-  sorry
-  -- use a
-  -- constructor
-  -- . rw [boundedAwayNeg_def]
-  --   use c
-  --   constructor
-  --   . grind
-  --   specialize h (c/2) (by positivity)
+  obtain ⟨a, hcauchy, haway, hlim⟩ := Real.boundedAwayZero_of_nonzero hx
 
-  --   intro n
-  --   specialize hb n
-  --   sorry
-  -- constructor
-  -- repeat simp
-  -- sorry
-  have h2 := h a
-  set a':= fun n => |a n|
-  have hawaypos': BoundedAwayPos a' := by
-    use c
-  have hcauchy': (a':Sequence).IsCauchy := by
-    simp [a']
-    rw [Sequence.isCauchy_def]
-    simp [Rat.eventuallySteady_def]
-    intro ε hε
-    choose N hN h' using hcauchy ε hε
+  rw [Sequence.isCauchy_def] at hcauchy
+
+  obtain ⟨ε, hε, h⟩ := haway
+  rcases hcauchy (ε / 2) (half_pos hε) with ⟨N, Nle, hN⟩
+
+  lift N to ℕ using Nle
+  set n := N
+  rcases lt_trichotomy 0 (a n) with h1 | h1 | h1
+  . right
+    left
+    rw [isPos_def]
+    set b := fun n:ℕ ↦ if n ≥ N then a n else ε
+    have hbcauchy: (b: Sequence).IsCauchy := by
+      rw [Sequence.IsCauchy.coe]
+      intro ε hε
+      specialize hcauchy ε hε
+      rcases hcauchy with ⟨N, _, hN⟩
+      lift N to ℕ using (by sorry)
+      use max N n
+      intro j _ k _
+      simp [Section_4_3.dist]
+      rw [Rat.steady_def] at hN
+      specialize hN j (by grind) k (by grind)
+      rw [Rat.Close] at hN
+      simp_all
+      simp [b]
+      rw [if_pos, if_pos]
+      simp_all
+      grind
+      grind
+    use b
+    split_ands
+    . rw [boundedAwayPos_def]
+      use ε/2
+      constructor
+      . grind
+      have: a n ≥ ε := by
+        grind
+      have h2: ∀ n', n' ≥ N -> a n' ≥ ε / 2 := by
+        intro n' hn'
+        rw [Rat.steady_def] at hN
+        specialize hN n (by sorry) n' (by sorry)
+        rw [Rat.Close] at hN
+        simp_all
+        rw [if_pos] at hN
+        grind
+        grind
+      intro n'
+      by_cases hn': n' ≥ N
+      . simp [b, hn']
+        apply h2
+        grind
+      simp [b, hn']
+      grind
+    . simpa
+    rw [hlim]
+    rw [LIM_eq_LIM]
+    rw [Sequence.equiv_iff]
+    intro e he
     use N
-    constructor
-    have : (a:Sequence).n₀ = 0 := by
-      simp
-    rw [this] at hN
+    intro n hn
+    simp [b]
+    rw [if_pos]
     grind
-    peel h' with n _ m _ _
-    have : N ≤ n:= by grind
-    have : N ≤ m:= by grind
-    simp_all [Rat.Close]
-    rw [if_pos (by omega), if_pos (by omega)] at *
     grind
-  specialize h a' hawaypos' hcauchy'
-  have : (LIM a').IsPos := by
-    use a'
-  simp_all
-  rw [Real.LIM_eq_LIM, Sequence.equiv_iff] at h
-  push_neg at h
-  simp [a'] at h
-  use (-a')
-  constructor
-  . sorry
-  constructor
-  . sorry
-  rw [Real.LIM_eq_LIM, Sequence.equiv_iff]
-  simp [a']
+    simpa
+    simpa
+  . left
+    grind
+  sorry
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 theorem Real.not_zero_pos (x:Real) : ¬(x = 0 ∧ x.IsPos) := by
