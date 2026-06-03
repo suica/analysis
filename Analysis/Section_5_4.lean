@@ -956,33 +956,134 @@ theorem Real.le_mul {ε:Real} (hε: ε.IsPos) (x:Real) : ∃ M:ℕ, M > 0 ∧ M 
   use 1; simp_all [isPos_iff]; linarith
 
 /-- Proposition 5.4.14 / Exercise 5.4.5 -/
-theorem Real.rat_between {x y:Real} (hxy: x < y) : ∃ q:ℚ, x < (q:Real) ∧ (q:Real) < y := by sorry
+theorem Real.rat_between {x y:Real} (hxy: x < y) : ∃ q:ℚ, x < (q:Real) ∧ (q:Real) < y := by
+  sorry
 
 /-- Exercise 5.4.3 -/
-theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by sorry
+theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by
+  obtain ⟨q, hq1, hq2⟩ := Real.rat_between (show x-1 < x by grind)
+  sorry
 
 /-- Exercise 5.4.4 -/
-theorem Real.exist_inv_nat_le {x:Real} (hx: x.IsPos) : ∃ N:ℤ, N>0 ∧ (N:Real)⁻¹ < x := by sorry
+theorem Real.exist_inv_nat_le {x:Real} (hx: x.IsPos) : ∃ N:ℤ, N>0 ∧ (N:Real)⁻¹ < x := by
+  sorry
 
 /-- Exercise 5.4.6 -/
-theorem Real.dist_lt_iff (ε x y:Real) : |x-y| < ε ↔ y-ε < x ∧ x < y+ε := by sorry
+theorem Real.dist_lt_iff (ε x y:Real) : |x-y| < ε ↔ y-ε < x ∧ x < y+ε := by
+  rw [Real.abs_eq_abs, abs]
+  rcases trichotomous (x-y) with h | h | h
+  . have h: x = y:= by grind
+    rw [h]
+    simp_all
+  . simp_all
+    constructor
+    .
+      have hxy : x>y := by
+        exact (gt_iff x y).mpr h
+      intro h
+      split_ands
+      . have : y - x < ε := by
+          grind
+        grind
+      grind
+    intro ⟨_, h2⟩
+    grind
+  . simp_all
+    rw [if_neg]
+    . constructor
+      . have hxy: y> x := by
+          apply (gt_iff y x).mpr
+          exact h
+        intro h
+        split_ands
+        . grind
+        . grind
+      intro ⟨h1, h2⟩
+      grind
+    intro h1
+    rw [<- neg_sub] at h
+    rw [<- neg_iff_pos_of_neg] at h
+    apply not_pos_neg (x-y)
+    simp_all
 
 /-- Exercise 5.4.6 -/
-theorem Real.dist_le_iff (ε x y:Real) : |x-y| ≤ ε ↔ y-ε ≤ x ∧ x ≤ y+ε := by sorry
+theorem Real.dist_le_iff (ε x y:Real) : |x-y| ≤ ε ↔ y-ε ≤ x ∧ x ≤ y+ε := by
+  constructor
+  . intro h
+    rw [le_iff] at h
+    rcases h with hlt | heq
+    . grind
+    rcases trichotomous (x-y) with h | h | h
+    . grind
+    . grind
+    split_ands
+    . grind
+    . grind
+  intro ⟨h1, h2⟩
+  grind
 
 /-- Exercise 5.4.7 -/
-theorem Real.le_add_eps_iff (x y:Real) : (∀ ε > 0, x ≤ y+ε) ↔ x ≤ y := by sorry
+theorem Real.le_add_eps_iff (x y:Real) : (∀ ε > 0, x ≤ y+ε) ↔ x ≤ y := by
+  constructor
+  . intro h
+    sorry
+  sorry
 
 /-- Exercise 5.4.7 -/
-theorem Real.dist_le_eps_iff (x y:Real) : (∀ ε > 0, |x-y| ≤ ε) ↔ x = y := by sorry
+theorem Real.dist_le_eps_iff (x y:Real) : (∀ ε > 0, |x-y| ≤ ε) ↔ x = y := by
+  constructor
+  . intro h
+    have h1: x ≤ y := by
+      rw [<- Real.le_add_eps_iff]
+      peel h with ε hε h
+      rw [Real.dist_le_iff] at h
+      grind
+    have h1: y ≤ x := by
+      rw [<- Real.le_add_eps_iff]
+      peel h with ε hε h
+      rw [Real.dist_le_iff] at h
+      grind
+    grind
+  intro h
+  rw [h]
+  intro ε hε
+  grind
 
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≤ x) :
-    LIM a ≤ x := by sorry
+    LIM a ≤ x := by
+      obtain ⟨b, hb_cauchy, hb_lim⟩ := eq_lim x
+      rw [hb_lim]
+      set c := (fun n ↦ b n) - (fun n:ℕ ↦ ((1/ ((n:ℚ) + 1))))
+      -- set c := max a b
+      have hbc : ∀ n,  c n ≤ b n := by
+        intro n
+        simp [c]
+        grind
+      have : LIM c = LIM b := by
+        simp only [c]
+        rw [<- LIM_sub]
+        rw [Real.LIM.harmonic]
+        simp_all
+        . simpa
+        apply Sequence.IsCauchy.harmonic'
+      rw [<- this]
+      apply Real.LIM_mono
+      repeat simpa
+      repeat simpa
+      . sorry
+      simp [c]
+      sorry
+      apply Sequence.IsCauchy.add
+      simpa
+      apply Sequence.IsCauchy.harmonic'
+      intro n
+      simpa
 
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_ge {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≥ x) :
-    LIM a ≥ x := by sorry
+    LIM a ≥ x := by
+      sorry
 
 theorem Real.max_eq (x y:Real) : max x y = if x ≥ y then x else y := max_def' x y
 
