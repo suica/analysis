@@ -208,10 +208,26 @@ theorem Real.not_pos_neg (x:Real) : ¬(x.IsPos ∧ x.IsNeg) := by
   rw [isNeg_def] at h2
   obtain ⟨a, hbound, hcauchy, hlim⟩ := h1
   obtain ⟨b, hbound', hcauchy', hlim'⟩ := h2
-  have : BoundedAwayNeg a := by
-    rw [boundedAwayNeg_def] at hbound'
-    sorry
-  apply not_boundedAwayPos_boundedAwayNeg ⟨hbound, this⟩
+
+  have lim_eq := (LIM_eq_LIM hcauchy hcauchy').mp (show LIM a = LIM b by grind)
+  rw [Sequence.equiv_iff] at lim_eq
+
+  obtain ⟨c, hc, hbound⟩ := hbound
+  obtain ⟨d, hc, hbound'⟩ := hbound'
+
+  specialize lim_eq (c/2+d/2) (by grind)
+  obtain ⟨N, hN⟩ := lim_eq
+  specialize hbound N
+  specialize hbound' N
+  specialize hN N (by grind)
+  have : a N - b N ≥ c +d := by
+    rw [Rat.sub_eq_add_neg]
+    gcongr
+    grind
+  have : c + d ≤ c / 2 + d / 2 ∧ c > 0 ∧ d > 0 := by
+    split_ands
+    <;> grind
+  grind
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 @[simp]
