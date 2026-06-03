@@ -891,6 +891,11 @@ theorem Real.LIM_mono_fail :
     ∧ ¬LIM a > LIM b := by
   use (fun n ↦ 1 + 1/((n:ℚ) + 1))
   use (fun n ↦ 1 - 1/((n:ℚ) + 1))
+  simp_all
+  split_ands
+  . sorry
+  . sorry
+  . sorry
   sorry
 
 /-- Proposition 5.4.12 (Bounding reals by rationals) -/
