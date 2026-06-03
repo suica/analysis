@@ -799,12 +799,60 @@ theorem Real.inv_of_gt {x y:Real} (hx: x.IsPos) (hy: y.IsPos) (hxy: x > y) : x�
 
 /-- (Not from textbook) {name}`Real` has the structure of a strict ordered ring. -/
 instance Real.instIsStrictOrderedRing : IsStrictOrderedRing Real where
-  add_le_add_left := by sorry
-  add_le_add_right := by sorry
-  mul_lt_mul_of_pos_left := by sorry
-  mul_lt_mul_of_pos_right := by sorry
-  le_of_add_le_add_left := by sorry
-  zero_le_one := by sorry
+  add_le_add_left := by
+    intro a b ha c
+    rw [le_iff] at *
+    rcases ha with ha | ha
+    . left
+      exact add_lt_add_right c ha
+    right
+    simp_all
+  add_le_add_right := by
+    intro a b ha c
+    rw [le_iff] at *
+    rcases ha with ha | ha
+    . left
+      simp_all [lt_iff]
+    right
+    simp_all
+  mul_lt_mul_of_pos_left := by
+    intro a apos b c h
+    rw [lt_iff] at *
+    simp_all
+    rw [<- mul_sub_left_distrib]
+    apply pos_mul
+    repeat simpa
+  mul_lt_mul_of_pos_right := by
+    intro c hc a b h
+    rw [lt_iff] at *
+    simp_all
+    rw [<- mul_sub_right_distrib]
+    apply pos_mul
+    repeat simpa
+  le_of_add_le_add_left := by
+    intro a b c h
+    rw [le_iff] at *
+    rcases h with h | h
+    . left
+      have := add_lt_add_right (-a) h
+      ring_nf at this
+      exact this
+    right
+    grind
+  zero_le_one := by
+    left
+    rw [lt_iff]
+    simp_all
+    use 1
+    constructor
+    . use 1
+      simp_all
+    constructor
+    . apply Sequence.IsCauchy.const
+    have h:= ratCast_def 1
+    change 1 = LIM (fun _ ↦ 1)
+    rw [<- h]
+    simp
 
 /-- Proposition 5.4.9 (The non-negative reals are closed)-/
 theorem Real.LIM_of_nonneg {a: ℕ → ℚ} (ha: ∀ n, a n ≥ 0) (hcauchy: (a:Sequence).IsCauchy) :
