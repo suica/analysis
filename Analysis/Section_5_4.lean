@@ -169,7 +169,67 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
     simpa
   . left
     grind
-  sorry
+  right
+  right
+  rw [isNeg_def]
+  set b := fun n:ℕ ↦ if n ≥ N then a n else -ε
+  have hbcauchy: (b: Sequence).IsCauchy := by
+    rw [Sequence.IsCauchy.coe]
+    intro ε hε
+    specialize hcauchy ε hε
+    rcases hcauchy with ⟨N, _, hN⟩
+    lift N to ℕ using (by sorry)
+    use max N n
+    intro j _ k _
+    simp [Section_4_3.dist]
+    rw [Rat.steady_def] at hN
+    specialize hN j (by sorry) k (by sorry)
+    rw [Rat.Close] at hN
+    simp_all
+    simp [b]
+    rw [if_pos, if_pos]
+    simp_all
+    grind
+    grind
+  use b
+  split_ands
+  . rw [boundedAwayNeg_def]
+    use ε/2
+    constructor
+    . grind
+    simp_all
+    intro n
+    have h2: ∀ n', n' ≥ N -> a n' ≤ -(ε / 2) := by
+      intro n' hn'
+      rw [Rat.steady_def] at hN
+      specialize hN N (by sorry) n' (by sorry)
+      rw [Rat.Close] at hN
+      simp_all
+      rw [if_pos, if_pos] at hN
+      have : a N <0 := by
+        grind
+      grind
+      grind
+      grind
+    by_cases hn': n ≥ N
+    . simp [b, hn']
+      apply h2
+      grind
+    simp [b, hn']
+    grind
+  . simpa
+  rw [hlim]
+  rw [LIM_eq_LIM]
+  rw [Sequence.equiv_iff]
+  intro e he
+  use N
+  intro n hn
+  simp [b]
+  rw [if_pos]
+  grind
+  grind
+  simpa
+  simpa
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 theorem Real.not_zero_pos (x:Real) : ¬(x = 0 ∧ x.IsPos) := by
