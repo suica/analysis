@@ -583,7 +583,9 @@ theorem Real.lt_trans {x y z:Real} (hxy: x < y) (hyz: y < z) : x < z := by
 
 /-- Proposition 5.4.7(d) (addition preserves order) / Exercise 5.4.2 -/
 theorem Real.add_lt_add_right {x y:Real} (z:Real) (hxy: x < y) : x + z < y + z := by
-  sorry
+  rw [lt_iff, isNeg_def] at *
+  ring_nf
+  exact hxy
 
 /-- Proposition 5.4.7(e) (positive multiplication preserves order) / Exercise 5.4.2 -/
 theorem Real.mul_lt_mul_right {x y z:Real} (hxy: x < y) (hz: z.IsPos) : x * z < y * z := by
@@ -591,10 +593,50 @@ theorem Real.mul_lt_mul_right {x y z:Real} (hxy: x < y) (hz: z.IsPos) : x * z < 
 
 /-- Proposition 5.4.7(e) (positive multiplication preserves order) / Exercise 5.4.2 -/
 theorem Real.mul_le_mul_left {x y z:Real} (hxy: x ≤ y) (hz: z.IsPos) : z * x ≤ z * y := by
-  sorry
+  rw [Real.le_iff] at *
+  rcases hxy with h | h
+  . left
+    have h1 := Real.mul_lt_mul_right h hz
+    simpa [mul_comm]
+  rw [h]
+  right
+  rfl
 
 theorem Real.mul_pos_neg {x y:Real} (hx: x.IsPos) (hy: y.IsNeg) : (x * y).IsNeg := by
-  sorry
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := hx
+  obtain ⟨b, hbound', hcauchy', hlim'⟩ := hy
+  rw [boundedAwayPos_def] at hbound
+  rw [boundedAwayNeg_def] at hbound'
+  obtain ⟨c, hc, hbound⟩ := hbound
+  obtain ⟨c', hc', hbound'⟩ := hbound'
+  use (a * b)
+  constructor
+  . use (c*c')
+    constructor
+    . positivity
+    simp
+    intro n
+    specialize hbound n
+    specialize hbound' n
+    simp_all
+    have prod_neg: a n * b n < 0 := by
+      have : a n > 0 := by
+        grind
+      have : b n < 0 := by
+        grind
+      (expose_names; exact (Rat.mul_neg_iff_of_pos_left this_1).mpr this)
+    have : |a n * b n| ≥ c * c' := by
+      simp_all
+      gcongr
+      grind
+      grind
+    rw [abs_eq_neg_self.mpr (by grind)] at this
+    grind
+  constructor
+  . apply Sequence.IsCauchy.mul
+    repeat simpa
+  rw [hlim, hlim', LIM_mul]
+  repeat simpa
 
 open Classical in
 /--
