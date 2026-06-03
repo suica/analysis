@@ -892,11 +892,33 @@ theorem Real.LIM_mono_fail :
   use (fun n ↦ 1 + 1/((n:ℚ) + 1))
   use (fun n ↦ 1 - 1/((n:ℚ) + 1))
   simp_all
+  have hh := Sequence.IsCauchy.harmonic'
+  simp at hh
   split_ands
-  . sorry
-  . sorry
-  . sorry
-  sorry
+  . apply Sequence.IsCauchy.add
+    apply Sequence.IsCauchy.const
+    exact hh
+  . apply Sequence.IsCauchy.sub
+    apply Sequence.IsCauchy.const
+    exact hh
+  . intro n
+    field_simp; ring_nf
+    grind
+  right
+  . have h1 : (LIM fun n ↦ 1 + ((n:ℚ) + 1)⁻¹) = (LIM fun n ↦ (1:ℚ)) + LIM fun n ↦ (↑n + 1)⁻¹ := by
+      rw [LIM_add]
+      rfl
+      apply Sequence.IsCauchy.const
+      exact hh
+    have h2 : (LIM fun n ↦ 1 - ((n:ℚ) + 1)⁻¹) = (LIM fun n ↦ (1:ℚ)) - LIM fun n ↦ (↑n + 1)⁻¹ := by
+      rw [LIM_sub]
+      rfl
+      apply Sequence.IsCauchy.const
+      exact hh
+    rw [h1, h2]
+    have h3 := Real.LIM.harmonic
+    simp at h3
+    simp [h3]
 
 /-- Proposition 5.4.12 (Bounding reals by rationals) -/
 theorem Real.exists_rat_le_and_nat_gt {x:Real} (hx: x.IsPos) :
