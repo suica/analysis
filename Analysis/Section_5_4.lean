@@ -1026,8 +1026,33 @@ theorem Real.dist_le_iff (ε x y:Real) : |x-y| ≤ ε ↔ y-ε ≤ x ∧ x ≤ y
 theorem Real.le_add_eps_iff (x y:Real) : (∀ ε > 0, x ≤ y+ε) ↔ x ≤ y := by
   constructor
   . intro h
-    sorry
-  sorry
+    by_contra! h1
+    rw [lt_iff] at h1
+    rw [isNeg_def] at h1
+    obtain ⟨a, hbound, hcauchy, hlim⟩ := h1
+    rw [boundedAwayNeg_def] at hbound
+    obtain ⟨c, hc, hbound⟩ := hbound
+    have := Real.LIM_mono hcauchy (Sequence.IsCauchy.const (-c)) hbound
+    have : LIM a ≤ -c := by
+      rw [ratCast_def]
+      convert this
+      rw [<- LIM_neg]
+      congr
+      apply Sequence.IsCauchy.const
+    specialize h (c/2) (by positivity)
+    rw [<- hlim] at this
+    have h: - ↑c / 2 ≤ y - x := by
+      grind
+    have : - (c / 2) ≤ - (c:Real) := by
+      grind
+    simp_all
+    have : (c:Real) ≤ 0 := by
+      grind
+    have : 0 < (c:Real) := by
+      exact_mod_cast hc
+    grind
+  intro h ε hε
+  grind
 
 /-- Exercise 5.4.7 -/
 theorem Real.dist_le_eps_iff (x y:Real) : (∀ ε > 0, |x-y| ≤ ε) ↔ x = y := by
