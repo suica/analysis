@@ -252,11 +252,67 @@ theorem Real.pos_add {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x+y).IsPos := by
   repeat simpa
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
-theorem Real.pos_mul {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x*y).IsPos := by sorry
+theorem Real.pos_mul {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x*y).IsPos := by
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := hx
+  obtain ⟨b, hbound', hcauchy', hlim'⟩ := hy
+  rw [isPos_def]
+  rw [boundedAwayPos_def] at hbound hbound'
+  obtain ⟨c, hc, hbound⟩ := hbound
+  obtain ⟨c', hc', hbound'⟩ := hbound'
+  use (a*b)
+  constructor
+  . use (c*c')
+    constructor
+    . positivity
+    simp_all
+    intro n
+    specialize hbound n
+    specialize hbound' n
+    apply mul_le_mul
+    repeat grind
+  constructor
+  . apply Sequence.IsCauchy.mul
+    repeat simpa
+  rw [hlim, hlim', LIM_mul]
+  repeat simpa
 
-theorem Real.pos_of_coe (q:ℚ) : (q:Real).IsPos ↔ q > 0 := by sorry
+theorem Real.pos_of_coe (q:ℚ) : (q:Real).IsPos ↔ q > 0 := by
+  constructor
+  . intro h
+    rw [Real.ratCast_def] at h
+    obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+    rw [boundedAwayPos_def] at hbound
+    obtain ⟨c, hc, hbound⟩ := hbound
+    simp_all
+    have equiv: Sequence.Equiv a fun x ↦ q := by
+      have h1 := Real.LIM_eq_LIM hcauchy (Sequence.IsCauchy.const q)
+      rw [<- h1]
+      simp_all
+    rw [Sequence.equiv_iff] at equiv
+    specialize equiv (c/2) (by grind)
+    obtain ⟨N, hN⟩ := equiv
+    specialize hN N (by grind)
+    have : a N - q ≤ |a N - q| := by
+      grind
+    have : a N - q ≤ c/2 := by
+      grind
+    have : a N - c/2 ≤ q := by
+      linarith
+    have : c/2 ≤ q := by
+      grind
+    grind
+  intro h
+  use (fun n ↦ q)
+  constructor
+  . rw [boundedAwayPos_def]
+    use q
+    simp_all
+  constructor
+  . apply Sequence.IsCauchy.const
+  rw [Real.ratCast_def]
 
-theorem Real.neg_of_coe (q:ℚ) : (q:Real).IsNeg ↔ q < 0 := by sorry
+theorem Real.neg_of_coe (q:ℚ) : (q:Real).IsNeg ↔ q < 0 := by
+  sorry
 
 open Classical in
 /-- Need to use classical logic here because {name}`IsPos` and {name}`IsNeg` are not decidable -/
