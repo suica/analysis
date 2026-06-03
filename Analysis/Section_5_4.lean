@@ -517,27 +517,69 @@ theorem Real.isNeg_iff (x:Real) : x.IsNeg ↔ x < 0 := by
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
 theorem Real.trichotomous' (x y:Real) : x > y ∨ x < y ∨ x = y := by
-  sorry
+  rcases trichotomous (x-y) with h1 | h1 | h1
+  . right
+    right
+    grind
+  . left
+    rw [Real.gt_iff]
+    exact h1
+  . right
+    left
+    rw [Real.lt_iff]
+    grind
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
 theorem Real.not_gt_and_lt (x y:Real) : ¬ (x > y ∧ x < y):= by
-  sorry
+  rw [Real.lt_iff, Real.gt_iff]
+  apply not_pos_neg
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
 theorem Real.not_gt_and_eq (x y:Real) : ¬ (x > y ∧ x = y):= by
-  sorry
+  rw [Real.gt_iff]
+  rw [and_comm]
+  have : x - y = 0 <-> x = y:= by
+    grind
+  rw [<- this]
+  apply not_zero_pos
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
 theorem Real.not_lt_and_eq (x y:Real) : ¬ (x < y ∧ x = y):= by
-  sorry
+  rw [Real.lt_iff]
+  rw [and_comm]
+  have : x - y = 0 <-> x = y:= by
+    grind
+  rw [<- this]
+  apply not_zero_neg
 
 /-- Proposition 5.4.7(b) (order is anti-symmetric) / Exercise 5.4.2 -/
 theorem Real.antisymm (x y:Real) : x < y ↔ y > x := by
-  sorry
+  rw [Real.lt_iff, Real.gt_iff]
+  have h1 := Real.neg_iff_pos_of_neg (x-y)
+  rw [h1]
+  simp_all
 
 /-- Proposition 5.4.7(c) (order is transitive) / Exercise 5.4.2 -/
 theorem Real.lt_trans {x y z:Real} (hxy: x < y) (hyz: y < z) : x < z := by
-  sorry
+  rw [lt_iff, isNeg_def] at *
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := hxy
+  obtain ⟨b, hbound', hcauchy', hlim'⟩ := hyz
+  use (a+b)
+  constructor
+  obtain ⟨c, hc, hbound⟩ := hbound
+  . rw [boundedAwayNeg_def]
+    use c
+    constructor
+    . grind
+    simp_all
+    grind
+  constructor
+  . apply Sequence.IsCauchy.add
+    repeat simpa
+  have : x - z = (x-y) + (y-z) := by ring
+  rw [<- LIM_add,<- hlim, <- hlim']
+  ring_nf
+  repeat simpa
 
 /-- Proposition 5.4.7(d) (addition preserves order) / Exercise 5.4.2 -/
 theorem Real.add_lt_add_right {x y:Real} (z:Real) (hxy: x < y) : x + z < y + z := by
