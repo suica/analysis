@@ -466,7 +466,54 @@ theorem Real.isPos_iff (x:Real) : x.IsPos ↔ x > 0 := by
   . grind
   simpa
 theorem Real.isNeg_iff (x:Real) : x.IsNeg ↔ x < 0 := by
-  sorry
+  have h1 := Real.isPos_iff (-x)
+  have h2: (-x).IsPos ↔ x.IsNeg := by simp_all
+  rw [h2] at h1
+  convert h1 using 1
+  rw [Real.gt_iff, Real.lt_iff]
+  constructor
+  . intro hneg
+    rw [isNeg_def] at hneg
+    obtain ⟨a, hbound, hcauchy, hlim⟩ := hneg
+    rw [boundedAwayNeg_def] at hbound
+    obtain ⟨c, hc, hbound⟩ := hbound
+    use (-a)
+    constructor
+    . rw [boundedAwayPos_def]
+      use c
+      constructor
+      . positivity
+      intro n
+      specialize hbound n
+      simp
+      grind
+    constructor
+    . apply Sequence.IsCauchy.neg
+      simpa
+    rw [LIM_neg, <- hlim]
+    grind
+    simpa
+
+  intro hpos
+  rw [isPos_def] at hpos
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := hpos
+  rw [boundedAwayPos_def] at hbound
+  obtain ⟨c, hc, hbound⟩ := hbound
+  use (-a)
+  constructor
+  . rw [boundedAwayNeg_def]
+    use c
+    constructor
+    . positivity
+    peel hbound with n
+    simp
+    grind
+  constructor
+  . apply Sequence.IsCauchy.neg
+    simpa
+  rw [LIM_neg, <- hlim]
+  simp
+  simpa
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
 theorem Real.trichotomous' (x y:Real) : x > y ∨ x < y ∨ x = y := by
