@@ -84,6 +84,7 @@ theorem Real.isNeg_def (x:Real) :
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
+  sorry
   obtain ⟨a, hcauchy, hlim⟩ := eq_lim x
   by_cases h : LIM a = 0
   . left
@@ -139,9 +140,13 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
   rw [Real.LIM_eq_LIM, Sequence.equiv_iff]
   simp [a']
 
-#exit
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
-theorem Real.not_zero_pos (x:Real) : ¬(x = 0 ∧ x.IsPos) := by sorry
+theorem Real.not_zero_pos (x:Real) : ¬(x = 0 ∧ x.IsPos) := by
+  rw [not_and]
+  intro h
+  simp_all
+  intro a x hx h acauchy
+  sorry
 
 theorem Real.nonzero_of_pos {x:Real} (hx: x.IsPos) : x ≠ 0 := by
   have := not_zero_pos x
@@ -155,14 +160,96 @@ theorem Real.nonzero_of_neg {x:Real} (hx: x.IsNeg) : x ≠ 0 := by
   simpa [hx] using this
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
-theorem Real.not_pos_neg (x:Real) : ¬(x.IsPos ∧ x.IsNeg) := by sorry
+theorem Real.not_pos_neg (x:Real) : ¬(x.IsPos ∧ x.IsNeg) := by
+  rw [not_and]
+  intro h1 h2
+  rw [isPos_def] at h1
+  rw [isNeg_def] at h2
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := h1
+  obtain ⟨b, hbound', hcauchy', hlim'⟩ := h2
+  have : BoundedAwayNeg a := by
+    rw [boundedAwayNeg_def] at hbound'
+    sorry
+  apply not_boundedAwayPos_boundedAwayNeg ⟨hbound, this⟩
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 @[simp]
-theorem Real.neg_iff_pos_of_neg (x:Real) : x.IsNeg ↔ (-x).IsPos := by sorry
+theorem Real.neg_iff_pos_of_neg (x:Real) : x.IsNeg ↔ (-x).IsPos := by
+  constructor
+  . intro hneg
+    obtain ⟨a, hbound, hcauchy, hlim⟩ := hneg
+    use (-a)
+    constructor
+    . rw [boundedAwayNeg_def] at hbound
+      obtain ⟨c, hc, hbound⟩ := hbound
+      use c
+      constructor
+      . grind
+      simp_all
+      grind
+    constructor
+    . apply Sequence.IsCauchy.neg
+      exact hcauchy
+    rw [hlim]
+    have : -a = (fun x:ℕ ↦ (-1:ℚ)) * a := by
+      ext n
+      simp
+    rw [this]
+    rw [<- LIM_mul, <- Real.ratCast_def]
+    rfl
+    apply Sequence.IsCauchy.const
+    repeat simpa
+  intro h
+  rw [isPos_def] at h
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+  rw [boundedAwayPos_def] at hbound
+  obtain ⟨c, hc, hbound⟩ := hbound
+  use (-a)
+  constructor
+  . rw [boundedAwayNeg_def]
+    use c
+    constructor
+    . simpa
+    simp_all
+  constructor
+  . apply Sequence.IsCauchy.neg
+    repeat simpa
+  have : -a = (fun x:ℕ ↦ (-1:ℚ)) * a := by
+      ext n
+      simp
+  rw [this]
+  rw [<- LIM_mul, <- Real.ratCast_def]
+  simp_all
+  rw [<- hlim]
+  simp
+  apply Sequence.IsCauchy.const
+  repeat simpa
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1-/
-theorem Real.pos_add {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x+y).IsPos := by sorry
+theorem Real.pos_add {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x+y).IsPos := by
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := hx
+  obtain ⟨b, hbound', hcauchy', hlim'⟩ := hy
+  rw [isPos_def]
+
+  rw [boundedAwayPos_def] at hbound hbound'
+  obtain ⟨c, hc, hbound⟩ := hbound
+  obtain ⟨c', hc', hbound'⟩ := hbound'
+  use (a+b)
+  constructor
+  . rw [boundedAwayPos_def]
+    use (c+c')
+    constructor
+    . positivity
+    simp_all
+    intro n
+    specialize hbound n
+    specialize hbound' n
+    linarith
+  constructor
+  . apply Sequence.IsCauchy.add
+    repeat simpa
+  rw [hlim, hlim', LIM_add]
+  repeat simpa
 
 /-- Proposition 5.4.4 (basic properties of positive reals) / Exercise 5.4.1 -/
 theorem Real.pos_mul {x y:Real} (hx: x.IsPos) (hy: y.IsPos) : (x*y).IsPos := by sorry
