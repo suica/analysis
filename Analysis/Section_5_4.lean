@@ -644,11 +644,74 @@ open Classical in
   and so classical logic is required to impose decidability.
 -/
 noncomputable instance Real.instLinearOrder : LinearOrder Real where
-  le_refl := sorry
-  le_trans := sorry
-  lt_iff_le_not_ge := sorry
-  le_antisymm := sorry
-  le_total := sorry
+  le_refl := fun a => by
+    right
+    rfl
+  le_trans := fun a b c hab hbc => by
+    rw [le_iff] at *
+    rcases hab with hab | hab
+    <;> rcases hbc with hbc | hbc
+    . left
+      exact lt_trans hab hbc
+    . left
+      rw [<- hbc]
+      exact hab
+    . left
+      rw [hab]
+      exact hbc
+    . right
+      simp_all
+  lt_iff_le_not_ge := by
+    intro a b
+    constructor
+    . intro h
+      constructor
+      . left
+        exact h
+      intro h'
+      rcases h' with h' | h'
+      . rw [lt_iff] at *
+        simp_all
+        have := Real.not_pos_neg (b-a)
+        simp_all
+      rw [h'] at h
+      rw [lt_iff] at h
+      simp_all
+      have := Real.nonzero_of_pos h
+      contradiction
+    intro ⟨hab, hba⟩
+    rw [le_iff] at hab
+    rcases hab with hab | hab
+    . exact hab
+    . rw [hab] at hba
+      have : b ≤ b := by
+        right
+        rfl
+      simp_all
+  le_antisymm := by
+    intro a b hab hba
+    rw [le_iff] at *
+    rcases hab with hab | hab
+    <;> rcases hba with hba | hba
+    . exfalso
+      have := Real.not_gt_and_lt a b
+      simp_all
+    . simp_all
+    . simp_all
+    . simp_all
+  le_total := by
+    intro a b
+    rcases trichotomous' a b with h | h | h
+    . right
+      left
+      exact h
+    . left
+      left
+      exact h
+    . rw [h]
+      left
+      right
+      rfl
   toDecidableLE := Classical.decRel _
 
 /--
