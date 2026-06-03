@@ -106,7 +106,9 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
   rcases hcauchy (ε / 2) (half_pos hε) with ⟨N, Nle, hN⟩
 
   lift N to ℕ using Nle
-  set n := N
+  set n := max 0 N
+  have : ((a: Sequence).from ↑n).n₀ = n := by
+    simp
   rcases lt_trichotomy 0 (a n) with h1 | h1 | h1
   . right
     left
@@ -116,10 +118,10 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
       rw [Sequence.IsCauchy.coe]
       intro ε hε
       specialize hcauchy ε hε
-      rcases hcauchy with ⟨N, _, hN⟩
-      lift N to ℕ using (by sorry)
-      use max N n
-      intro j _ k _
+      rcases hcauchy with ⟨N, haha, hN⟩
+      lift N to ℕ using haha
+      use max N (max n ((a:Sequence).from N).n₀.toNat)
+      intro j hj' k hk'
       simp [Section_4_3.dist]
       rw [Rat.steady_def] at hN
       specialize hN j (by grind) k (by grind)
@@ -141,7 +143,7 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
       have h2: ∀ n', n' ≥ N -> a n' ≥ ε / 2 := by
         intro n' hn'
         rw [Rat.steady_def] at hN
-        specialize hN n (by sorry) n' (by sorry)
+        specialize hN n (by grind) n' (by grind)
         rw [Rat.Close] at hN
         simp_all
         rw [if_pos] at hN
@@ -177,13 +179,13 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
     rw [Sequence.IsCauchy.coe]
     intro ε hε
     specialize hcauchy ε hε
-    rcases hcauchy with ⟨N, _, hN⟩
-    lift N to ℕ using (by sorry)
+    rcases hcauchy with ⟨N, haha, hN⟩
+    lift N to ℕ using haha
     use max N n
     intro j _ k _
     simp [Section_4_3.dist]
     rw [Rat.steady_def] at hN
-    specialize hN j (by sorry) k (by sorry)
+    specialize hN j (by grind) k (by grind)
     rw [Rat.Close] at hN
     simp_all
     simp [b]
@@ -202,14 +204,13 @@ theorem Real.trichotomous (x:Real) : x = 0 ∨ x.IsPos ∨ x.IsNeg := by
     have h2: ∀ n', n' ≥ N -> a n' ≤ -(ε / 2) := by
       intro n' hn'
       rw [Rat.steady_def] at hN
-      specialize hN N (by sorry) n' (by sorry)
+      have : ((a: Sequence).from ↑N).n₀ = N := by
+        simp
+      specialize hN N (by grind) n' (by grind)
       rw [Rat.Close] at hN
       simp_all
-      rw [if_pos, if_pos] at hN
-      have : a N <0 := by
+      have : a N < 0 := by
         grind
-      grind
-      grind
       grind
     by_cases hn': n ≥ N
     . simp [b, hn']
