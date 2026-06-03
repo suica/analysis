@@ -312,7 +312,8 @@ theorem Real.pos_of_coe (q:ℚ) : (q:Real).IsPos ↔ q > 0 := by
   rw [Real.ratCast_def]
 
 theorem Real.neg_of_coe (q:ℚ) : (q:Real).IsNeg ↔ q < 0 := by
-  sorry
+  have := Real.pos_of_coe (-q)
+  simp_all
 
 open Classical in
 /-- Need to use classical logic here because {name}`IsPos` and {name}`IsNeg` are not decidable -/
@@ -347,43 +348,161 @@ instance Real.instLE : LE Real where
 theorem Real.lt_iff (x y:Real) : x < y ↔ (x-y).IsNeg := by rfl
 theorem Real.le_iff (x y:Real) : x ≤ y ↔ (x < y) ∨ (x = y) := by rfl
 
-theorem Real.gt_iff (x y:Real) : x > y ↔ (x-y).IsPos := by sorry
-theorem Real.ge_iff (x y:Real) : x ≥ y ↔ (x > y) ∨ (x = y) := by sorry
+lemma LIM_neg (a:ℕ → ℚ) (ha: (a:Sequence).IsCauchy) : LIM (-a) = -LIM a := by
+  have h1: -a = (fun x:ℕ ↦ (-1:ℚ)) * a := by
+    ext n
+    simp
+  simp_all
+  rw [<- Real.LIM_mul, <- Real.ratCast_def]
+  simp_all
+  . apply Sequence.IsCauchy.const
+  exact ha
 
-theorem Real.lt_of_coe (q q':ℚ): q < q' ↔ (q:Real) < (q':Real) := by sorry
+theorem Real.gt_iff (x y:Real) : x > y ↔ (x-y).IsPos := by
+  constructor
+  . intro h
+    rw [isPos_def]
+    obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+    use (-a)
+    constructor
+    . rw [boundedAwayPos_def]
+      simp_all
+      rw [boundedAwayNeg_def] at hbound
+      peel hbound with c hc hbound
+      grind
+    constructor
+    . apply Sequence.IsCauchy.neg
+      repeat simpa
+    rw [LIM_neg, <- hlim]
+    ring_nf
+    simpa
+  intro h
+  rw [isPos_def] at h
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+  rw [boundedAwayPos_def] at hbound
+  obtain ⟨c, hc, hbound⟩ := hbound
+  use (-a)
+  constructor
+  . rw [boundedAwayNeg_def]
+    simp_all
+    use c
+  constructor
+  . apply Sequence.IsCauchy.neg
+    repeat simpa
+  rw [LIM_neg, <- hlim]
+  ring_nf
+  simpa
+theorem Real.ge_iff (x y:Real) : x ≥ y ↔ (x > y) ∨ (x = y) := by
+  simp_all [le_iff]
+  rw [eq_comm]
+
+theorem Real.lt_of_coe (q q':ℚ): q < q' ↔ (q:Real) < (q':Real) := by
+  rw [ratCast_def, ratCast_def, lt_iff, LIM_sub]
+  change q < q' ↔ (LIM ((fun x ↦ (q - q')))).IsNeg
+  constructor
+  . intro h
+    use (fun x ↦ (q - q'))
+    constructor
+    . rw [boundedAwayNeg_def]
+      use (q' - q)
+      grind
+    constructor
+    . apply Sequence.IsCauchy.const
+    rfl
+  intro h
+  rw [isNeg_def] at h
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+  rw [boundedAwayNeg_def] at hbound
+  obtain ⟨c, hc, hbound⟩ := hbound
+  have h1:= LIM_eq_LIM hcauchy (Sequence.IsCauchy.const (q - q'))
+  have h2: Sequence.Equiv a fun x ↦ q - q' := h1.mp (symm hlim)
+  rw [Sequence.equiv_iff] at h2
+  specialize h2 (c/2) (by grind)
+  obtain ⟨N, hN⟩ := h2
+  specialize hN N (by grind)
+  rw [abs_sub_le_iff] at hN
+  have : q - q'  ≤ c / 2 + a N := by grind
+  have : q - q'  ≤ - c / 2 := by grind
+  linarith
+  repeat apply Sequence.IsCauchy.const
 
 theorem Real.gt_of_coe (q q':ℚ): q > q' ↔ (q:Real) > (q':Real) := Real.lt_of_coe _ _
 
-theorem Real.isPos_iff (x:Real) : x.IsPos ↔ x > 0 := by sorry
-theorem Real.isNeg_iff (x:Real) : x.IsNeg ↔ x < 0 := by sorry
+theorem Real.isPos_iff (x:Real) : x.IsPos ↔ x > 0 := by
+  simp_all
+  constructor
+  . intro h
+    rw [isPos_def] at h
+    obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+    rw [boundedAwayPos_def] at hbound
+    obtain ⟨c, hc, hbound⟩ := hbound
+    use (-a)
+    constructor
+    . rw [boundedAwayNeg_def]
+      simp_all
+      use c
+    constructor
+    . apply Sequence.IsCauchy.neg
+      simpa
+    rw [LIM_neg, <- hlim]
+    grind
+    simpa
+  intro h
+  obtain ⟨a, hbound, hcauchy, hlim⟩ := h
+  rw [boundedAwayNeg_def] at hbound
+  obtain ⟨c, hc, hbound⟩ := hbound
+  use (-a)
+  constructor
+  . rw [boundedAwayPos_def]
+    simp_all
+    use c
+    constructor
+    . positivity
+    grind
+  constructor
+  . apply Sequence.IsCauchy.neg
+    simpa
+  rw [LIM_neg, <- hlim]
+  . grind
+  simpa
+theorem Real.isNeg_iff (x:Real) : x.IsNeg ↔ x < 0 := by
+  sorry
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
-theorem Real.trichotomous' (x y:Real) : x > y ∨ x < y ∨ x = y := by sorry
+theorem Real.trichotomous' (x y:Real) : x > y ∨ x < y ∨ x = y := by
+  sorry
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
-theorem Real.not_gt_and_lt (x y:Real) : ¬ (x > y ∧ x < y):= by sorry
+theorem Real.not_gt_and_lt (x y:Real) : ¬ (x > y ∧ x < y):= by
+  sorry
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
-theorem Real.not_gt_and_eq (x y:Real) : ¬ (x > y ∧ x = y):= by sorry
+theorem Real.not_gt_and_eq (x y:Real) : ¬ (x > y ∧ x = y):= by
+  sorry
 
 /-- Proposition 5.4.7(a) (order trichotomy) / Exercise 5.4.2 -/
-theorem Real.not_lt_and_eq (x y:Real) : ¬ (x < y ∧ x = y):= by sorry
+theorem Real.not_lt_and_eq (x y:Real) : ¬ (x < y ∧ x = y):= by
+  sorry
 
 /-- Proposition 5.4.7(b) (order is anti-symmetric) / Exercise 5.4.2 -/
-theorem Real.antisymm (x y:Real) : x < y ↔ y > x := by sorry
+theorem Real.antisymm (x y:Real) : x < y ↔ y > x := by
+  sorry
 
 /-- Proposition 5.4.7(c) (order is transitive) / Exercise 5.4.2 -/
-theorem Real.lt_trans {x y z:Real} (hxy: x < y) (hyz: y < z) : x < z := by sorry
+theorem Real.lt_trans {x y z:Real} (hxy: x < y) (hyz: y < z) : x < z := by
+  sorry
 
 /-- Proposition 5.4.7(d) (addition preserves order) / Exercise 5.4.2 -/
-theorem Real.add_lt_add_right {x y:Real} (z:Real) (hxy: x < y) : x + z < y + z := by sorry
+theorem Real.add_lt_add_right {x y:Real} (z:Real) (hxy: x < y) : x + z < y + z := by
+  sorry
 
 /-- Proposition 5.4.7(e) (positive multiplication preserves order) / Exercise 5.4.2 -/
 theorem Real.mul_lt_mul_right {x y z:Real} (hxy: x < y) (hz: z.IsPos) : x * z < y * z := by
   rw [antisymm, gt_iff] at hxy ⊢; convert pos_mul hxy hz using 1; ring
 
 /-- Proposition 5.4.7(e) (positive multiplication preserves order) / Exercise 5.4.2 -/
-theorem Real.mul_le_mul_left {x y z:Real} (hxy: x ≤ y) (hz: z.IsPos) : z * x ≤ z * y := by sorry
+theorem Real.mul_le_mul_left {x y z:Real} (hxy: x ≤ y) (hz: z.IsPos) : z * x ≤ z * y := by
+  sorry
 
 theorem Real.mul_pos_neg {x y:Real} (hx: x.IsPos) (hy: y.IsNeg) : (x * y).IsNeg := by
   sorry
@@ -405,7 +524,8 @@ noncomputable instance Real.instLinearOrder : LinearOrder Real where
   (Not from textbook) {name}`LinearOrder`s come with a definition of absolute value {lean (type := "Real → Real")}`(|·|)`.
   Show that it agrees with our earlier definition.
 -/
-theorem Real.abs_eq_abs (x:Real) : |x| = abs x := by sorry
+theorem Real.abs_eq_abs (x:Real) : |x| = abs x := by
+  sorry
 
 /-- Proposition 5.4.8 -/
 theorem Real.inv_of_pos {x:Real} (hx: x.IsPos) : x⁻¹.IsPos := by
