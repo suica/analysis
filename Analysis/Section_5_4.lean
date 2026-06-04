@@ -1095,7 +1095,34 @@ theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+
 
 /-- Exercise 5.4.4 -/
 theorem Real.exist_inv_nat_le {x:Real} (hx: x.IsPos) : ∃ N:ℤ, N>0 ∧ (N:Real)⁻¹ < x := by
-  sorry
+  set ε := (1:Real)
+  have hpos : ε.IsPos := by
+    simp [ε]
+    change IsPos ((1:ℚ):Real)
+    rw [Real.pos_of_coe]
+    linarith
+  have h1 := Real.le_mul (ε:=ε) hpos (1/x)
+  obtain ⟨N, Npos, hN⟩ := h1
+  use N
+  split_ands
+  grind
+  simp [ε] at hN
+  norm_cast
+  have hN : x⁻¹ * x * (N: Real)⁻¹ < ↑N * x * (N: Real)⁻¹ := by
+    gcongr
+    rw [isPos_iff] at hx
+    exact hx
+  have hN : x * x⁻¹ * (↑N)⁻¹ < ↑N * (↑N)⁻¹ * x := by
+    grind
+  repeat rw [Real.self_mul_inv] at hN
+  grind
+  . apply Real.nonzero_of_pos
+    change ((N:ℚ): Real).IsPos
+    rw [Real.pos_of_coe]
+    simp
+    simpa
+  apply Real.nonzero_of_pos
+  simpa
 
 /-- Exercise 5.4.6 -/
 theorem Real.dist_lt_iff (ε x y:Real) : |x-y| < ε ↔ y-ε < x ∧ x < y+ε := by
