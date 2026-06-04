@@ -1086,8 +1086,139 @@ theorem Real.le_mul {ε:Real} (hε: ε.IsPos) (x:Real) : ∃ M:ℕ, M > 0 ∧ M 
 
 /-- Proposition 5.4.14 / Exercise 5.4.5 -/
 theorem Real.rat_between {x y:Real} (hxy: x < y) : ∃ q:ℚ, x < (q:Real) ∧ (q:Real) < y := by
-  sorry
+  obtain ⟨a, hacauchy, hlima⟩ := eq_lim x
+  obtain ⟨b, hbcauchy, hlimb⟩ := eq_lim y
+  have hxy : (y-x).IsPos := by
+    rw [isPos_iff]
+    grind
+  rw [isPos_def] at hxy
+  obtain ⟨c, hcpos, hccauchy, hlimc⟩ := hxy
+  rw [hlima, hlimb] at hlimc
+  rw [LIM_sub] at hlimc
+  rw [LIM_eq_LIM] at hlimc
+  simp [Sequence.equiv_iff] at hlimc
 
+
+  rw [boundedAwayPos_def] at hcpos
+  obtain ⟨k, hkpos, hcbound⟩ := hcpos
+
+  specialize hlimc (k/2) (by grind)
+  obtain ⟨N1, hN⟩ := hlimc
+
+  have hacauchy':= hacauchy (k/4) (by grind)
+  rcases hacauchy' with ⟨N2, hN2_le, hN2⟩
+  lift N2 to ℕ using hN2_le
+  rw [Rat.steady_def] at hN2
+
+  set N := max N1 N2
+
+  specialize hN N (by grind)
+  have hcN := hcbound N
+  have hlow : b N ≥ k / 2 + a N := by
+    grind
+  set q := a N + k / 2
+
+  have h1: q > a N := by
+    sorry
+  have h2 : q < b N := by
+    sorry
+
+  use q
+  split_ands
+  . rw [lt_iff]
+    set a' := (fun n ↦ if n ≥ N then a n - q else -k/4)
+    have : (a':Sequence).IsCauchy := by
+      rw [Sequence.isCauchy_def]
+      intro ε hε
+      rw [Rat.eventuallySteady_def]
+      rw [Sequence.isCauchy_def] at hacauchy
+      specialize hacauchy (ε/2) (by grind)
+      rcases hacauchy with ⟨N_1, hN_1_le, hN⟩
+      rw [Rat.steady_def] at hN
+      set N' := max N (max 0 N_1.toNat)
+      use N'
+      constructor
+      . have : ((fun n ↦ if n ≥ N then a n - q else -k / 4):Sequence).n₀ = 0:=by
+          simp
+        rw [this]
+        positivity
+      rw [Rat.steady_def]
+      intro e _ f _
+      rw [Rat.Close]
+      simp_all
+      simp [a']
+      rw [if_pos, if_pos, if_pos, if_pos]
+      simp
+      .
+        specialize hN e (by grind) f (by grind)
+        rw [Rat.Close] at hN
+        split_ifs at hN
+        . linarith
+        . grind
+        . linarith
+        . grind
+      grind
+      . have : N ≤ e := by
+          grind
+        grind
+      grind
+      grind
+    use (a')
+    split_ands
+    . rw [boundedAwayNeg_def]
+      use (k/4)
+      split_ands
+      simp_all
+      intro n
+      simp_all [q]
+      specialize hN2 N (by grind) n
+      simp_all
+      simp [a']
+      split_ifs
+      . specialize hN2 (by grind)
+        rw [Rat.Close] at hN2
+        simp_all
+        have : a N - a n ≤ k / 2 := by
+          grind
+        have : - k / 2 ≤ a N - a n := by
+          grind
+        simp
+        grind
+      grind
+    . simpa
+    rw [ratCast_def, hlima, LIM_sub]
+    rw [LIM_eq_LIM]
+    rw [Sequence.equiv_iff]
+    intro ε hε
+
+    -- 计算 a 本身的稳定位置
+    rw [Sequence.isCauchy_def] at hacauchy
+    specialize hacauchy (ε/2) (by grind)
+    rcases hacauchy with ⟨N_1, hN_1_le, hN⟩
+    rw [Rat.steady_def] at hN
+
+    set N' := max N (max 0 N_1.toNat)
+    use N'
+    intro n hn
+    simp [q]
+    ring_nf
+
+    have hN1 := hN N' (by grind) n (by grind)
+    have hN2 := hN N (by sorry) n (by sorry)
+    simp [Rat.Close] at *
+    simp [a']
+    simp_all
+    rw [if_pos]
+    . grind
+    . simp [N'] at hn
+      exact hn.1
+    . sorry
+    . simpa
+    . exact hacauchy
+    . sorry
+    done
+  repeat simpa
+#exit
 /-- Exercise 5.4.3 -/
 theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by
   obtain ⟨q, hq1, hq2⟩ := Real.rat_between (show x-1 < x by grind)
@@ -1098,9 +1229,13 @@ theorem Real.exist_inv_nat_le {x:Real} (hx: x.IsPos) : ∃ N:ℤ, N>0 ∧ (N:Rea
   set ε := (1:Real)
   have hpos : ε.IsPos := by
     simp [ε]
-    change IsPos ((1:ℚ):Real)
-    rw [Real.pos_of_coe]
-    linarith
+    . apply Sequence.IsCauchy.const
+    rw [ratCast_def, hlimb, LIM_sub]
+    rw [LIM_eq_LIM]
+    rw [Sequence.equiv_iff]
+    intro ε
+    sorry
+  repeat simpa
   have h1 := Real.le_mul (ε:=ε) hpos (1/x)
   obtain ⟨N, Npos, hN⟩ := h1
   use N
