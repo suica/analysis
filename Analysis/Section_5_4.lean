@@ -1178,13 +1178,12 @@ theorem Real.rat_between {x y:Real} (hxy: x < y) : ∃ q:ℚ, x < (q:Real) ∧ (
       . specialize hN2 (by grind)
         rw [Rat.Close] at hN2
         simp_all
-        have : a N - a n ≤ k / 2 := by
-          grind
-        have : - k / 2 ≤ a N - a n := by
-          grind
-        simp
+        simp [q]
+        have : a N - a n ≥ - k / 4 := by
+          rw [abs_sub_le_iff] at hN2
+          linarith
         grind
-      grind
+      . sorry
     . simpa
     rw [ratCast_def, hlima, LIM_sub]
     rw [LIM_eq_LIM]
@@ -1193,22 +1192,22 @@ theorem Real.rat_between {x y:Real} (hxy: x < y) : ∃ q:ℚ, x < (q:Real) ∧ (
 
     -- 计算 a 本身的稳定位置
     rw [Sequence.isCauchy_def] at hacauchy
-    specialize hacauchy (ε/2) (by grind)
+    specialize hacauchy (ε/2) (by sorry)
     rcases hacauchy with ⟨N_1, hN_1_le, hN⟩
     rw [Rat.steady_def] at hN
 
     set N' := max N (max 0 N_1.toNat)
     use N'
     intro n hn
-    simp [q]
+    change |(a - fun x ↦ q) n - a' n| ≤ ε
     ring_nf
 
-    have hN1 := hN N' (by grind) n (by grind)
-    have hN2 := hN N (by sorry) n (by sorry)
-    simp [Rat.Close] at *
-    simp [a']
-    simp_all
-    rw [if_pos]
+    . have hN1 := hN N' (by grind) n (by grind)
+      have hN2 := hN N (by sorry) n (by sorry)
+      simp [Rat.Close] at *
+      simp [a']
+      simp_all
+      rw [if_pos]
     . grind
     . simp [N'] at hn
       exact hn.1
