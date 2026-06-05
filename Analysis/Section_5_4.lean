@@ -1235,7 +1235,7 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
     dsimp [b']
     split_ifs
     .
-      have close := hN3 N (by sorry) n (by sorry)
+      have close := hN3 N ?_ n ?_
       simp [Rat.Close] at close
       rw [if_pos, if_pos] at close
       have: q - b N < - k / 4:=by
@@ -1249,6 +1249,10 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
         linarith
       . omega
       . omega
+      . simp
+        omega
+      . simp
+        omega
     . linarith
 
   -- 13. 关键：把序列位置的不等式提升到实数不等式
