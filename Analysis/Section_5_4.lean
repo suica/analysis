@@ -1337,8 +1337,6 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
     exact hacauchy
   . simpa
 
-#exit
-
 /-- Exercise 5.4.3 -/
 theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by
   obtain ⟨q, hq1, hq2⟩ := Real.rat_between (show x-1 < x by grind)
