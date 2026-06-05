@@ -1482,28 +1482,56 @@ theorem Real.dist_le_eps_iff (x y:Real) : (∀ ε > 0, |x-y| ≤ ε) ↔ x = y :
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≤ x) :
     LIM a ≤ x := by
-      obtain ⟨b, hb_cauchy, hb_lim⟩ := eq_lim x
-      rw [hb_lim]
-      set c := (fun n ↦ b n) - (fun n:ℕ ↦ ((1/ ((n:ℚ) + 1))))
-      -- set c := max a b
-      have hbc : ∀ n,  c n ≤ b n := by
-        intro n
-        simp [c]
-        grind
-      have : LIM c = LIM b := by
-        simp only [c]
-        rw [<- LIM_sub]
-        rw [Real.LIM.harmonic]
-        simp_all
-        . simpa
-        apply Sequence.IsCauchy.harmonic'
-      rw [<- this]
-      apply Real.LIM_mono
-      repeat simpa
-      . sorry
-      simp [c]
+      rw [← le_add_eps_iff]
+      intro ε hε
 
-      sorry
+      rw [← isPos_iff] at hε
+      obtain ⟨N, Npos, hN⟩ := Real.exist_inv_nat_le (hε)
+      lift N to ℕ using (by positivity)
+      set e := (N:ℚ)⁻¹
+
+      have : LIM a ≤ x + e := by
+        suffices _: LIM a - x ≤ e by linarith
+        have h1 := hcauchy e (by sorry)
+        rcases h1 with ⟨N', Nle', hN'⟩
+        lift N' to ℕ using Nle'
+        rw [Rat.steady_def] at hN'
+        set N2 := max N' N
+        specialize hN' N2 (by sorry)
+        set b := fun n ↦ (if n ≥ N2 then a N2 + e else a n)
+        have : LIM a ≤ LIM b := by
+          apply Real.LIM_mono
+          exact hcauchy
+          . have : (b: Sequence).IsCauchy := by
+              set b' := fun n ↦ a N2 + e
+              have hbequiv: Sequence.Equiv b b' := by
+                apply Sequence.equiv_if_eventually_eq N2
+                intro n hn
+                simp [b', b]
+                intro _
+                linarith
+              rw [Sequence.isCauchy_of_equiv hbequiv]
+              . apply Sequence.IsCauchy.const
+            exact this
+          intro n
+          dsimp [b]
+          split_ifs
+          . specialize hN' n ?_
+            . have: ((a: Sequence).from N').n₀ = N' := by
+                simp
+              rw [this]
+              simp [N2] at *
+              linarith
+            simp [Rat.Close] at hN'
+            rw [if_pos, if_pos] at hN'
+            grind
+            grind
+            grind
+          . linarith
+        sorry
+      apply le_trans this
+      gcongr
+      . sorry
 
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_ge {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≥ x) :
