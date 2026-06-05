@@ -1130,7 +1130,6 @@ lemma Sequence.equiv_if_eventually_eq {a b:ℕ → ℚ} (N: ℕ):  (∀ n ≥ N,
   simp [h]
   grind
 
-set_option diagnostics true
 theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real) ∧ (q : Real) < y := by
   -- 1. 取代表元（你已经做了）
   obtain ⟨a, hacauchy, hlima⟩ := eq_lim x
@@ -1138,7 +1137,10 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
 
   -- 2. 从 x < y 得到 y - x 是正数
   have hxy_pos : (y - x).IsPos := by
-    sorry
+    rw [lt_iff] at hxy
+    rw [neg_iff_pos_of_neg] at hxy
+    simp at hxy
+    simpa
 
   -- 3. 展开 IsPos 定义，得到正有理数间隙
   rw [isPos_def] at hxy_pos
@@ -1160,15 +1162,15 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
   obtain ⟨k, hkpos, hcbound⟩ := hcpos
 
   -- 7. 利用 c ≈ b - a，找到 N 使得 |(b-a) n - c n| < k/2 对 n ≥ N
-  have hequiv := hlimc (k/4) (by sorry)
+  have hequiv := hlimc (k/4) (by positivity)
   obtain ⟨N1, hN1⟩ := hequiv
 
   -- 8. a 的 Cauchy 条件，控制尾部波动
-  have hacauchy' := hacauchy (k/8) (by sorry)
+  have hacauchy' := hacauchy (k/8) (by positivity)
   rcases hacauchy' with ⟨N2, hN2_le, hN2⟩
 
   -- b 的 Cauchy 条件，控制尾部波动
-  have hbcauchy' := hbcauchy (k/8) (by sorry)
+  have hbcauchy' := hbcauchy (k/8) (by positivity)
   rcases hbcauchy' with ⟨N3, hN3_le, hN3⟩
   lift N3 to ℕ using hN3_le
 
@@ -1176,13 +1178,22 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
 
   -- 9. 在位置 N 取值
   have hcN := hcbound N
-  have hN2' := hN2 N (by sorry)
+  have hN2' := hN2 N (by simp; omega)
 
   -- 10. 计算：b N - a N > k/2
   have h_gap : b N - a N > k / 2 := by
     -- 从 c N ≥ k 和 |(b N - a N) - c N| < k/2 推出
     have h1 : |(b N - a N) - c N| < k / 2 := by
-      sorry
+      specialize hN1 N ?_ ?_
+      . simp
+        omega
+      . simp
+        omega
+      simp [Rat.Close] at hN1
+      rw [if_pos, if_pos] at hN1
+      linarith
+      . omega
+      . omega
     have h2 : c N ≥ k := hcN
     -- |X - c| < k/2 且 c ≥ k 意味着 X > k/2
     rw [abs_lt] at h1
@@ -1212,17 +1223,22 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
     .
       simp [q]
       have close := hN2' n ?_
-      simp [Rat.Close] at close
+      rw [Rat.Close] at close
+      simp only [Sequence.n0_coe, ge_iff_le, sup_le_iff, Nat.cast_nonneg, true_and,
+        Sequence.eval_coe_at_int, ↓reduceIte, Int.toNat_natCast, dite_eq_ite] at close
       rw [if_pos, if_pos] at close
       have : -k/8 ≤ a N - a n := by
         rw [abs_sub_le_iff] at close
-        grind
-      . grind
-      have : N2 ≤ N := by
-        simp [N]
+        linarith
       . linarith
-      . simp [N]
-      . simp_all [N]
+      have : N2 ≤ N := by
+        simp only [N]
+        omega
+      . linarith
+      . dsimp [N]
+        omega
+      . dsimp [N]
+        omega
     . linarith
   set b' := fun n ↦ if n ≥ N then q - b n else -(k / 8)
   have hb'bounded_away_neg: (_: True) -> BoundedAwayNeg b' := by
