@@ -1339,8 +1339,60 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
 
 /-- Exercise 5.4.3 -/
 theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by
-  obtain ⟨q, hq1, hq2⟩ := Real.rat_between (show x-1 < x by grind)
-  sorry
+  obtain ⟨a, hacauchy, hlima⟩ := eq_lim x
+  have h1 := hacauchy (1/4:ℚ) (by grind)
+  rw [Rat.eventuallySteady_def] at h1
+  obtain ⟨N, Npos, hN⟩ := h1
+  lift N to ℕ using Npos
+
+  have := Real.rat_between (show x-1/4 < x+1/4 by grind)
+  rcases this with ⟨q, hq1, hq2⟩
+  set z:= ⌊q⌋
+  set b := a - z
+  have hbcauchy: (b: Sequence).IsCauchy := by
+    apply Sequence.IsCauchy.sub
+    exact hacauchy
+    apply Sequence.IsCauchy.const
+  rcases trichotomous (LIM b:Real) with h | h | h
+  . have hxeqz: x = z := by
+      simp [b] at h
+      rw [← LIM_sub] at h
+      have : LIM z = z:= by
+        sorry
+      rw [hlima, ← this]
+      linarith
+      exact hacauchy
+      apply Sequence.IsCauchy.const
+    use z
+    split_ands
+    . linarith
+    . linarith
+    intro y hy
+    apply le_antisymm_iff.mpr
+    rw [hxeqz] at hy
+    split_ands
+    . exact_mod_cast hy.1
+    . rw [Int.le_iff_lt_add_one]
+      exact_mod_cast hy.2
+  . have hxgtz: x > z := by
+      sorry
+    use z
+    split_ands
+    . linarith
+    . rw [lt_iff]
+      sorry
+    intro y hy
+
+    apply le_antisymm_iff.mpr
+    split_ands
+    . simp [z]
+
+      sorry
+    . rw [Int.le_iff_lt_add_one]
+      have : (z:Real) < y + 1 := by
+        linarith
+      exact_mod_cast this
+  . sorry
 
 /-- Exercise 5.4.4 -/
 theorem Real.exist_inv_nat_le {x:Real} (hx: x.IsPos) : ∃ N:ℤ, N>0 ∧ (N:Real)⁻¹ < x := by
