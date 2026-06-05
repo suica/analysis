@@ -1120,6 +1120,16 @@ lemma Sequence.IsCauchy.ad_hoc_if {a:ℕ → ℚ} {N: ℕ}: ((a: Sequence).IsCau
   split_ands
   repeat grind
 
+lemma Sequence.equiv_if_eventually_eq {a b:ℕ → ℚ} (N: ℕ):  (∀ n ≥ N, a n = b n) -> Sequence.Equiv a b := by
+  intro h
+  rw [Sequence.equiv_iff]
+  intro ε hε
+  use N
+  intro n hn
+  specialize h n hn
+  simp [h]
+  grind
+
 theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real) ∧ (q : Real) < y := by
   -- 1. 取代表元（你已经做了）
   obtain ⟨a, hacauchy, hlima⟩ := eq_lim x
@@ -1184,20 +1194,15 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
   have h2 : q < b N := by
     simp [q]
     linarith [h_gap, hkpos]
-
-  -- 13. 关键：把序列位置的不等式提升到实数不等式
-  use q
-  constructor
-  · rw [lt_iff]
-    rw [isNeg_def]
-    use (fun n ↦ if n ≥ N then a n - q else -k)
-    constructor
+  set a' := fun n ↦ if n ≥ N then a n - q else -k
+  have ha'bounded_away_neg: (a: True) -> BoundedAwayNeg a' := by
+    intro _
     rw [boundedAwayNeg_def]
     use (k/8)
     constructor
     . linarith
     intro n
-    simp
+    simp [a']
     split_ifs
     .
       simp [q]
@@ -1212,25 +1217,28 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
         simp [N]
       . linarith
       . simp [N]
-      . simp
-        expose_names
-        simp [N] at h
-        linarith
+      . simp_all [N]
     . linarith
+  -- 13. 关键：把序列位置的不等式提升到实数不等式
+  use q
+  constructor
+  · rw [lt_iff]
+    rw [isNeg_def]
+    use (fun n ↦ if n ≥ N then a n - q else -k)
+    constructor
+    . change BoundedAwayNeg a'
+      apply ha'bounded_away_neg
+      trivial
     split_ands
     . apply Sequence.IsCauchy.ad_hoc_if
       simpa
     have : LIM (fun n ↦ if n ≥ N then a n - q else -k) = LIM (fun n ↦ a n - q) := by
       rw [LIM_eq_LIM]
-      rw [Sequence.equiv_iff]
-      intro ε hε
-      use N
+      apply Sequence.equiv_if_eventually_eq N
       intro n hn
       rw [if_pos]
-      . ring_nf
-        grind
       . exact hn
-      . exact Sequence.IsCauchy.ad_hoc_if hacauchy
+      . apply Sequence.IsCauchy.ad_hoc_if hacauchy
       . apply Sequence.IsCauchy.sub
         simpa
         apply Sequence.IsCauchy.const
@@ -1241,7 +1249,9 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
     rfl
     . simpa
     . apply Sequence.IsCauchy.const
-  · -- 证明 q < y
+  ·
+    -- 证明 q < y
+    rw [lt_iff]
     sorry
   . sorry
   . simpa
