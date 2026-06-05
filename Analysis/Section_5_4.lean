@@ -1479,6 +1479,7 @@ theorem Real.dist_le_eps_iff (x y:Real) : (∀ ε > 0, |x-y| ≤ ε) ↔ x = y :
   intro ε hε
   grind
 
+set_option diagnostics true
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≤ x) :
     LIM a ≤ x := by
@@ -1499,20 +1500,28 @@ theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
         set N2 := max N' N
         specialize hN' N2 (by sorry)
         set b := fun n ↦ (if n ≥ N2 then a N2 + e else a n)
+        set b' := fun n ↦ a N2 + e
+        have hbequiv: Sequence.Equiv b b' := by
+          apply Sequence.equiv_if_eventually_eq N2
+          intro n hn
+          simp [b', b]
+          intro _
+          linarith
+        have hbcauchy: (b: Sequence).IsCauchy := by
+          rw [Sequence.isCauchy_of_equiv hbequiv]
+          . apply Sequence.IsCauchy.const
+        have hlimb' : LIM b' = ↑(a N2 + e) := by
+          rw [ratCast_def]
+        have hlimb: LIM b = LIM b' := by
+          rw [LIM_eq_LIM]
+          exact hbequiv
+          . exact hbcauchy
+          rw [← Sequence.isCauchy_of_equiv hbequiv]
+          exact hbcauchy
         have : LIM a ≤ LIM b := by
           apply Real.LIM_mono
           exact hcauchy
-          . have : (b: Sequence).IsCauchy := by
-              set b' := fun n ↦ a N2 + e
-              have hbequiv: Sequence.Equiv b b' := by
-                apply Sequence.equiv_if_eventually_eq N2
-                intro n hn
-                simp [b', b]
-                intro _
-                linarith
-              rw [Sequence.isCauchy_of_equiv hbequiv]
-              . apply Sequence.IsCauchy.const
-            exact this
+          . exact hbcauchy
           intro n
           dsimp [b]
           split_ifs
@@ -1520,15 +1529,35 @@ theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
             . have: ((a: Sequence).from N').n₀ = N' := by
                 simp
               rw [this]
-              simp [N2] at *
-              linarith
+              dsimp [N2] at *
+              omega
             simp [Rat.Close] at hN'
             rw [if_pos, if_pos] at hN'
-            grind
-            grind
-            grind
+            rw [abs_sub_le_iff] at hN'
+            dsimp [N2] at *
+            . linarith
+            . omega
+            . omega
           . linarith
-        sorry
+        have hlima_estimate: LIM a ≤ ↑(a N2 + e) := by
+          rw [← hlimb']
+          rw [← hlimb]
+          linarith
+        have hx_estimate: a N2 ≤ x := by
+          specialize h N2
+          linarith
+        calc
+          LIM a - x
+          ≤ LIM a - ↑(a N2) := by gcongr
+          _ ≤ e := ?_
+        suffices _: LIM a  ≤ ↑e + ↑(a N2) by linarith
+        convert hlima_estimate
+        simp [ratCast_def]
+        rw [LIM_add, LIM_add, add_comm]
+        apply Sequence.IsCauchy.const
+        apply Sequence.IsCauchy.const
+        apply Sequence.IsCauchy.const
+        apply Sequence.IsCauchy.const
       apply le_trans this
       gcongr
       . sorry
