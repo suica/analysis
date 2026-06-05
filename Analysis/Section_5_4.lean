@@ -1479,7 +1479,7 @@ theorem Real.dist_le_eps_iff (x y:Real) : (∀ ε > 0, |x-y| ≤ ε) ↔ x = y :
   intro ε hε
   grind
 
-set_option diagnostics true
+set_option diagnostics true in
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≤ x) :
     LIM a ≤ x := by
@@ -1493,12 +1493,17 @@ theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
 
       have : LIM a ≤ x + e := by
         suffices _: LIM a - x ≤ e by linarith
-        have h1 := hcauchy e (by sorry)
+        have h1 := hcauchy e (by
+          have : (N:ℚ)⁻¹ >0 := by
+            simp
+            exact_mod_cast Npos
+          exact_mod_cast this
+        )
         rcases h1 with ⟨N', Nle', hN'⟩
         lift N' to ℕ using Nle'
         rw [Rat.steady_def] at hN'
         set N2 := max N' N
-        specialize hN' N2 (by sorry)
+        specialize hN' N2 (by simp [N2])
         set b := fun n ↦ (if n ≥ N2 then a N2 + e else a n)
         set b' := fun n ↦ a N2 + e
         have hbequiv: Sequence.Equiv b b' := by
@@ -1560,7 +1565,9 @@ theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
         apply Sequence.IsCauchy.const
       apply le_trans this
       gcongr
-      . sorry
+      . dsimp [e] at *
+        simp_all
+        linarith
 
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_ge {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≥ x) :
