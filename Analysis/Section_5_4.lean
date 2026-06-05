@@ -1159,7 +1159,7 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
   set N := max N1.toNat N2.toNat
 
   -- 9. 在位置 N 取值
-  have hN1' := hN1 N (by sorry)
+  -- have hN1' := hN1 N (by sorry)
   have hcN := hcbound N
   have hN2' := hN2 N (by grind)
 
@@ -1201,7 +1201,7 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
     split_ifs
     .
       simp [q]
-      have close:= hN2' n (by sorry)
+      have close := hN2' n ?_
       simp [Rat.Close] at close
       rw [if_pos, if_pos] at close
       have : -k/8 ≤ a N - a n := by
@@ -1211,7 +1211,11 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
       have : N2 ≤ N := by
         simp [N]
       . linarith
-      simp [N]
+      . simp [N]
+      . simp
+        expose_names
+        simp [N] at h
+        linarith
     . linarith
     split_ands
     . apply Sequence.IsCauchy.ad_hoc_if
