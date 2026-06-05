@@ -1337,6 +1337,58 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
     exact hacauchy
   . simpa
 
+theorem Real.floor_exist' (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by
+  have hloose: ∃ n: ℤ, n ≤ x ∧ x < n+2 := by
+    sorry
+  rcases hloose with ⟨n, hn1, hn2⟩
+  by_cases hn3: n+1 ≤ x
+  . use n+1
+    split_ands
+    . exact_mod_cast hn3
+    simp
+    linarith
+    .
+      intro y hy
+      by_contra! h1
+      wlog h: y > n + 1
+      . specialize this x (y-1) (by grind) (by grind) (by grind) (n+1) (by grind) (by grind) (by grind)
+        exact this
+      simp at h
+      have : n + 2 ≤ y := by
+        linarith
+      have : x < y := by
+        calc
+          x < (n + 2: Real) := by exact_mod_cast hn2
+          _ ≤ y := ?_
+        exact_mod_cast this
+      linarith
+  simp at hn3
+  use n
+  split_ands
+  . exact_mod_cast hn1
+  ring_nf
+  linarith
+  intro y hy
+  . by_contra! h1
+    wlog h: y > n
+    . specialize this x y (by grind) (by grind) (by grind) n (by grind) (by grind) (by grind)
+      exact this
+    simp at h
+    have h: n < y := by grind
+    have : n + 1 ≤ y := by
+      linarith
+    norm_cast at *
+    have : (n: Real) + 1 < (n: Real) + 1 := by
+      calc
+        n + 1
+          ≤ (y: Real) := by exact_mod_cast this
+        _ ≤ x := ?_
+        _ < n + 1 := ?_
+      . exact_mod_cast hy.1
+      . exact_mod_cast hn3
+    linarith
+
+
 /-- Exercise 5.4.3 -/
 theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by
   obtain ⟨a, hacauchy, hlima⟩ := eq_lim x
