@@ -1130,6 +1130,7 @@ lemma Sequence.equiv_if_eventually_eq {a b:ℕ → ℚ} (N: ℕ):  (∀ n ≥ N,
   simp [h]
   grind
 
+set_option diagnostics true
 theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real) ∧ (q : Real) < y := by
   -- 1. 取代表元（你已经做了）
   obtain ⟨a, hacauchy, hlima⟩ := eq_lim x
@@ -1159,19 +1160,23 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
   obtain ⟨k, hkpos, hcbound⟩ := hcpos
 
   -- 7. 利用 c ≈ b - a，找到 N 使得 |(b-a) n - c n| < k/2 对 n ≥ N
-  have hequiv := hlimc (k/4) (by grind)
+  have hequiv := hlimc (k/4) (by sorry)
   obtain ⟨N1, hN1⟩ := hequiv
 
   -- 8. a 的 Cauchy 条件，控制尾部波动
-  have hacauchy' := hacauchy (k/8) (by grind)
+  have hacauchy' := hacauchy (k/8) (by sorry)
   rcases hacauchy' with ⟨N2, hN2_le, hN2⟩
 
-  set N := max N1.toNat N2.toNat
+  -- b 的 Cauchy 条件，控制尾部波动
+  have hbcauchy' := hbcauchy (k/8) (by sorry)
+  rcases hbcauchy' with ⟨N3, hN3_le, hN3⟩
+  lift N3 to ℕ using hN3_le
+
+  set N := max N1.toNat (max N2.toNat N3)
 
   -- 9. 在位置 N 取值
-  -- have hN1' := hN1 N (by sorry)
   have hcN := hcbound N
-  have hN2' := hN2 N (by grind)
+  have hN2' := hN2 N (by sorry)
 
   -- 10. 计算：b N - a N > k/2
   have h_gap : b N - a N > k / 2 := by
@@ -1219,6 +1224,33 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
       . simp [N]
       . simp_all [N]
     . linarith
+  set b' := fun n ↦ if n ≥ N then q - b n else -(k / 8)
+  have hb'bounded_away_neg: (_: True) -> BoundedAwayNeg b' := by
+    intro _
+    rw [boundedAwayNeg_def]
+    use (k/8)
+    constructor
+    . linarith
+    intro n
+    dsimp [b']
+    split_ifs
+    .
+      have close := hN3 N (by sorry) n (by sorry)
+      simp [Rat.Close] at close
+      rw [if_pos, if_pos] at close
+      have: q - b N < - k / 4:=by
+        calc
+            q - b N = a N + k / 4 - b N := by rfl
+          _ = k / 4 - (b N - a N) := by ring_nf
+          _ < k / 4 - k / 2 := by gcongr
+          _ = -k / 4 := by ring_nf
+      . rw [abs_sub_le_iff] at close
+        have close_1: b N - b n ≤ k / 8 := close.1
+        linarith
+      . omega
+      . omega
+    . linarith
+
   -- 13. 关键：把序列位置的不等式提升到实数不等式
   use q
   constructor
@@ -1231,7 +1263,7 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
       trivial
     split_ands
     . apply Sequence.IsCauchy.ad_hoc_if
-      simpa
+      exact hacauchy
     have : LIM (fun n ↦ if n ≥ N then a n - q else -k) = LIM (fun n ↦ a n - q) := by
       rw [LIM_eq_LIM]
       apply Sequence.equiv_if_eventually_eq N
@@ -1240,39 +1272,53 @@ theorem Real.rat_between {x y : Real} (hxy : x < y) : ∃ q : ℚ, x < (q : Real
       . exact hn
       . apply Sequence.IsCauchy.ad_hoc_if hacauchy
       . apply Sequence.IsCauchy.sub
-        simpa
+        exact hacauchy
         apply Sequence.IsCauchy.const
     rw [this]
     rw [hlima]
     change (LIM fun n ↦ a n) - ↑q = LIM fun n ↦ a n - q
     rw [ratCast_def, LIM_sub]
     rfl
-    . simpa
+    . exact hacauchy
     . apply Sequence.IsCauchy.const
   ·
     -- 证明 q < y
     rw [lt_iff]
-    sorry
-  . sorry
+    use (b')
+    have hb'equiv: Sequence.Equiv b' (fun n ↦ q - b n) := by
+      apply Sequence.equiv_if_eventually_eq N
+      intro n hn
+      dsimp [b']
+      rw [if_pos]
+      . exact hn
+    have hb'cauchy: (b': Sequence).IsCauchy := by
+      rw [Sequence.isCauchy_of_equiv hb'equiv]
+      . apply Sequence.IsCauchy.sub
+        apply Sequence.IsCauchy.const
+        simpa
+    split_ands
+    . apply hb'bounded_away_neg
+      trivial
+    . exact hb'cauchy
+    rw [hlimb, ratCast_def, LIM_sub]
+    have : LIM b' = LIM ((fun x ↦ q) - b)  := by
+      rw [LIM_eq_LIM]
+      simpa
+      simpa
+      apply Sequence.IsCauchy.sub
+      . apply Sequence.IsCauchy.const
+      . exact hbcauchy
+    symm
+    exact this
+    . apply Sequence.IsCauchy.const
+    exact hbcauchy
+  . apply Sequence.IsCauchy.sub
+    exact hbcauchy
+    exact hacauchy
   . simpa
 
 #exit
-    rw [LIM_const]
-    simpa
-    simpa
-    rw [LIM_const]
-    simpa
-    simpa
-    rw [LIM_const]
-    simpa
-    rw [LIM_const]
-    simpa
-    simpa
-    rw [LIM_const]
-    simpa
-    simpa
-    rw [LIM_const]
-    simpa
+
 /-- Exercise 5.4.3 -/
 theorem Real.floor_exist (x:Real) : ∃! n:ℤ, (n:Real) ≤ x ∧ x < (n:Real)+1 := by
   obtain ⟨q, hq1, hq2⟩ := Real.rat_between (show x-1 < x by grind)
@@ -1283,13 +1329,9 @@ theorem Real.exist_inv_nat_le {x:Real} (hx: x.IsPos) : ∃ N:ℤ, N>0 ∧ (N:Rea
   set ε := (1:Real)
   have hpos : ε.IsPos := by
     simp [ε]
-    . apply Sequence.IsCauchy.const
-    rw [ratCast_def, hlimb, LIM_sub]
-    rw [LIM_eq_LIM]
-    rw [Sequence.equiv_iff]
-    intro ε
-    sorry
-  repeat simpa
+    change ((1:ℚ):Real).IsPos
+    rw [Real.pos_of_coe]
+    grind
   have h1 := Real.le_mul (ε:=ε) hpos (1/x)
   obtain ⟨N, Npos, hN⟩ := h1
   use N
