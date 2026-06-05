@@ -1500,20 +1500,27 @@ theorem Real.LIM_of_le {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
       rw [<- this]
       apply Real.LIM_mono
       repeat simpa
-      repeat simpa
       . sorry
       simp [c]
+
       sorry
-      apply Sequence.IsCauchy.add
-      simpa
-      apply Sequence.IsCauchy.harmonic'
-      intro n
-      simpa
 
 /-- Exercise 5.4.8 -/
 theorem Real.LIM_of_ge {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy) (h: ∀ n, a n ≥ x) :
     LIM a ≥ x := by
-      sorry
+      have hneg_cauchy: ((fun n ↦ -a n): Sequence).IsCauchy := by
+        apply Sequence.IsCauchy.neg
+        exact hcauchy
+      have h': ∀ n, (fun n ↦ -a n) n ≤ -x := by
+        intro n
+        simp
+        apply h
+      have h1 := Real.LIM_of_le hneg_cauchy (h')
+      change LIM (- fun n ↦ a n) ≤ -x at h1
+      rw [LIM_neg] at h1
+      simp at h1
+      gcongr
+      exact hcauchy
 
 theorem Real.max_eq (x y:Real) : max x y = if x ≥ y then x else y := max_def' x y
 
