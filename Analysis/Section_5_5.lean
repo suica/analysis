@@ -54,15 +54,31 @@ theorem Real.Ioi_def (x:Real) : .Ioi x = { z | z > x } := rfl
 
 /-- Example 5.5.3 -/
 example : ¬ ∃ M : Real, M ∈ upperBounds (.Ioi 0) := by
-  sorry
+  push_neg
+  intro M h
+  rw [Real.upperBound_def] at h
+  set x := max (M+1) 1
+  specialize h x (?_)
+  . rw [Real.Ioi_def]
+    simp
+    simp [x]
+  simp [x] at h
+  linarith
 
 /-- Example 5.5.4 -/
 example : ∀ M, M ∈ upperBounds (∅ : Set Real) := by
-  sorry
+  intro M
+  rw [Real.upperBound_def]
+  intro x hx
+  exfalso
+  apply hx
 
 theorem Real.upperBound_upper {M M': Real} (h: M ≤ M') {E: Set Real} (hb: M ∈ upperBounds E) :
     M' ∈ upperBounds E := by
-  sorry
+  rw [Real.upperBound_def] at *
+  intro x hx
+  specialize hb x hx
+  linarith
 
 /-- Definition 5.5.5 (least upper bound).  Here we use the {name}`IsLUB` predicate defined in Mathlib. -/
 theorem Real.isLUB_def (E: Set Real) (M: Real) :
