@@ -39,7 +39,15 @@ theorem Real.Icc_def (x y:Real) : .Icc x y = { z | x ≤ z ∧ z ≤ y } := rfl
 theorem Real.mem_Icc (x y z:Real) : z ∈ Set.Icc x y ↔ x ≤ z ∧ z ≤ y := by simp [Real.Icc_def]
 
 /-- Example 5.5.2 -/
-example (M: Real) : M ∈ upperBounds (.Icc 0 1) ↔ M ≥ 1 := by sorry
+example (M: Real) : M ∈ upperBounds (.Icc 0 1) ↔ M ≥ 1 := by
+  rw [Real.upperBound_def]
+  constructor
+  . intro h
+    specialize h 1 (by grind)
+    exact h
+  intro h x hx
+  rw [Real.mem_Icc] at hx
+  linarith
 
 /-- API for Example 5.5.3 -/
 theorem Real.Ioi_def (x:Real) : .Ioi x = { z | z > x } := rfl
