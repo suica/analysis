@@ -285,7 +285,36 @@ theorem Real.LIM_abs {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy): |LIM a| = LIM 
 
 theorem Real.LIM_of_le' {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
     (h: ∃ N, ∀ n ≥ N, a n ≤ x) : LIM a ≤ x := by
-  sorry
+  obtain ⟨N, hn⟩ := h
+
+  -- 找一个 m s.t. m < x
+  obtain ⟨m, hm, _⟩ := Real.floor_exist x
+  set a' := fun n ↦ if n≥N then a n else m
+
+  have ha: ∀ (n : ℕ), ↑(a' n) ≤ x := by
+    intro n
+    simp [a']
+    split_ifs
+    . grind
+    have := hm.1
+    exact_mod_cast this
+  have aa'_eq: Sequence.Equiv a a' := by
+    apply Sequence.equiv_if_eventually_eq N
+    intro n hn
+    simp [a']
+    grind
+  have ha'cauchy: (a': Sequence).IsCauchy := by
+    rw [← Sequence.isCauchy_of_equiv aa'_eq]
+    exact hcauchy
+  have ha'lim: LIM a = LIM a' := by
+    rw [LIM_eq_LIM]
+    exact aa'_eq
+    exact hcauchy
+    exact ha'cauchy
+  rw [ha'lim]
+  apply Real.LIM_of_le
+  exact ha'cauchy
+  exact ha
 
 /-- Exercise 5.5.4 -/
 theorem Real.LIM_of_Cauchy {q:ℕ → ℚ} (hq: ∀ M, ∀ n ≥ M, ∀ n' ≥ M, |q n - q n'| ≤ 1 / (M+1)) :
