@@ -185,15 +185,60 @@ theorem Real.upperBound_discrete_unique {E: Set Real} {n:ℕ} {m m':ℤ}
 /-- Lemmas that can be helpful for proving 5.5.4 -/
 theorem Sequence.IsCauchy.abs {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy):
   ((|a| : ℕ → ℚ) : Sequence).IsCauchy := by
-  sorry
+  rw [Sequence.isCauchy_def] at *
+  peel ha with ε hε N Nle n hn m hm h
+  rw [Rat.Close] at *
+  simp_all
+  repeat rw [if_pos] at *
+  lift n to ℕ using (by grind)
+  lift m to ℕ using (by grind)
+  simp_all
+  have h1 := abs_abs_sub_abs_le (a n) (a m)
+  repeat grind
 
 theorem Real.LIM.abs_eq {a b:ℕ → ℚ} (ha: (a: Sequence).IsCauchy)
     (hb: (b: Sequence).IsCauchy) (h: LIM a = LIM b): LIM |a| = LIM |b| := by
-  sorry
+  rw [LIM_eq_LIM] at *
+  rw [Sequence.equiv_iff] at *
+  peel h with ε hε _ N hN h
+  simp
+  have h1 := abs_abs_sub_abs_le (a N) (b N)
+  grind
+  repeat simpa
+  . apply Sequence.IsCauchy.abs
+    simpa
+  . apply Sequence.IsCauchy.abs
+    simpa
 
 theorem Real.LIM.abs_eq_pos {a: ℕ → ℚ} (h: LIM a > 0) (ha: (a:Sequence).IsCauchy):
     LIM a = LIM |a| := by
-  sorry
+  simp at h
+  simp [lt_iff] at h
+  rw [isPos_def] at h
+  obtain ⟨b, hbaway, hbcauchy, hlimb⟩ := h
+  obtain ⟨c, cpos, hcc⟩ := hbaway
+
+  have : LIM |b| = LIM |a| := by
+    apply Real.LIM.abs_eq
+    exact hbcauchy
+    exact ha
+    simp_all
+  rw [← this, hlimb]
+  rw [LIM_eq_LIM, Sequence.equiv_iff]
+  intro ε hε
+  use 0
+  intro n _
+  have : |b n| = b n := by
+    specialize hcc n
+    rw [abs_eq_self]
+    linarith
+  simp
+  rw [this]
+  simp
+  grind
+  exact hbcauchy
+  apply Sequence.IsCauchy.abs
+  . exact hbcauchy
 
 theorem Real.LIM_abs {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy): |LIM a| = LIM |a| := by
   sorry
