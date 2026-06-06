@@ -120,13 +120,58 @@ theorem Real.bddAbove_def (E: Set Real) : BddAbove E ↔ ∃ M, M ∈ upperBound
 theorem Real.bddBelow_def (E: Set Real) : BddBelow E ↔ ∃ M, M ∈ lowerBounds E := Set.nonempty_def
 
 /-- Exercise 5.5.2 -/
-theorem Real.upperBound_between {E: Set Real} {n:ℕ} {L K:ℤ} (hLK: L < K)
+theorem Real.upperBound_between {E: Set Real} {n:ℕ} {L K:ℤ} (_: L < K)
   (hK: K*((1/(n+1):ℚ):Real) ∈ upperBounds E) (hL: L*((1/(n+1):ℚ):Real) ∉ upperBounds E) :
     ∃ m, L < m
     ∧ m ≤ K
     ∧ m*((1/(n+1):ℚ):Real) ∈ upperBounds E
     ∧ (m-1)*((1/(n+1):ℚ):Real) ∉ upperBounds E := by
-  sorry
+  set P := fun z: ℤ ↦ (z * (1/(n+1):ℚ): Real) ∈ upperBounds E
+  set S : Set ℤ := {m | L < m ∧ m ≤ K ∧ P m}
+  have h1: ∃ b, ∀ (z : ℤ), P z → b ≤ z := by
+    rw [Real.upperBound_def] at hL
+    push_neg at hL
+    obtain ⟨x, hx, hx2⟩ := hL
+    use L
+    intro z hpz
+    dsimp [P] at hpz
+    rw [Real.upperBound_def] at hpz
+    specialize hpz x hx
+    have : L * (1 / (n + 1):ℚ) < ↑z * (1 / (↑n + 1)) := by
+      have := lt_of_lt_of_le hx2 hpz
+      norm_cast at *
+    field_simp at this
+    apply le_of_lt
+    exact_mod_cast this
+  have h2 := Int.exists_least_of_bdd h1 ⟨K, hK⟩
+  obtain ⟨m, hPm, hlb⟩ := h2
+  use m
+  have hmS: m ∈ S := by
+    dsimp [S]
+    split_ands
+    . by_contra h
+      simp at h
+      have : P L := by
+        dsimp [P] at *
+        rw [Real.upperBound_def] at *
+        intro x hx
+        specialize hPm x hx
+        apply le_trans hPm
+        gcongr
+      contradiction
+    . specialize hlb K hK
+      exact hlb
+    exact hPm
+  simp [S] at hmS
+  split_ands
+  . linarith
+  . linarith
+  exact hPm
+  intro hm'
+  specialize hlb (m-1) _
+  . dsimp [P]
+    exact_mod_cast hm'
+  linarith
 
 /-- Exercise 5.5.3 -/
 theorem Real.upperBound_discrete_unique {E: Set Real} {n:ℕ} {m m':ℤ}
