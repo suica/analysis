@@ -53,13 +53,16 @@ example (M: Real) : M ∈ upperBounds (.Icc 0 1) ↔ M ≥ 1 := by
 theorem Real.Ioi_def (x:Real) : .Ioi x = { z | z > x } := rfl
 
 /-- Example 5.5.3 -/
-example : ¬ ∃ M : Real, M ∈ upperBounds (.Ioi 0) := by sorry
+example : ¬ ∃ M : Real, M ∈ upperBounds (.Ioi 0) := by
+  sorry
 
 /-- Example 5.5.4 -/
-example : ∀ M, M ∈ upperBounds (∅ : Set Real) := by sorry
+example : ∀ M, M ∈ upperBounds (∅ : Set Real) := by
+  sorry
 
 theorem Real.upperBound_upper {M M': Real} (h: M ≤ M') {E: Set Real} (hb: M ∈ upperBounds E) :
-    M' ∈ upperBounds E := by sorry
+    M' ∈ upperBounds E := by
+  sorry
 
 /-- Definition 5.5.5 (least upper bound).  Here we use the {name}`IsLUB` predicate defined in Mathlib. -/
 theorem Real.isLUB_def (E: Set Real) (M: Real) :
@@ -69,10 +72,12 @@ theorem Real.isGLB_def (E: Set Real) (M: Real) :
     IsGLB E M ↔ M ∈ lowerBounds E ∧ ∀ M' ∈ lowerBounds E, M' ≤ M := by rfl
 
 /-- Example 5.5.6 -/
-example : IsLUB (.Icc 0 1) (1 : Real) := by sorry
+example : IsLUB (.Icc 0 1) (1 : Real) := by
+  sorry
 
 /-- Example 5.5.7 -/
-example : ¬∃ M, IsLUB (∅: Set Real) M := by sorry
+example : ¬∃ M, IsLUB (∅: Set Real) M := by
+  sorry
 
 /-- Proposition 5.5.8 (Uniqueness of least upper bound)-/
 theorem Real.LUB_unique {E: Set Real} {M M': Real} (h1: IsLUB E M) (h2: IsLUB E M') : M = M' := by
@@ -89,7 +94,8 @@ theorem Real.upperBound_between {E: Set Real} {n:ℕ} {L K:ℤ} (hLK: L < K)
     ∃ m, L < m
     ∧ m ≤ K
     ∧ m*((1/(n+1):ℚ):Real) ∈ upperBounds E
-    ∧ (m-1)*((1/(n+1):ℚ):Real) ∉ upperBounds E := by sorry
+    ∧ (m-1)*((1/(n+1):ℚ):Real) ∉ upperBounds E := by
+  sorry
 
 /-- Exercise 5.5.3 -/
 theorem Real.upperBound_discrete_unique {E: Set Real} {n:ℕ} {m m':ℤ}
@@ -97,26 +103,33 @@ theorem Real.upperBound_discrete_unique {E: Set Real} {n:ℕ} {m m':ℤ}
   (hm2: (((m:ℚ) / (n+1) - 1 / (n+1):ℚ):Real) ∉ upperBounds E)
   (hm'1: (((m':ℚ) / (n+1):ℚ):Real) ∈ upperBounds E)
   (hm'2: (((m':ℚ) / (n+1) - 1 / (n+1):ℚ):Real) ∉ upperBounds E) :
-    m = m' := by sorry
+    m = m' := by
+  sorry
 
 /-- Lemmas that can be helpful for proving 5.5.4 -/
 theorem Sequence.IsCauchy.abs {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy):
-  ((|a| : ℕ → ℚ) : Sequence).IsCauchy := by sorry
+  ((|a| : ℕ → ℚ) : Sequence).IsCauchy := by
+  sorry
 
 theorem Real.LIM.abs_eq {a b:ℕ → ℚ} (ha: (a: Sequence).IsCauchy)
-    (hb: (b: Sequence).IsCauchy) (h: LIM a = LIM b): LIM |a| = LIM |b| := by sorry
+    (hb: (b: Sequence).IsCauchy) (h: LIM a = LIM b): LIM |a| = LIM |b| := by
+  sorry
 
 theorem Real.LIM.abs_eq_pos {a: ℕ → ℚ} (h: LIM a > 0) (ha: (a:Sequence).IsCauchy):
-    LIM a = LIM |a| := by sorry
+    LIM a = LIM |a| := by
+  sorry
 
-theorem Real.LIM_abs {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy): |LIM a| = LIM |a| := by sorry
+theorem Real.LIM_abs {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy): |LIM a| = LIM |a| := by
+  sorry
 
 theorem Real.LIM_of_le' {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
-    (h: ∃ N, ∀ n ≥ N, a n ≤ x) : LIM a ≤ x := by sorry
+    (h: ∃ N, ∀ n ≥ N, a n ≤ x) : LIM a ≤ x := by
+  sorry
 
 /-- Exercise 5.5.4 -/
 theorem Real.LIM_of_Cauchy {q:ℕ → ℚ} (hq: ∀ M, ∀ n ≥ M, ∀ n' ≥ M, |q n - q n'| ≤ 1 / (M+1)) :
-    (q:Sequence).IsCauchy ∧ ∀ M, |q M - LIM q| ≤ 1 / (M+1) := by sorry
+    (q:Sequence).IsCauchy ∧ ∀ M, |q M - LIM q| ≤ 1 / (M+1) := by
+  sorry
 
 /--
 The sequence m₁, m₂, … is well-defined.
@@ -284,7 +297,8 @@ theorem Real.exist_sqrt_two : ∃ x:Real, x^2 = 2 := by
       _ ≥ x^2 - 2 * ε * 2 + 0 * 0 := by gcongr
       _ = x^2 - 4 * ε := by ring
       _ > 2 := hε3
-    have why (y:Real) (hy: y ∈ E) : x - ε ≥ y := by sorry
+    have why (y:Real) (hy: y ∈ E) : x - ε ≥ y := by
+      sorry
     have claim13: x-ε ∈ upperBounds E := by rwa [upperBound_def]
     have claim14: x ≤ x-ε := by grind [isLUB_def]
     linarith
@@ -307,13 +321,15 @@ theorem Real.exist_sqrt_two : ∃ x:Real, x^2 = 2 := by
   assumption
 
 /-- Remark 5.5.13 -/
-theorem Real.exist_irrational : ∃ x:Real, ¬ ∃ q:ℚ, x = (q:Real) := by sorry
+theorem Real.exist_irrational : ∃ x:Real, ¬ ∃ q:ℚ, x = (q:Real) := by
+  sorry
 
 /-- Helper lemma for Exercise 5.5.1. -/
 theorem Real.mem_neg (E: Set Real) (x:Real) : x ∈ -E ↔ -x ∈ E := Set.mem_neg
 
 /-- Exercise 5.5.1-/
-theorem Real.inf_neg {E: Set Real} {M:Real} (h: IsLUB E M) : IsGLB (-E) (-M) := by sorry
+theorem Real.inf_neg {E: Set Real} {M:Real} (h: IsLUB E M) : IsGLB (-E) (-M) := by
+  sorry
 
 theorem Real.GLB_exist {E: Set Real} (hE: Set.Nonempty E) (hbound: BddBelow E): ∃ S, IsGLB E S := by
   sorry
@@ -336,7 +352,8 @@ theorem ExtendedReal.inf_of_bounded_finite {E: Set Real} (hnon: E.Nonempty) (hb:
 
 /-- Exercise 5.5.5 -/
 theorem Real.irrat_between {x y:Real} (hxy: x < y) :
-    ∃ z, x < z ∧ z < y ∧ ¬ ∃ q:ℚ, z = (q:Real) := by sorry
+    ∃ z, x < z ∧ z < y ∧ ¬ ∃ q:ℚ, z = (q:Real) := by
+  sorry
 
 /- Use the notion of supremum in this section to define a Mathlib `sSup` operation -/
 noncomputable instance Real.inst_SupSet : SupSet Real where
