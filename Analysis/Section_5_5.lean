@@ -241,7 +241,47 @@ theorem Real.LIM.abs_eq_pos {a: ℕ → ℚ} (h: LIM a > 0) (ha: (a:Sequence).Is
   . exact hbcauchy
 
 theorem Real.LIM_abs {a:ℕ → ℚ} (ha: (a:Sequence).IsCauchy): |LIM a| = LIM |a| := by
-  sorry
+  by_cases h: (LIM a) = 0
+  . simp [h]
+    have : LIM a = LIM 0 := by
+      change LIM a = LIM (fun _↦ 0)
+      rw [LIM.zero]
+      exact h
+    have := Real.LIM.abs_eq ha ?_ this
+    rw [this]
+    simp_all
+    apply Sequence.IsCauchy.const
+  wlog h: LIM a > 0
+  .
+    specialize this (a:=-a) _ _ _
+    . apply Sequence.IsCauchy.neg
+      exact ha
+    . intro h
+      rw [LIM_neg] at h
+      grind
+      exact ha
+    .
+      rw [← isPos_iff] at *
+      rw [LIM_neg]
+      rw [← neg_iff_pos_of_neg]
+      rcases trichotomous (LIM a) with h | h | h
+      . contradiction
+      . contradiction
+      . exact h
+      exact ha
+    simp_all
+    rw [← this]
+    rw [LIM_neg, abs_neg]
+    exact ha
+  . rw [abs_eq_abs, abs]
+    simp_all
+    rw [if_pos]
+    . apply Real.LIM.abs_eq_pos
+      exact h
+      exact ha
+    rw [isPos_iff]
+    exact h
+
 
 theorem Real.LIM_of_le' {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy)
     (h: ∃ N, ∀ n ≥ N, a n ≤ x) : LIM a ≤ x := by
