@@ -89,11 +89,26 @@ theorem Real.isGLB_def (E: Set Real) (M: Real) :
 
 /-- Example 5.5.6 -/
 example : IsLUB (.Icc 0 1) (1 : Real) := by
-  sorry
+  rw [Real.isLUB_def]
+  split_ands
+  . rw [Real.upperBound_def]
+    intro x hx
+    rw [Real.mem_Icc] at hx
+    linarith
+  intro M' hM'
+  rw [Real.upperBound_def] at hM'
+  specialize hM' 1 (by grind)
+  linarith
 
 /-- Example 5.5.7 -/
 example : ¬∃ M, IsLUB (∅: Set Real) M := by
-  sorry
+  push_neg
+  intro M h
+  rw [Real.isLUB_def] at h
+  obtain ⟨ h1, h2 ⟩ := h
+  specialize h2 (M-1) ?_
+  . simp [upperBounds_empty]
+  linarith
 
 /-- Proposition 5.5.8 (Uniqueness of least upper bound)-/
 theorem Real.LUB_unique {E: Set Real} {M M': Real} (h1: IsLUB E M) (h2: IsLUB E M') : M = M' := by
