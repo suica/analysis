@@ -214,7 +214,47 @@ theorem Real.zpow_mul (x:Real) (n m:ℤ) : (x^n)^m = x^(n*m) := by
     simpa
 
 /-- Analogue of Proposition 4.3.12(a) -/
-theorem Real.mul_zpow (x y:Real) (n:ℤ) : (x*y)^n = x^n * y^n := by sorry
+theorem Real.mul_zpow (x y:Real) (n:ℤ) : (x*y)^n = x^n * y^n := by
+  by_cases hx: x = 0
+  . by_cases hy: y = 0
+    . simp [hx, hy]
+      by_cases hn: n = 0
+      . rw [hn]
+        simp
+      rw [zero_zpow]
+      simp
+      omega
+    simp_all
+    by_cases hn: n = 0
+    . rw [hn]
+      simp
+    rw [zero_zpow]
+    simp
+    omega
+  by_cases hy: y = 0
+  . rw [hy]
+    simp
+    by_cases hn: n = 0
+    . rw [hn]
+      simp
+    rw [zero_zpow]
+    simp
+    omega
+  induction n with
+  | zero =>
+    simp
+  | succ n ih =>
+    rw [←zpow_add, ih, ← zpow_add, ← zpow_add]
+    ring_nf
+    field_simp
+    omega
+    omega
+    positivity
+  | pred n ih =>
+    rw [Int.sub_eq_add_neg, ← zpow_add, ih, ← zpow_add, ← zpow_add]
+    field_simp
+    repeat simpa
+    positivity
 
 /-- Analogue of Proposition 4.3.12(b) -/
 theorem Real.zpow_pos {x:Real} (n:ℤ) (hx: x > 0) : x^n > 0 := by sorry
