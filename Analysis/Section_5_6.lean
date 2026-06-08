@@ -331,25 +331,40 @@ theorem Real.zpow_ge_zpow_ofneg {x y:Real} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (h
     . grind
     order
 
+lemma lemma1 : ∀ (x y:Real) (n:ℤ) (hy: y > 0) (hn: n > 0) (hxy: x^n ≤ y^n), x ≤ y := by
+  intro x y n hy hn hxy
+  lift n to ℕ using by order
+  have := Real.pow_gt_pow x y n
+  by_contra! h
+  simp_all
+  specialize this (by order)
+  linarith
+
 /-- Analogue of Proposition 4.3.12(c) -/
 theorem Real.zpow_inj {x y:Real} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n = y^n) : x = y := by
-  sorry
-  induction n with
-  | zero =>
-    simp_all
-  | succ n ih =>
-    simp_all
-    by_cases hn: n = 0
-    . simp_all
-    simp_all
-    rw [← zpow_add, ← zpow_add] at hxy
-    simp_all
-    . sorry
-    order
-  | pred n ih =>
-    simp_all
-    sorry
-
+  wlog h: x ≥ y
+  . specialize this hy hx hn (symm hxy) (by order)
+    exact symm this
+  have h1: x ≤ y:= by
+    wlog hn: n > 0
+    . specialize this (x:=x) (y:=y) (n:=-n) (by order) (by order)
+      have _: -n>0:= by
+        grind
+      specialize this (by order)
+      apply this
+      .
+        have h: -n>0:= by
+          grind
+        lift (-n) to ℕ using (by positivity) with k hk
+        rw [show n = -k by omega, Real.zpow_neg, Real.zpow_neg] at hxy
+        field_simp at hxy
+        symm
+        exact_mod_cast hxy
+      grind
+      grind
+    apply lemma1 x y n hy hn
+    grind
+  linarith
 
 /-- Analogue of Proposition 4.3.12(d) -/
 theorem Real.zpow_abs (x:Real) (n:ℤ) : |x|^n = |x^n| := by
