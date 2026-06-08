@@ -32,6 +32,7 @@ namespace Chapter5
 
 lemma Real.pow_zero (x: Real) : x ^ 0 = 1 := rfl
 
+@[simp]
 lemma Real.pow_succ (x: Real) (n:ℕ) : x ^ (n+1) = (x ^ n) * x := rfl
 
 lemma Real.pow_of_coe (q: ℚ) (n:ℕ) : (q:Real) ^ n = (q ^ n:ℚ) := by induction' n with n hn <;> simp
@@ -41,31 +42,57 @@ to be a `Field`), but the spirit of the exercises is to adapt the proofs of
 Proposition 4.3.10 that you previously established. -/
 
 /-- Analogue of Proposition 4.3.10(a) -/
-theorem Real.pow_add (x:Real) (m n:ℕ) : x^n * x^m = x^(n+m) := by sorry
+theorem Real.pow_add (x:Real) (m n:ℕ) : x^n * x^m = x^(n+m) := by
+  induction' n with n hn <;> simp; ring_nf
 
 /-- Analogue of Proposition 4.3.10(a) -/
-theorem Real.pow_mul (x:Real) (m n:ℕ) : (x^n)^m = x^(n*m) := by sorry
+theorem Real.pow_mul (x:Real) (m n:ℕ) : (x^n)^m = x^(n*m) := by
+  induction' n with n hn <;> simp [Real.pow_succ]; ring_nf; linarith
 
 /-- Analogue of Proposition 4.3.10(a) -/
-theorem Real.mul_pow (x y:Real) (n:ℕ) : (x*y)^n = x^n * y^n := by sorry
+theorem Real.mul_pow (x y:Real) (n:ℕ) : (x*y)^n = x^n * y^n := by
+  induction' n with n hn <;> simp; ring_nf
 
 /-- Analogue of Proposition 4.3.10(b) -/
-theorem Real.pow_eq_zero (x:Real) (n:ℕ) (hn : 0 < n) : x^n = 0 ↔ x = 0 := by sorry
+theorem Real.pow_eq_zero (x:Real) (n:ℕ) (hn : 0 < n) : x^n = 0 ↔ x = 0 := by
+  constructor
+  . intro h
+    simp at h
+    exact h.left
+  intro h
+  rw [h]
+  simp
+  grind
 
 /-- Analogue of Proposition 4.3.10(c) -/
-theorem Real.pow_nonneg {x:Real} (n:ℕ) (hx: x ≥ 0) : x^n ≥ 0 := by sorry
+theorem Real.pow_nonneg {x:Real} (n:ℕ) (hx: x ≥ 0) : x^n ≥ 0 := by
+  induction' n with n hn <;> simp
+  exact Left.mul_nonneg hn hx
 
 /-- Analogue of Proposition 4.3.10(c) -/
-theorem Real.pow_pos {x:Real} (n:ℕ) (hx: x > 0) : x^n > 0 := by sorry
+theorem Real.pow_pos {x:Real} (n:ℕ) (hx: x > 0) : x^n > 0 := by
+  induction' n with n hn <;> simp
+  exact Left.mul_pos hn hx
 
 /-- Analogue of Proposition 4.3.10(c) -/
-theorem Real.pow_ge_pow (x y:Real) (n:ℕ) (hxy: x ≥ y) (hy: y ≥ 0) : x^n ≥ y^n := by sorry
+theorem Real.pow_ge_pow (x y:Real) (n:ℕ) (hxy: x ≥ y) (hy: y ≥ 0) : x^n ≥ y^n := by
+  induction' n with n hn <;> simp
+  gcongr
+  apply pow_nonneg
+  grind
 
 /-- Analogue of Proposition 4.3.10(c) -/
-theorem Real.pow_gt_pow (x y:Real) (n:ℕ) (hxy: x > y) (hy: y ≥ 0) (hn: n > 0) : x^n > y^n := by sorry
+theorem Real.pow_gt_pow (x y:Real) (n:ℕ) (hxy: x > y) (hy: y ≥ 0) (hn: n > 0) : x^n > y^n := by
+  induction' n with n ih <;> simp
+  . contradiction
+  by_cases h: n = 0
+  . simp [h]
+    simpa
+  gcongr
 
 /-- Analogue of Proposition 4.3.10(d) -/
-theorem Real.pow_abs (x:Real) (n:ℕ) : |x|^n = |x^n| := by sorry
+theorem Real.pow_abs (x:Real) (n:ℕ) : |x|^n = |x^n| := by
+  induction' n with n hn <;> simp
 
 /-- Definition 5.6.2 (Exponentiating a real by an integer). Here we use the Mathlib definition coming from {name}`DivInvMonoid`. -/
 lemma Real.pow_eq_pow (x: Real) (n:ℕ): x ^ (n:ℤ) = x ^ n := by rfl
@@ -75,11 +102,116 @@ lemma Real.zpow_zero (x: Real) : x ^ (0:ℤ) = 1 := by rfl
 
 lemma Real.zpow_neg {x:Real} (n:ℕ) : x^(-n:ℤ) = 1 / (x^n) := by simp
 
-/-- Analogue of Proposition 4.3.12(a) -/
-theorem Real.zpow_add (x:Real) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by sorry
+lemma Real.zpow_sub_one {x:Real} (n:ℤ) (h:x ≠ 0) : x^(n-1) = x^n / x := by
+  induction n with
+  | zero =>
+    simp
+  | succ n ih =>
+    simp
+    norm_cast
+    simp
+    rw [mul_div_assoc, div_self]
+    rw [mul_one]
+    exact h
+  | pred n ih =>
+    simp at *
+    rw [Int.sub_eq_add_neg, ← neg_add] at ih
+    change x ^ (-((n + 1:ℕ):ℤ)) = (x ^ n)⁻¹ / x at ih
+    rw [zpow_neg] at ih
+    rw [show -(n:ℤ) - 1 - 1 = - ↑((n+1+1):ℕ) by omega]
+    rw [zpow_neg]
+    rw [pow_succ]
+    rw [← div_div, div_eq_mul_inv]
+    rw [show -(n:ℤ) - 1  = - ↑((n+1):ℕ) by omega]
+    rw [zpow_neg, div_eq_mul_inv]
+    ring_nf
+
+lemma Real.zpow_add_one {x:Real} (n:ℤ) (h:x ≠ 0): x^(n+1) = x^n * x := by
+  induction n with
+  | zero =>
+    simp
+  | succ n ih =>
+    norm_cast
+  | pred n ih =>
+    simp at *
+    rw [show -(n:ℤ) - 1 = - ↑((n+1):ℕ) by omega]
+    rw [zpow_neg, div_eq_mul_inv]
+    simp
+    ring_nf
+    rw [mul_comm x]
+    rw [inv_mul_cancel₀]
+    simp
+    exact h
 
 /-- Analogue of Proposition 4.3.12(a) -/
-theorem Real.zpow_mul (x:Real) (n m:ℤ) : (x^n)^m = x^(n*m) := by sorry
+theorem Real.zpow_add (x:Real) (n m:ℤ) (hx: x ≠ 0): x^n * x^m = x^(n+m) := by
+  induction m with
+  | zero =>
+    simp
+  | succ m ih =>
+    simp_all
+    norm_cast
+    rw [pow_succ]
+    rw [show n + ↑(m + 1) = n + ↑m + 1 by omega]
+    rw [Real.zpow_add_one, ← ih]
+    ring_nf
+    exact hx
+  | pred m ih =>
+    simp_all
+    rw [show n + (-↑m - 1) = n - ↑m - 1 by omega]
+    rw [Real.zpow_sub_one, Real.zpow_sub_one]
+    field_simp
+    rw [Real.zpow_neg]
+    field_simp at *
+    norm_cast
+    omega
+    omega
+
+/-- Analogue of Proposition 4.3.12(a) -/
+theorem Real.zpow_mul (x:Real) (n m:ℤ) : (x^n)^m = x^(n*m) := by
+  by_cases hx: x = 0
+  . rw [hx]
+    . by_cases hm: m = 0
+      simp [hm]
+      by_cases hn: n = 0
+      . rw [hn]
+        simp
+      rw [zero_zpow, zero_zpow, zero_zpow]
+      positivity
+      positivity
+      omega
+  by_cases hn: n = 0
+  . by_cases hm: m = 0
+    . rw [hn, hm]
+      simp
+    rw [hn]
+    simp
+  have : x^n ≠ 0 := by
+    by_contra h
+    rw [zpow_eq_zero_iff] at h
+    contradiction
+    exact hn
+  induction m with
+  | zero =>
+    simp
+  | succ m ih =>
+    simp_all
+    rw [← Real.zpow_add]
+    simp [ih]
+    simp [mul_add]
+    rw [zpow_add]
+    omega
+    omega
+  | pred m ih =>
+    rw [Real.zpow_sub_one, mul_sub]
+    rw [Real.zpow_neg] at *
+    rw [ih]
+    field_simp; ring_nf
+    rw [Int.sub_eq_add_neg, zpow_add]
+    congr
+    ring_nf
+    exact hx
+    simpa
 
 /-- Analogue of Proposition 4.3.12(a) -/
 theorem Real.mul_zpow (x y:Real) (n:ℤ) : (x*y)^n = x^n * y^n := by sorry
