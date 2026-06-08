@@ -257,13 +257,77 @@ theorem Real.mul_zpow (x y:Real) (n:ℤ) : (x*y)^n = x^n * y^n := by
     positivity
 
 /-- Analogue of Proposition 4.3.12(b) -/
-theorem Real.zpow_pos {x:Real} (n:ℤ) (hx: x > 0) : x^n > 0 := by sorry
+theorem Real.zpow_pos {x:Real} (n:ℤ) (hx: x > 0) : x^n > 0 := by
+  induction n with
+  | zero =>
+    simp
+  | succ n ih =>
+    simp
+    rw [← zpow_add]
+    simp
+    positivity
+    positivity
+  | pred n ih =>
+    rw [Int.sub_eq_add_neg, ← zpow_add]
+    positivity
+    positivity
 
 /-- Analogue of Proposition 4.3.12(b) -/
-theorem Real.zpow_ge_zpow {x y:Real} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n > 0): x^n ≥ y^n := by sorry
+theorem Real.zpow_ge_zpow {x y:Real} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n > 0): x^n ≥ y^n := by
+  lift n to ℕ using by order
+  induction n with
+  | zero =>
+    simp
+  | succ n ih =>
+    simp
+    rw [← zpow_add]
+    simp
+    . rw [← zpow_add]
+      simp
+      by_cases hn: n = 0
+      . gcongr
+        rw [hn]
+        by_cases hx: x = 0
+        . rw [hx]
+          simp
+        simp
+      specialize ih (by omega)
+      gcongr
+      apply pow_nonneg
+      grind
+      linarith
+    positivity
 
 theorem Real.zpow_ge_zpow_ofneg {x y:Real} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (hn: n < 0) : x^n ≤ y^n := by
-  sorry
+  induction n with
+  | zero =>
+    simp
+  | succ n ih =>
+    contradiction
+  | pred n ih =>
+    have : x > 0 := by
+      order
+    have : x * x⁻¹ > 0:= by
+      grind
+    have : x⁻¹ > 0 := by
+      #check mul_pos_iff
+      sorry
+    rw [Int.sub_eq_add_neg, ← zpow_add]
+    simp
+    by_cases hn: n = 0
+    . rw [hn]
+      simp
+      gcongr
+    rw [← zpow_add]
+    gcongr
+    . simp
+      gcongr
+    simp
+    specialize ih (by omega)
+    gcongr
+    simp
+    . grind
+    order
 
 /-- Analogue of Proposition 4.3.12(c) -/
 theorem Real.zpow_inj {x y:Real} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n = y^n) : x = y := by
