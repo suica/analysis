@@ -310,8 +310,10 @@ theorem Real.zpow_ge_zpow_ofneg {x y:Real} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (h
     have : x * x⁻¹ > 0:= by
       grind
     have : x⁻¹ > 0 := by
-      #check mul_pos_iff
-      sorry
+      rw [← isPos_iff]
+      apply Real.inv_of_pos
+      rw [isPos_iff]
+      grind
     rw [Int.sub_eq_add_neg, ← zpow_add]
     simp
     by_cases hn: n = 0
@@ -332,9 +334,26 @@ theorem Real.zpow_ge_zpow_ofneg {x y:Real} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (h
 /-- Analogue of Proposition 4.3.12(c) -/
 theorem Real.zpow_inj {x y:Real} {n:ℤ} (hx: x > 0) (hy : y > 0) (hn: n ≠ 0) (hxy: x^n = y^n) : x = y := by
   sorry
+  induction n with
+  | zero =>
+    simp_all
+  | succ n ih =>
+    simp_all
+    by_cases hn: n = 0
+    . simp_all
+    simp_all
+    rw [← zpow_add, ← zpow_add] at hxy
+    simp_all
+    . sorry
+    order
+  | pred n ih =>
+    simp_all
+    sorry
+
 
 /-- Analogue of Proposition 4.3.12(d) -/
-theorem Real.zpow_abs (x:Real) (n:ℤ) : |x|^n = |x^n| := by sorry
+theorem Real.zpow_abs (x:Real) (n:ℤ) : |x|^n = |x^n| := by
+  induction' n <;> simp
 
 /-- Definition 5.6.2. We permit "junk values" when {lean}`x` is negative or {lean}`n` vanishes. -/
 noncomputable abbrev Real.root (x:Real) (n:ℕ) : Real := sSup { y:Real | y ≥ 0 ∧ y^n ≤ x }
@@ -344,7 +363,11 @@ noncomputable abbrev Real.sqrt (x:Real) := x.root 2
 /-- Lemma 5.6.5 (Existence of n^th roots) -/
 theorem Real.rootset_nonempty {x:Real} (hx: x ≥ 0) (n:ℕ) (hn: n ≥ 1) : { y:Real | y ≥ 0 ∧ y^n ≤ x }.Nonempty := by
   use 0
-  sorry
+  simp
+  have : 0^n = 0 := by
+    simp
+    grind
+  simp_all
 
 theorem Real.rootset_bddAbove {x:Real} (n:ℕ) (hn: n ≥ 1) : BddAbove { y:Real | y ≥ 0 ∧ y^n ≤ x } := by
   -- This proof is written to follow the structure of the original text.
