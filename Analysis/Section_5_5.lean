@@ -557,7 +557,14 @@ theorem Real.exist_sqrt_two : ∃ x:Real, x^2 = 2 := by
       _ = x^2 - 4 * ε := by ring
       _ > 2 := hε3
     have why (y:Real) (hy: y ∈ E) : x - ε ≥ y := by
-      sorry
+      simp [E] at hy
+      simp
+      have : y^2 ≤ (x-ε)^2 := by
+        grind
+      rw [← sq_le_sq₀]
+      exact this
+      grind
+      grind
     have claim13: x-ε ∈ upperBounds E := by rwa [upperBound_def]
     have claim14: x ≤ x-ε := by grind [isLUB_def]
     linarith
