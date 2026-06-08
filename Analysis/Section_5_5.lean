@@ -319,7 +319,76 @@ theorem Real.LIM_of_le' {x:Real} {a:ℕ → ℚ} (hcauchy: (a:Sequence).IsCauchy
 /-- Exercise 5.5.4 -/
 theorem Real.LIM_of_Cauchy {q:ℕ → ℚ} (hq: ∀ M, ∀ n ≥ M, ∀ n' ≥ M, |q n - q n'| ≤ 1 / (M+1)) :
     (q:Sequence).IsCauchy ∧ ∀ M, |q M - LIM q| ≤ 1 / (M+1) := by
-  sorry
+  have hcauchy: (q:Sequence).IsCauchy := by
+    rw [Sequence.isCauchy_def]
+    intro ε hε
+    rw [Rat.eventuallySteady_def]
+    have εpos: (ε:Real).IsPos := by
+      rw [isPos_iff]
+      exact_mod_cast hε
+    obtain ⟨M, Mpos, hM⟩ := Real.exist_inv_nat_le εpos
+    use M
+    lift M to ℕ using (by grind)
+    split_ands
+    . simp
+    . intro n hn m hm
+      rw [Rat.Close]
+      lift n to ℕ using (by grind)
+      lift m to ℕ using (by grind)
+      simp_all
+      specialize hq M n hn m hm
+      have : (M + 1: ℚ) ⁻¹ < (M: ℚ)⁻¹ := by
+        refine (inv_lt_inv₀ ?_ ?_).mpr ?_
+        grind
+        exact_mod_cast Mpos
+        grind
+      apply le_trans hq
+      apply le_of_lt
+      apply _root_.lt_trans this
+      have : (↑M)⁻¹ < ε := by
+        have : ε - (↑M)⁻¹ > 0 := by
+          rw [← Real.pos_of_coe]
+          simp_all
+          rw [isPos_iff]
+          grind
+        rw [← Real.pos_of_coe] at this
+        rw [isPos_iff] at this
+        norm_cast at this
+        linarith
+      exact this
+  split_ands
+  . exact hcauchy
+  intro M
+  rw [ratCast_def, LIM_sub]
+  rw [Real.LIM_abs]
+  change LIM |(fun x ↦ q M - q x)| ≤ 1 / (↑M + 1)
+  specialize hq M M (by grind)
+  apply Real.LIM_of_le'
+  . apply Sequence.IsCauchy.abs
+    apply Sequence.IsCauchy.sub
+    apply Sequence.IsCauchy.const
+    exact hcauchy
+  . use M
+    intro n hn
+    simp at *
+    specialize hq n hn
+    norm_cast
+    rw [Rat.le_iff_eq_or_lt] at hq
+    rcases hq with h | h
+    . left
+      have : (↑M + 1: ℚ)⁻¹ - |q M - q n| > 0 := by
+        linarith
+      rw [← Real.pos_of_coe] at this
+      rw [isPos_iff] at this
+      simp at this
+      exact_mod_cast this
+    . rw [h]
+      simp
+  . apply Sequence.IsCauchy.sub
+    apply Sequence.IsCauchy.const
+    exact hcauchy
+  . apply Sequence.IsCauchy.const
+  exact hcauchy
 
 /--
 The sequence m₁, m₂, … is well-defined.
