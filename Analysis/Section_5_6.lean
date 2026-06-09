@@ -507,21 +507,62 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
           specialize h4 (y-ε) hupper
           exact h4
         linarith
-      . sorry
+      .
+        have claim1: ∃ ε>0, y+ε>0 ∧ (y+ε)^n < x := by
+          set ε := max ((x- (y)^n)/ (y^(n-1)) * n) (1/2)
+          have : y-ε > 0 := by
+            sorry
+          have : ε > 0 := by
+            sorry
+          have h_comm {ε:Real}: Commute (y+ε) y := by
+            exact Commute.all (y + ε) y
+          have h_decomp {ε:Real} := Commute.mul_geom_sum₂ (x:=y+ε) (y:=y) (n:=n) h_comm
+          simp at h_decomp
+          have h_sum_est : ∑ i ∈ Finset.range n, (y^(n-1)) ≤ ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) := by
+            gcongr
+            expose_names
+            simp_all
+            have : y ^ (n - 1) = y^i * y^(n - 1 - i) := by
+              rw [pow_add]
+              grind
+            rw [this]
+            gcongr
+            grind
+          replace h_sum_est : n * y^(n-1) ≤ ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) := by
+            have : ∑ i ∈ Finset.range n, y ^ (n - 1) = n * y^(n-1) := by
+              rw [Finset.sum_const]
+              simp
+            rw [this] at h_sum_est
+            exact h_sum_est
+          have h_est : ε * (y^(n-1)) * n ≤ (y+ε)^n - (y)^n := by
+            rw [← h_decomp]
+            rw [mul_assoc]
+            gcongr
+            grind
+          simp_all
+          use ε
+          split_ands
+          . grind
+          . grind
+          .
+            have h_yeps_lt_x : (y+ε)^n < x := by
+              have h_lt_diff : (y+ε)^n - y^n < x - y^n := by
+                rw [← h_decomp]
+                sorry
+              linarith
+            exact h_yeps_lt_x
+        obtain ⟨ ε, hε, hε' ⟩ := claim1
+        have h_yeps_in_S : y + ε ∈ {z | 0 ≤ z ∧ z^n ≤ x}:=by
+          constructor
+          grind
+          grind
+        have : y + ε ≤ y := by
+          rw [upperBound_def] at hy
+          specialize hy (y + ε) h_yeps_in_S
+          exact hy
+        linarith
       . exact h
-    intro h
-    rw [← h]
-    simp [root]
-    simp_all
-    simp [sSup, ExtendedReal.sup]
-    rw [dif_pos, dif_pos]
-    .
-      sorry
-    . apply Real.rootset_bddAbove
-      grind
-    . apply Real.rootset_nonempty
-      grind
-      grind
+    sorry
 
 /-- Lemma 5.6.6 (c) / Exercise 5.6.1 -/
 theorem Real.root_nonneg {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n ≥ 0 := by sorry
