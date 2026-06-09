@@ -562,7 +562,20 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
           exact hy
         linarith
       . exact h
-    sorry
+    intro h
+    simp [root]
+    have : sSup {y | 0 ≤ y ∧ y ^ n ≤ x} ^ n = x := by
+      sorry
+    apply Real.zpow_inj (n:=n)
+    grind
+    . have h_non := Real.rootset_nonempty hx n hn
+      have h_bdd := Real.rootset_bddAbove n hn (x:=x)
+      have h1:= ExtendedReal.sSup_of_bounded h_non h_bdd
+      rw [Real.isLUB_def] at h1
+      obtain ⟨ h1, h2 ⟩ := h1
+      sorry
+    grind
+    simp_all
 
 /-- Lemma 5.6.6 (c) / Exercise 5.6.1 -/
 theorem Real.root_nonneg {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n ≥ 0 := by sorry
