@@ -588,7 +588,61 @@ theorem Real.exist_sqrt_two : ∃ x:Real, x^2 = 2 := by
 
 /-- Remark 5.5.13 -/
 theorem Real.exist_irrational : ∃ x:Real, ¬ ∃ q:ℚ, x = (q:Real) := by
-  sorry
+  obtain ⟨ x, hx ⟩ := Real.exist_sqrt_two
+  use x
+  push_neg
+  intro q hq
+  wlog hqpos: q > 0
+  . simp_all
+    specialize this (-q) (by linarith) (-q) (by simp)
+    have : q = 0 := by grind
+    simp [this] at hx
+  replace hq: (x:Real) = (q:Real) := by
+    grind
+  have h1 := Rat.num_div_den q
+  set b := q.den
+  rw [hq] at hx
+  norm_cast at hx
+  have : q.num > 0 := by
+    refine Rat.num_pos.mpr ?_
+    grind
+  lift q.num to ℕ using (by grind) with a ha
+  have : b > 0 := by
+    exact Rat.den_pos q
+  simp at h1
+  rw [← h1] at hx
+  simp at hx
+  field_simp at hx
+  norm_cast at hx
+  have h2dvda2: 2 ∣ a^2 := by
+    exact Dvd.intro_left (b ^ 2) (id (Eq.symm hx))
+  have h2dvda: 2 ∣ a := by
+    apply Prime.dvd_of_dvd_pow (n:=2)
+    exact h2dvda2
+    decide
+  have h2dvdb: 2 ∣ b := by
+    rcases h2dvda with ⟨k, hk⟩
+    have : b ^ 2 = 2 * k ^ 2 := by
+      rw [hk] at hx
+      ring_nf at hx ⊢
+      linarith
+    have h2dvdb2 : 2 ∣ b ^ 2 := by
+      rw [this]
+      use k ^ 2
+    exact Nat.Prime.dvd_of_dvd_pow (by norm_num) h2dvdb2
+  have : gcd a b ≥ 2 := by
+    have h1 :=  Nat.dvd_gcd h2dvda h2dvdb
+    apply Nat.le_of_dvd
+    . by_contra h
+      simp at h
+      grind
+    exact h1
+  have : gcd a b = 1 := by
+    have h1 := q.reduced
+    rw [← ha] at h1
+    simp at h1
+    exact Rat.natCast_eq_one_iff.mp (congrArg Nat.cast h1)
+  linarith
 
 /-- Helper lemma for Exercise 5.5.1. -/
 theorem Real.mem_neg (E: Set Real) (x:Real) : x ∈ -E ↔ -x ∈ E := Set.mem_neg
