@@ -384,6 +384,18 @@ theorem Real.rootset_nonempty {x:Real} (hx: x ≥ 0) (n:ℕ) (hn: n ≥ 1) : { y
     grind
   simp_all
 
+lemma le_pow_of_lt {x:Real} (hx: x ≥ 1) (n:ℕ) (hn: n ≥ 1) : x ≤ x^n := by
+  induction n with
+  | zero =>
+    contradiction
+  | succ i ih =>
+    simp_all
+    by_cases hn_1:  i ≥ 1
+    . simp_all
+      nth_rewrite 1 [← mul_one x]
+      gcongr
+    simp_all
+
 theorem Real.rootset_bddAbove {x:Real} (n:ℕ) (hn: n ≥ 1) : BddAbove { y:Real | y ≥ 0 ∧ y^n ≤ x } := by
   -- This proof is written to follow the structure of the original text.
   rw [_root_.bddAbove_def]
@@ -391,17 +403,63 @@ theorem Real.rootset_bddAbove {x:Real} (n:ℕ) (hn: n ≥ 1) : BddAbove { y:Real
   . use 1; intro y hy; simp at hy
     by_contra! hy'
     replace hy' : 1 < y^n := by
-      sorry
+      have := Real.pow_gt_pow (x:=y) (y:=1) (n:=n) (by grind) (by grind) (by grind)
+      simp_all
     linarith
   use x; intro y hy; simp at hy
   by_contra! hy'
   replace hy' : x < y^n := by
-    sorry
+    have h2 := Real.pow_gt_pow (x:=y) (y:=x) (n:=n) (by grind) (by grind) (by grind)
+    simp at h2
+    have h3 : x ≤ x^n := by
+      apply le_pow_of_lt (by linarith) n hn
+    grind
   linarith
 
 /-- Lemma 5.6.6 (ab) / Exercise 5.6.1 -/
 theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) :
-  y = x.root n ↔ y^n = x := by sorry
+  y = x.root n ↔ y^n = x := by
+    constructor
+    . intro h
+      have hbdd := Real.rootset_bddAbove (x:=x) n hn
+      have hnon := Real.rootset_nonempty (x:=x) hx n hn
+      -- have hglb := Real.LUB_exist hnon hbdd
+      have h3 := ExtendedReal.sSup_of_bounded hnon hbdd
+      rw [h]
+      -- obtain ⟨ y, hy, h1 ⟩ := hglb
+      simp [root]
+      rw [Real.isLUB_def] at h3
+      obtain ⟨ h3, h4 ⟩ := h3
+      apply le_antisymm
+      set y := sSup {y | 0 ≤ y ∧ y ^ n ≤ x}
+      -- have hy: y = sSup {y | 0 ≤ y ∧ y ^ n ≤ x} := by
+      --   apply le_antisymm
+      --   .
+      --     simp [upperBound_def] at h3
+      --     apply h3
+      --     grind
+      --   sorry
+      have : y^n ≤ x := by
+        simp [upperBound_def] at h3
+        sorry
+      have : x ≤ y^n := by
+        sorry
+      linarith
+      sorry
+    intro h
+    rw [← h]
+    simp [root]
+    simp_all
+    -- apply ExtendedReal.sSup_of_bounded
+    simp [sSup, ExtendedReal.sup]
+    rw [dif_pos, dif_pos]
+    .
+      sorry
+    . apply Real.rootset_bddAbove
+      grind
+    . apply Real.rootset_nonempty
+      grind
+      grind
 
 /-- Lemma 5.6.6 (c) / Exercise 5.6.1 -/
 theorem Real.root_nonneg {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n ≥ 0 := by sorry
