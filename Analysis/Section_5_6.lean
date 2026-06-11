@@ -490,6 +490,8 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
               simp
             apply this
             linarith
+            linarith
+            linarith
           have : y ∈ {y:Real|y=0} := by
             grind
           simp at this
@@ -511,8 +513,8 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
           simp_all
           have : y^n ≥ 0 := by
             apply Real.pow_nonneg (n:=n)
-            grind
-          have : y ^ n = 0 := by grind
+            linarith
+          have : y ^ n = 0 := by linarith
           rw [Real.pow_eq_zero] at this
           exact this
           . linarith
@@ -535,8 +537,14 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
       rw [Real.isLUB_def] at h3
       obtain ⟨ h3, h4 ⟩ := h3
       have ydef: sSup {y | 0 ≤ y ∧ y ^ n ≤ x} = y := by
-        sorry
-      simp_all
+        apply le_antisymm
+        simp at h3
+        . specialize h4 y hy
+          exact h4
+        simp [lowerBound_def] at h1
+        specialize h1 (sSup {y | y ≥ 0 ∧ y ^ n ≤ x}) h3
+        exact h1
+      simp_all only [ge_iff_le]
       obtain h | h | h := trichotomous' (y ^ n) x
       . exfalso
         have claim1: ∃ ε>0, y-ε>0 ∧ (y-ε)^n > x := by
@@ -655,8 +663,8 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
         obtain ⟨ ε, hε, hε' ⟩ := claim1
         have h_yeps_in_S : y + ε ∈ {z | 0 ≤ z ∧ z^n ≤ x}:=by
           constructor
-          grind
-          grind
+          linarith
+          linarith
         have : y + ε ≤ y := by
           rw [upperBound_def] at hy
           specialize hy (y + ε) h_yeps_in_S
