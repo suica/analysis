@@ -475,13 +475,16 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
             expose_names
             simp at h_1
             have : y = x := by grind
-            have {x: Real} {n: ℕ} (h: x< 1) (h2: n≥1): x^n≤x := by
+            have {x: Real} {n: ℕ} (h: x < 1) (h1: x≥0) (h2: n≥1): x^n≤x := by
               induction' n with i ih
               . contradiction
               rw [pow_succ]
               by_cases h: i ≥ 1
               . specialize ih (by grind)
-                sorry
+                have : x ^ i * x ≤ x * 1 := by
+                  gcongr
+                simp at this
+                exact this
               simp at h
               rw [h]
               simp
