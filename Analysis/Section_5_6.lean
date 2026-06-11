@@ -421,7 +421,105 @@ set_option diagnostics true in
 theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) :
   y = x.root n ↔ y^n = x := by
     by_cases hy : y = 0
-    . sorry
+    . simp [hy]
+      constructor
+      . intro h
+        simp [root] at h
+        rw [zero_pow]
+        symm
+        set s:= {y:Real | 0 ≤ y ∧ y ^ n ≤ x}
+        have hnon : s.Nonempty := by
+          apply Real.rootset_nonempty (x:=x) hx n hn
+        have hbdd : BddAbove s := by
+          apply Real.rootset_bddAbove (x:=x) n hn
+        have h2 := ExtendedReal.sSup_of_bounded hnon hbdd
+        rw [← h] at h2
+        rw [isLUB_def] at h2
+        obtain ⟨ h2, h3 ⟩ := h2
+        rw [upperBound_def] at h2
+        have : s = {0} := by
+          simp [s]
+          ext y
+          constructor
+          . intro h
+            simp at h ⊢
+            specialize h2 y (by grind)
+            grind
+          intro h
+          simp at h
+          rw [h]
+          simp
+          rw [zero_pow]
+          linarith
+          linarith
+        . have h0_in_s : 0 ∈ s := by
+            rw [this]
+            simp
+          by_contra hx
+          have hx: x > 0 := by
+            grind
+          set y := min 1 x
+          have : y ∈ s := by
+            simp [y, s]
+            split_ands
+            . linarith
+            rw [min_eq]
+            split_ifs
+            . have :(1:Real) ^ n = 1 := by
+                induction n
+                . simp
+                rw [pow_succ]
+                simp
+              rw [this]
+              grind
+            expose_names
+            simp at h_1
+            have : y = x := by grind
+            have {x: Real} {n: ℕ} (h: x< 1) (h2: n≥1): x^n≤x := by
+              induction' n with i ih
+              . contradiction
+              rw [pow_succ]
+              by_cases h: i ≥ 1
+              . specialize ih (by grind)
+                sorry
+              simp at h
+              rw [h]
+              simp
+            apply this
+            linarith
+          have : y ∈ {y:Real|y=0} := by
+            grind
+          simp at this
+          simp [y] at this
+          rw [min_eq] at this
+          split_ifs at this
+          . linarith
+          . linarith
+        linarith
+      intro h
+      rw [zero_pow] at h
+      symm at h
+      rw [h]
+      simp [root]
+      have h1 : {y: Real | 0 ≤ y ∧ y ^ n ≤ 0} = {y: Real | y = 0} := by
+        ext y
+        constructor
+        . intro h
+          simp_all
+          have : y^n ≥ 0 := by
+            apply Real.pow_nonneg (n:=n)
+            grind
+          have : y ^ n = 0 := by grind
+          rw [Real.pow_eq_zero] at this
+          exact this
+          . linarith
+        intro h
+        simp_all
+        rw [zero_pow]
+        linarith
+      rw [h1]
+      simp
+      linarith
     constructor
     . intro h
       have hbdd := Real.rootset_bddAbove (x:=x) n hn
