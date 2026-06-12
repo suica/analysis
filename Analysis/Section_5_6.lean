@@ -1244,7 +1244,37 @@ theorem Real.ratPow_add {x:Real} (hx: x > 0) (q r:ℚ) : x^(q+r) = x^q * x^r := 
 
 /-- Lemma 5.6.9(b) / Exercise 5.6.2 -/
 theorem Real.ratPow_ratPow {x:Real} (hx: x > 0) (q r:ℚ) : (x^q)^r = x^(q*r) := by
-  sorry
+  obtain ⟨a,b,hb, hab⟩ := Rat.eq_quot q
+  obtain ⟨a',b',hb', hab'⟩ := Rat.eq_quot r
+  rw [hab, hab', ratPow_def, ratPow_def]
+  have h1: (↑a / ↑b:ℚ) * (↑a' / ↑b':ℚ) = ((a * a':ℤ) / (b * b':ℕ):ℚ) := by
+    field_simp
+    grind
+  rw [h1, ratPow_def]
+  rw [← zpow_mul]
+  congr
+  have : a/b = ((a*b':ℤ) / (b*b':ℕ):ℚ) := by
+    field_simp
+    norm_cast
+    grind
+  have h2:= Real.pow_root_eq_pow_root (hq:=this) (x:=x) (hx:=by linarith) (hb:=by positivity) (hb':=by positivity)
+  rw [← h2]
+  rw [← zpow_mul]
+  have h1 := root_of_pow (x:= (x.root (b * b') ^ a)) (n:=b') (?_) (by grind)
+  exact h1
+  . simp
+    apply zpow_nonneg
+    apply root_nonneg
+    linarith
+    exact Right.one_le_mul hb hb'
+  linarith
+  positivity
+  linarith
+  linarith
+  rw [ratPow_def]
+  apply zpow_pos
+  rw [root_pos]
+  repeat linarith
 
 /-- Lemma 5.6.9(c) / Exercise 5.6.2 -/
 theorem Real.ratPow_neg {x:Real} (hx: x > 0) (q:ℚ) : x^(-q) = 1 / x^q := by
