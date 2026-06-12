@@ -657,7 +657,12 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
             have h_yeps_lt_x : (y+ε)^n < x := by
               have h_lt_diff : (y+ε)^n - y^n < x - y^n := by
                 rw [← h_decomp]
-                sorry
+                have h1: ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) < ∑ i ∈ Finset.range n, (y + ε) ^ (n-1) := by
+                  sorry
+                simp [Finset.sum_const] at h1
+                have h2: ε * ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) < ε * (n * (y + ε) ^ (n-1)) := by
+                  gcongr
+                apply lt_trans h2
               linarith
             exact h_yeps_lt_x
         obtain ⟨ ε, hε, hε' ⟩ := claim1
@@ -671,6 +676,7 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
           exact hy
         linarith
       . exact h
+    sorry
     intro h
     simp [root]
     have : sSup {y | 0 ≤ y ∧ y ^ n ≤ x} ^ n = x := by
