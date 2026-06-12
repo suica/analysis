@@ -331,7 +331,7 @@ theorem Real.zpow_ge_zpow_ofneg {x y:Real} {n:ℤ} (hxy: x ≥ y) (hy: y > 0) (h
     . grind
     order
 
-lemma lemma1 : ∀ (x y:Real) (n:ℤ) (hy: y > 0) (hn: n > 0) (hxy: x^n ≤ y^n), x ≤ y := by
+lemma lemma1 : ∀ (x y:Real) (n:ℤ) (_: y > 0) (_: n > 0) (_: x^n ≤ y^n), x ≤ y := by
   intro x y n hy hn hxy
   lift n to ℕ using by order
   have := Real.pow_gt_pow x y n
@@ -587,7 +587,6 @@ lemma lemma2 {n:ℕ} {x y: Real} (hx: x ≥ 0) (hy: y ≥ 0) (hn: n ≥ 1) (hy: 
         linarith
       . exact h
 
-set_option diagnostics true in
 /-- Lemma 5.6.6 (ab) / Exercise 5.6.1 -/
 theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) :
   y = x.root n ↔ y^n = x := by
@@ -1059,7 +1058,12 @@ theorem Real.root_one {x:Real} (hx: x > 0): x.root 1 = x := by
   exact this
 
 theorem Real.pow_cancel {y z:Real} (hy: y > 0) (hz: z > 0) {n:ℕ} (hn: n ≥ 1)
-  (h: y^n = z^n) : y = z := by sorry
+  (h: y^n = z^n) : y = z := by
+    apply zpow_inj (n:=n)
+    . linarith
+    . linarith
+    grind
+    exact_mod_cast h
 
 example : ¬(∀ (y:Real) (z:Real) (n:ℕ) (_: n ≥ 1) (_: y^n = z^n), y = z) := by
   simp; refine ⟨ (-3), 3, 2, ?_, ?_, ?_ ⟩ <;> norm_num
@@ -1086,9 +1090,26 @@ theorem Real.pow_root_eq_pow_root {a a':ℤ} {b b':ℕ} (hb: b > 0) (hb' : b' > 
         push_cast at *; ring_nf at *; simp [hq]
       specialize this hb hb' hq (by linarith)
       simpa [zpow_neg] using this
-    have : a' = 0 := by sorry
+    have : a' = 0 := by
+      simp_all
+      norm_cast at hq
+      symm at hq
+      rw [Rat.divInt_eq_zero _] at hq
+      exact hq
+      grind
     simp_all
-  have : a' > 0 := by sorry
+  have : a' > 0 := by
+    norm_cast at hq
+    rw [Rat.divInt_eq_divInt_iff] at hq
+    have : a' * ↑b > 0 := by
+      rw [← hq]
+      positivity
+    simp at this
+    rw [mul_pos_iff_of_pos_right] at this
+    grind
+    grind
+    grind
+    grind
   field_simp at hq
   lift a to ℕ using by order
   lift a' to ℕ using by order
