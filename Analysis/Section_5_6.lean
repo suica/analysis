@@ -762,16 +762,114 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
     . rfl
 
 /-- Lemma 5.6.6 (c) / Exercise 5.6.1 -/
-theorem Real.root_nonneg {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n ≥ 0 := by sorry
+theorem Real.root_nonneg {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n ≥ 0 := by
+  by_cases hxeqzero : x = 0
+  . simp [root]
+    simp [hxeqzero]
+    have : {y:Real | 0 ≤ y ∧ y ^ n ≤ 0} = {0} := by
+      ext y
+      simp
+      constructor
+      . intro ⟨h1, h2⟩
+        have : y^n≥ 0:= by
+          apply pow_nonneg
+          grind
+        have : y^n=0:= by grind
+        rw [Real.pow_eq_zero] at this
+        exact this
+        grind
+      intro h
+      simp [h]
+      right
+      rw [zero_pow]
+      grind
+    rw [this]
+    simp_all
+  have h_non := Real.rootset_nonempty hx n hn
+  have h_bdd := Real.rootset_bddAbove n hn (x:=x)
+  have h1 := ExtendedReal.sSup_of_bounded h_non h_bdd
+  replace hx : x > 0 := by positivity
+  rw [isLUB_def] at h1
+  obtain ⟨ h1, h2 ⟩ := h1
+  simp [root]
+  have : 0 ∈ {y | 0 ≤ y ∧ y ^ n ≤ x} := by
+    simp
+    rw [zero_pow]
+    positivity
+    positivity
+  have hsup_nonneg: 0 ≤ sSup {y | 0 ≤ y ∧ y ^ n ≤ x} := by
+    simp [upperBound_def] at h1
+    specialize h1 (0) (by grind) (by grind)
+    exact h1
+  exact hsup_nonneg
+
+lemma zero_root_eq_zero {n:ℕ} (hn: n ≥ 1) : (0:Real).root n = 0 := by
+  have : {y:Real | 0 ≤ y ∧ y ^ n ≤ 0} = {0} := by
+    ext y
+    simp
+    constructor
+    . intro ⟨h1, h2⟩
+      have : y^n≥ 0:= by
+        apply pow_nonneg
+        grind
+      have : y^n=0:= by grind
+      rw [Real.pow_eq_zero] at this
+      exact this
+      grind
+    intro h
+    simp [h]
+    right
+    rw [zero_pow]
+    grind
+  simp [Real.root]
+  rw [this]
+  simp
 
 /-- Lemma 5.6.6 (c) / Exercise 5.6.1 -/
-theorem Real.root_pos {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n > 0 ↔ x > 0 := by sorry
+theorem Real.root_pos {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n > 0 ↔ x > 0 := by
+  by_contra! ⟨h1,h2⟩ | ⟨h1, h2⟩
+  have : x = 0 := by linarith
+  rw [this] at h1
+  have : (0:Real).root n = 0 := by
+    apply zero_root_eq_zero
+    grind
+  linarith
+  . have h3:= Real.root_nonneg hx hn
+    have : x.root n = 0 := by
+      linarith
+    have h1 := Real.eq_root_iff_pow_eq hx (y:=0) (by grind) (n:=n) (by grind)
+    symm at this
+    rw [h1] at this
+    rw [zero_pow] at this
+    linarith
+    linarith
+
 
 theorem Real.pow_of_root {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) :
-  (x.root n)^n = x := by sorry
+  (x.root n)^n = x := by
+    by_cases hx: x = 0
+    . simp [hx]
+      split_ands
+      . apply zero_root_eq_zero
+        grind
+      grind
+    set y:= x.root n
+    have hypos: y>0:= by
+      rw [Real.root_pos]
+      . grind
+      grind
+      grind
+    have hx: x > 0 := by
+      grind
+    have h1:= Real.eq_root_iff_pow_eq (x:=x) (by grind) (y:=y) (by grind) (n:=n) (by grind)
+    rw [← h1]
 
 theorem Real.root_of_pow {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) :
-  (x^n).root n = x := by sorry
+  (x^n).root n = x := by
+    set y:= x ^ n
+    have h1:= Real.eq_root_iff_pow_eq (x:=y) (by positivity) (y:=x) (by positivity) (n:=n) (by grind)
+    symm
+    rw [h1]
 
 /-- Lemma 5.6.6 (d) / Exercise 5.6.1 -/
 theorem Real.root_mono {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) : x > y ↔ x.root n > y.root n := by sorry
