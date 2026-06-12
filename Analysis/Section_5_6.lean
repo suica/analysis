@@ -1005,9 +1005,58 @@ theorem Real.root_mul {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 
   exact hmain
 
 /-- Lemma 5.6.6 (g) / Exercise 5.6.1 -/
-theorem Real.root_root {x:Real} (hx: x ≥ 0) {n m:ℕ} (hn: n ≥ 1) (hm: m ≥ 1): (x.root n).root m = x.root (n*m) := by sorry
+theorem Real.root_root {x:Real} (hx: x ≥ 0) {n m:ℕ} (hn: n ≥ 1) (hm: m ≥ 1): (x.root n).root m = x.root (n*m) := by
+  by_cases hx': x = 0
+  . simp_all
+    repeat rw [zero_root_eq_zero]
+    rw [← mul_one 1]
+    gcongr
+    linarith
+    linarith
+  set y := (x.root n).root m
+  have hy: y^m = x.root n := by
+    rw [Real.pow_of_root]
+    apply root_nonneg
+    grind
+    grind
+    grind
+  have hy: (y^m)^n = (x.root n)^n := by
+    congr
+  nth_rw 2 [pow_of_root] at hy
+  rw [pow_mul] at hy
+  rw [← Real.pow_of_root hx (n:=m*n)] at hy
+  apply zpow_inj (n:=m*n)
+  . rw [root_pos]
+    rw [root_pos]
+    grind
+    linarith
+    linarith
+    apply root_nonneg
+    linarith
+    linarith
+    linarith
+  . rw [root_pos]
+    grind
+    linarith
+    rw [← mul_one 1]
+    gcongr
+  . positivity
 
-theorem Real.root_one {x:Real} (hx: x > 0): x.root 1 = x := by sorry
+  . norm_cast
+    ring_nf
+    exact hy
+  . rw [← mul_one 1]
+    gcongr
+  . positivity
+  . linarith
+
+theorem Real.root_one {x:Real} (hx: x > 0): x.root 1 = x := by
+  have : x^1 = x := by simp
+  have : (x.root 1)^1 = x^1 := by
+    rw [Real.pow_of_root]
+    repeat linarith
+  simp at this
+  exact this
 
 theorem Real.pow_cancel {y z:Real} (hy: y > 0) (hz: z > 0) {n:ℕ} (hn: n ≥ 1)
   (h: y^n = z^n) : y = z := by sorry
