@@ -416,12 +416,33 @@ theorem Real.rootset_bddAbove {x:Real} (n:ℕ) (hn: n ≥ 1) : BddAbove { y:Real
     grind
   linarith
 
-lemma claim_y_add_eps_pow_n_lt_x {y x: Real} {n:ℕ} { h: n≥1 } {h2: y^n<x}: ∃ ε>0, y+ε>0 ∧ (y+ε)^n < x := by
+lemma claim_y_add_eps_pow_n_lt_x {y x: Real} {n:ℕ} { h: n≥1 } {h2: y^n<x} {hy: y>0}: ∃ ε>0, y+ε>0 ∧ (y+ε)^n < x := by
   set ε := min ((x- (y)^n)/ (2*(y+1)^(n-1) * n)) (1/2)
   have hyε: y-ε > 0 := by
+    simp [ε]
+    left
+    field_simp
     sorry
   have hε_pos: ε > 0 := by
-    sorry
+    simp [ε]
+    have : x - y ^ n >0 := by linarith
+    have : 2 * (y + 1) ^ (n - 1) * ↑n >0 := by
+      by_cases h: n = 1
+      . simp [h]
+      have : (y + 1) ^ (n - 1) ≥ 0 := by
+        apply pow_nonneg
+        grind
+      rcases this with a | b
+      . positivity
+      . symm at b
+        rw [Real.pow_eq_zero] at b
+        rw [b]
+        rw [zero_pow]
+        exfalso
+        grind
+        grind
+        grind
+    positivity
   have h_comm {ε:Real}: Commute (y+ε) y := by
     exact Commute.all (y + ε) y
   have h_decomp {ε:Real} := Commute.mul_geom_sum₂ (x:=y+ε) (y:=y) (n:=n) h_comm
@@ -677,8 +698,9 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
           specialize h4 (y-ε) hupper
           exact h4
         linarith
-      .
-        obtain ⟨ ε, hε, hε' ⟩ := claim_y_add_eps_pow_n_lt_x (h:=hn) (y:=y) (x:=x) (h2:=h)
+      . have : y>0:= by
+          grind
+        obtain ⟨ ε, hε, hε' ⟩ := claim_y_add_eps_pow_n_lt_x (h:=hn) (y:=y) (x:=x) (h2:=h) (hy:=h0)
         have h_yeps_in_S : y + ε ∈ {z | 0 ≤ z ∧ z^n ≤ x}:=by
           constructor
           linarith
