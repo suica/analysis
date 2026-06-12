@@ -944,7 +944,20 @@ theorem Real.root_mono {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥
 
 /-- Lemma 5.6.6 (e) / Exercise 5.6.1 -/
 theorem Real.root_mono_of_gt_one {x : Real} (hx: x > 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k < x.root l := by
-  sorry
+  have : x.root k ≤ x.root l := by
+    simp at hkl
+    rw [lt_iff_exists_add] at hkl
+    obtain ⟨c, cpos, hc⟩ := hkl
+    rw [hc]
+    sorry
+  rcases this with h | h
+  . exact h
+  . exfalso
+    have : (x.root k)^(k*l) = (x.root l)^(k*l) := by
+      rw [h]
+    have : x^l = x^k := by
+      sorry
+    sorry
 
 /-- Lemma 5.6.6 (e) / Exercise 5.6.1 -/
 theorem Real.root_mono_of_lt_one {x : Real} (hx0: 0 < x) (hx: x < 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k > x.root l := by
