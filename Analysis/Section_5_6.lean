@@ -416,6 +416,67 @@ theorem Real.rootset_bddAbove {x:Real} (n:ℕ) (hn: n ≥ 1) : BddAbove { y:Real
     grind
   linarith
 
+lemma claim_y_add_eps_pow_n_lt_x {y x: Real} {n:ℕ} { h: n≥1 } {h2: y^n<x}: ∃ ε>0, y+ε>0 ∧ (y+ε)^n < x := by
+  set ε := min ((x- (y)^n)/ (2*(y+1)^(n-1) * n)) (1/2)
+  have hyε: y-ε > 0 := by
+    sorry
+  have hε_pos: ε > 0 := by
+    sorry
+  have h_comm {ε:Real}: Commute (y+ε) y := by
+    exact Commute.all (y + ε) y
+  have h_decomp {ε:Real} := Commute.mul_geom_sum₂ (x:=y+ε) (y:=y) (n:=n) h_comm
+  simp at h_decomp
+  have h_sum_est :  ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) ≤ ∑ i ∈ Finset.range n, ((y+1)^(n-1))  := by
+    gcongr
+    expose_names
+    simp_all
+    have : (y+1) ^ (n - 1) = (y+1)^i * (y+1)^(n - 1 - i) := by
+      rw [← pow_add]
+      grind
+    rw [this]
+    gcongr
+    apply pow_nonneg
+    linarith
+    apply pow_nonneg
+    linarith
+    linarith
+    simp [ε]
+    right
+    linarith
+    order
+    linarith
+  simp [Finset.sum_const] at h_sum_est
+  have h_est : ε * ((y+1)^(n-1)) * n ≥ (y+ε)^n - (y)^n := by
+    rw [← h_decomp]
+    rw [mul_assoc]
+    gcongr
+    grind
+  simp_all
+  use ε
+  split_ands
+  . grind
+  . grind
+  .
+    have h_yeps_lt_x : (y+ε)^n < x := by
+      have h_lt_diff : (y+ε)^n - y^n < x - y^n := by
+        have: ε * ((y+1)^(n-1)) * n < x - y^n := by
+          have : ε ≤ (x - y^n)/(2*(y + 1) ^ (n - 1) * ↑n) := by
+            simp [ε]
+          calc
+            ε * (y + 1) ^ (n - 1) * ↑n
+              ≤ (x - y^n)/(2*(y + 1) ^ (n - 1) * ↑n) * (y + 1) ^ (n - 1) * ↑n := by
+                gcongr
+                apply pow_nonneg
+                grind
+            _ = (x - y^n)/2 := by
+              field_simp
+              grind
+            _ < x - y^n := by
+              linarith
+        linarith
+      linarith
+    exact h_yeps_lt_x
+
 set_option diagnostics true in
 /-- Lemma 5.6.6 (ab) / Exercise 5.6.1 -/
 theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) :
@@ -617,55 +678,7 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
           exact h4
         linarith
       .
-        have claim1: ∃ ε>0, y+ε>0 ∧ (y+ε)^n < x := by
-          set ε := max ((x- (y)^n)/ (y^(n-1)) * n) (1/2)
-          have : y-ε > 0 := by
-            sorry
-          have : ε > 0 := by
-            sorry
-          have h_comm {ε:Real}: Commute (y+ε) y := by
-            exact Commute.all (y + ε) y
-          have h_decomp {ε:Real} := Commute.mul_geom_sum₂ (x:=y+ε) (y:=y) (n:=n) h_comm
-          simp at h_decomp
-          have h_sum_est : ∑ i ∈ Finset.range n, (y^(n-1)) ≤ ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) := by
-            gcongr
-            expose_names
-            simp_all
-            have : y ^ (n - 1) = y^i * y^(n - 1 - i) := by
-              rw [pow_add]
-              grind
-            rw [this]
-            gcongr
-            grind
-          replace h_sum_est : n * y^(n-1) ≤ ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) := by
-            have : ∑ i ∈ Finset.range n, y ^ (n - 1) = n * y^(n-1) := by
-              rw [Finset.sum_const]
-              simp
-            rw [this] at h_sum_est
-            exact h_sum_est
-          have h_est : ε * (y^(n-1)) * n ≤ (y+ε)^n - (y)^n := by
-            rw [← h_decomp]
-            rw [mul_assoc]
-            gcongr
-            grind
-          simp_all
-          use ε
-          split_ands
-          . grind
-          . grind
-          .
-            have h_yeps_lt_x : (y+ε)^n < x := by
-              have h_lt_diff : (y+ε)^n - y^n < x - y^n := by
-                rw [← h_decomp]
-                have h1: ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) < ∑ i ∈ Finset.range n, (y + ε) ^ (n-1) := by
-                  sorry
-                simp [Finset.sum_const] at h1
-                have h2: ε * ∑ i ∈ Finset.range n, (y + ε) ^ i * y ^ (n - 1 - i) < ε * (n * (y + ε) ^ (n-1)) := by
-                  gcongr
-                apply lt_trans h2
-              linarith
-            exact h_yeps_lt_x
-        obtain ⟨ ε, hε, hε' ⟩ := claim1
+        obtain ⟨ ε, hε, hε' ⟩ := claim_y_add_eps_pow_n_lt_x (h:=hn) (y:=y) (x:=x) (h2:=h)
         have h_yeps_in_S : y + ε ∈ {z | 0 ≤ z ∧ z^n ≤ x}:=by
           constructor
           linarith
@@ -677,20 +690,20 @@ theorem Real.eq_root_iff_pow_eq {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (
         linarith
       . exact h
     sorry
-    intro h
-    simp [root]
-    have : sSup {y | 0 ≤ y ∧ y ^ n ≤ x} ^ n = x := by
-      sorry
-    apply Real.zpow_inj (n:=n)
-    grind
-    . have h_non := Real.rootset_nonempty hx n hn
-      have h_bdd := Real.rootset_bddAbove n hn (x:=x)
-      have h1:= ExtendedReal.sSup_of_bounded h_non h_bdd
-      rw [Real.isLUB_def] at h1
-      obtain ⟨ h1, h2 ⟩ := h1
-      sorry
-    grind
-    simp_all
+    -- intro h
+    -- simp [root]
+    -- have : sSup {y | 0 ≤ y ∧ y ^ n ≤ x} ^ n = x := by
+    --   sorry
+    -- apply Real.zpow_inj (n:=n)
+    -- grind
+    -- . have h_non := Real.rootset_nonempty hx n hn
+    --   have h_bdd := Real.rootset_bddAbove n hn (x:=x)
+    --   have h1:= ExtendedReal.sSup_of_bounded h_non h_bdd
+    --   rw [Real.isLUB_def] at h1
+    --   obtain ⟨ h1, h2 ⟩ := h1
+    --   sorry
+    -- grind
+    -- simp_all
 
 /-- Lemma 5.6.6 (c) / Exercise 5.6.1 -/
 theorem Real.root_nonneg {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) : x.root n ≥ 0 := by sorry
