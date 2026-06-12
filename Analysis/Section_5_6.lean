@@ -872,7 +872,76 @@ theorem Real.root_of_pow {x:Real} (hx: x ≥ 0) {n:ℕ} (hn: n ≥ 1) :
     rw [h1]
 
 /-- Lemma 5.6.6 (d) / Exercise 5.6.1 -/
-theorem Real.root_mono {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) : x > y ↔ x.root n > y.root n := by sorry
+theorem Real.root_mono {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) : x > y ↔ x.root n > y.root n := by
+  constructor
+  . intro h
+    have h1: (x.root n)^n ≥ (y.root n)^n := by
+      rw [Real.pow_of_root, Real.pow_of_root]
+      grind
+      repeat linarith
+    simp at h1
+    by_cases hy : y = 0
+    . simp [hy]
+      rw [zero_root_eq_zero]
+      have : x.root n > 0:= by
+        rw [root_pos]
+        repeat linarith
+      exact this
+      linarith
+    have : y.root n > 0 := by
+      rw [Real.root_pos]
+      grind
+      grind
+      grind
+    have : x.root n > 0 := by
+      rw [Real.root_pos]
+      grind
+      grind
+      grind
+    have h2 := lemma1 (y:=x.root n) (x:=y.root n) (n:=n) (by grind) (by grind) (by exact_mod_cast h1)
+    simp
+    rcases h2 with h | h
+    . exact h
+    . exfalso
+      rw [Real.eq_root_iff_pow_eq _ _ _] at h
+      symm at h
+      rw [Real.pow_of_root] at h
+      repeat linarith
+  intro h
+  by_cases hy : y = 0
+  . simp [hy]
+    change x > 0
+    have : (x.root n)^n = x := by
+      rw [Real.pow_of_root]
+      linarith
+      linarith
+    rw [← this]
+    apply pow_pos
+    rw [hy, zero_root_eq_zero] at h
+    exact h
+    grind
+  have h1: (x.root n)^n ≥ (y.root n)^n := by
+    apply zpow_ge_zpow (n:=n)
+    linarith
+    rw [root_pos]
+    grind
+    grind
+    grind
+    grind
+  simp at h1
+  have : y.root n > 0 := by
+    rw [Real.root_pos]
+    grind
+    grind
+    grind
+  rw [pow_of_root, pow_of_root] at h1
+  simp
+  rcases h1 with h1 | h1
+  . simpa
+  rw [h1] at h
+  exfalso
+  repeat linarith
+
 
 /-- Lemma 5.6.6 (e) / Exercise 5.6.1 -/
 theorem Real.root_mono_of_gt_one {x : Real} (hx: x > 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k < x.root l := by sorry
