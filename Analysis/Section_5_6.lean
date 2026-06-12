@@ -949,15 +949,55 @@ theorem Real.root_mono_of_gt_one {x : Real} (hx: x > 1) {k l: ℕ} (hkl: k > l) 
     rw [lt_iff_exists_add] at hkl
     obtain ⟨c, cpos, hc⟩ := hkl
     rw [hc]
-    sorry
+    have : (x.root (l + c))^(l*(l+c)) ≤ (x.root l)^(l*(l+c)) := by
+      rw [mul_comm,← Real.pow_mul, pow_of_root]
+      rw [mul_comm,← Real.pow_mul, pow_of_root]
+      rw [← pow_add]
+      nth_rw 1 [← mul_one (x^l)]
+      gcongr
+      . rw [← pow_zero (x)]
+        gcongr
+        grind
+      linarith
+      linarith
+      linarith
+      linarith
+    apply lemma1 (n:= l*(l+c))
+    . rw [root_pos]
+      grind
+      grind
+      grind
+    . positivity
+    exact this
   rcases this with h | h
   . exact h
   . exfalso
     have : (x.root k)^(k*l) = (x.root l)^(k*l) := by
       rw [h]
-    have : x^l = x^k := by
-      sorry
-    sorry
+    rw [← Real.pow_mul, mul_comm, ← Real.pow_mul] at this
+    rw [pow_of_root, pow_of_root] at this
+    simp at hkl
+    rw [lt_iff_exists_add] at hkl
+    obtain ⟨c, cpos, hc⟩ := hkl
+    rw [hc] at this
+    rw [← pow_add] at this
+    have h1: x^(c) = 1 := by
+      have : x ^ l * (x^l)⁻¹ = (x ^ l * x ^ c) * (x^l)⁻¹ := by
+        grind
+      field_simp at this
+      symm
+      exact this
+    have : c = 0 := by
+      rw [pow_eq_one_iff_cases] at h1
+      rcases h1 with h1 | h1 | ⟨ha, hb⟩
+      . exact h1
+      . linarith
+      . linarith
+    linarith
+    linarith
+    linarith
+    linarith
+    linarith
 
 /-- Lemma 5.6.6 (e) / Exercise 5.6.1 -/
 theorem Real.root_mono_of_lt_one {x : Real} (hx0: 0 < x) (hx: x < 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k > x.root l := by
@@ -1140,17 +1180,67 @@ theorem Real.ratPow_def {x:Real} (hx: x > 0) (a:ℤ) {b:ℕ} (hb: b > 0) : x^(a/
   . have := q.den_nz; omega
   rw [Rat.num_div_den q]
 
-theorem Real.ratPow_eq_root {x:Real} (hx: x > 0) {n:ℕ} (hn: n ≥ 1) : x^(1/n:ℚ) = x.root n := by sorry
+theorem Real.ratPow_eq_root {x:Real} (hx: x > 0) {n:ℕ} (hn: n ≥ 1) : x^(1/n:ℚ) = x.root n := by
+  have h1 := ratPow_def hx 1 hn
+  simp_all
 
-theorem Real.ratPow_eq_pow {x:Real} (hx: x > 0) (n:ℤ) : x^(n:ℚ) = x^n := by sorry
+theorem Real.ratPow_eq_pow {x:Real} (hx: x > 0) (n:ℤ) : x^(n:ℚ) = x^n := by
+  have : (n:ℚ) = (n:ℚ)/1 := by
+    simp
+  rw [this]
+  have h1:= ratPow_def (a:=n) (b:=1) (x:=x) (by grind) (by grind)
+  simp_all
+  have : x.root 1 ^ n = (x.root 1 ^ 1) ^ n := by
+    congr
+    simp
+  rw [this, pow_of_root]
+  linarith
+  linarith
 
 /-- Lemma 5.6.9(a) / Exercise 5.6.2 -/
 theorem Real.ratPow_pos {x:Real} (hx: x > 0) (q:ℚ) : x^q > 0 := by
-  sorry
+  obtain ⟨a,b, hb,hab⟩ := Rat.eq_quot q
+  rw [hab, ratPow_def]
+  apply zpow_pos
+  rw [root_pos]
+  repeat linarith
 
 /-- Lemma 5.6.9(b) / Exercise 5.6.2 -/
 theorem Real.ratPow_add {x:Real} (hx: x > 0) (q r:ℚ) : x^(q+r) = x^q * x^r := by
-  sorry
+  obtain ⟨a,b,hb, hab⟩ := Rat.eq_quot q
+  obtain ⟨a',b',hb', hab'⟩ := Rat.eq_quot r
+  rw [hab, hab', ratPow_def, ratPow_def]
+  have h1: x ^ ((a / b:ℚ) + ↑a' / ↑b') = x ^ ((a*b' + a'*b: ℤ) / (b*b':ℕ):ℚ) := by
+    congr
+    field_simp
+    norm_cast
+    grind
+  rw [h1, ratPow_def]
+  have : (a/b:ℚ) = ((a*b'):ℤ)/(b*b':ℕ) := by
+    field_simp
+    norm_cast
+    grind
+  have h2 :=Real.pow_root_eq_pow_root (hq:=this) (x:=x) (hx:=hx) (hb:=by positivity) (hb':=by positivity)
+  rw [← h2]
+  have : (a'/b':ℚ) = ((a'*b):ℤ)/(b*b':ℕ) := by
+    field_simp
+    norm_cast
+    grind
+  have h2 :=Real.pow_root_eq_pow_root (hq:=this) (x:=x) (hx:=hx) (hb:=by positivity) (hb':=by positivity)
+  rw [← h2]
+  rw [zpow_add]
+  . have : x.root (b * b') > 0 := by
+      rw [root_pos]
+      linarith
+      linarith
+      exact Right.one_le_mul hb hb'
+    linarith
+  . linarith
+  . positivity
+  . linarith
+  . positivity
+  . positivity
+  . positivity
 
 /-- Lemma 5.6.9(b) / Exercise 5.6.2 -/
 theorem Real.ratPow_ratPow {x:Real} (hx: x > 0) (q r:ℚ) : (x^q)^r = x^(q*r) := by
