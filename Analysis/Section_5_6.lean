@@ -944,16 +944,65 @@ theorem Real.root_mono {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥
 
 
 /-- Lemma 5.6.6 (e) / Exercise 5.6.1 -/
-theorem Real.root_mono_of_gt_one {x : Real} (hx: x > 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k < x.root l := by sorry
+theorem Real.root_mono_of_gt_one {x : Real} (hx: x > 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k < x.root l := by
+  sorry
 
 /-- Lemma 5.6.6 (e) / Exercise 5.6.1 -/
-theorem Real.root_mono_of_lt_one {x : Real} (hx0: 0 < x) (hx: x < 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k > x.root l := by sorry
+theorem Real.root_mono_of_lt_one {x : Real} (hx0: 0 < x) (hx: x < 1) {k l: ℕ} (hkl: k > l) (hl: l ≥ 1) : x.root k > x.root l := by
+  sorry
 
 /-- Lemma 5.6.6 (e) / Exercise 5.6.1 -/
-theorem Real.root_of_one {k: ℕ} (hk: k ≥ 1): (1:Real).root k = 1 := by sorry
+theorem Real.root_of_one {k: ℕ} (hk: k ≥ 1): (1:Real).root k = 1 := by
+  have h1: (root 1 k) ^ k = 1 := by
+    rw [Real.pow_of_root]
+    grind
+    grind
+  have h2: (1:Real) ^ k = 1 := by simp
+  nth_rw 2 [← h2] at h1
+  apply zpow_inj
+  rw [root_pos]
+  repeat linarith
+  exact h1
 
 /-- Lemma 5.6.6 (f) / Exercise 5.6.1 -/
-theorem Real.root_mul {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) : (x*y).root n = (x.root n) * (y.root n) := by sorry
+theorem Real.root_mul {x y:Real} (hx: x ≥ 0) (hy: y ≥ 0) {n:ℕ} (hn: n ≥ 1) : (x*y).root n = (x.root n) * (y.root n) := by
+  by_cases hx': x = 0
+  . simp_all
+    repeat rw [zero_root_eq_zero]
+    linarith
+    linarith
+  by_cases hy': y = 0
+  . simp_all
+    repeat rw [zero_root_eq_zero]
+    linarith
+    linarith
+  set z := (x*y).root n
+  have hz: z^n = x*y:= by
+    rw [pow_of_root]
+    positivity
+    linarith
+  have hmain: z^n = (x.root n * y.root n)^n:= by
+    rw [mul_pow]
+    rw [pow_of_root, pow_of_root, pow_of_root]
+    repeat linarith
+    positivity
+    linarith
+  have hx_root_pos: x.root n > 0 := by
+    rw [root_pos]
+    repeat grind
+  have hy_root_pos: y.root n > 0 := by
+    rw [root_pos]
+    repeat grind
+  apply zpow_inj (n:=n)
+  simp_all [z]
+  . change (x * y).root n > 0
+    rw [root_pos]
+    positivity
+    positivity
+    linarith
+  . positivity
+  . positivity
+  exact hmain
 
 /-- Lemma 5.6.6 (g) / Exercise 5.6.1 -/
 theorem Real.root_root {x:Real} (hx: x ≥ 0) {n m:ℕ} (hn: n ≥ 1) (hm: m ≥ 1): (x.root n).root m = x.root (n*m) := by sorry
