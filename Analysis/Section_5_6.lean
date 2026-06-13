@@ -1494,7 +1494,38 @@ theorem Real.max_ratPow {x y:Real} (hx: x > 0) (hy: y > 0) {q:ℚ} (hq: q > 0) :
 /-- Exercise 5.6.5 -/
 theorem Real.min_ratPow {x y:Real} (hx: x > 0) (hy: y > 0) {q:ℚ} (hq: q > 0) :
   min (x^q) (y^q) = (min x y)^q := by
-  sorry
+  wlog hxy: x^q ≤ y^q
+  . simp at hxy
+    specialize this (x:=y) (y:=x) (q:=q) (by grind) (by grind) (by grind) (by grind)
+    grind
+  simp_all
+  have : x≤y := by
+    rcases hxy with hxy | hxy
+    . left
+      rw [← gt_iff_lt]
+      rw [Real.ratPow_mono (q:=q)]
+      exact hxy
+      grind
+      grind
+      grind
+    . right
+      obtain ⟨a, b, hbpos, hab⟩ := Rat.eq_quot q
+      rw [hab] at hxy
+      rw [Real.ratPow_def, Real.ratPow_def] at hxy
+      replace hxy : (y.root b ^ a) ^ (b:ℤ) = (x.root b ^ a) ^ (b:ℤ) := by
+        grind
+      rw [zpow_mul, zpow_mul, mul_comm] at hxy
+      rw [← zpow_mul] at hxy
+      rw [← zpow_mul] at hxy
+      simp at hxy
+      rw [pow_of_root, pow_of_root] at hxy
+      apply zpow_inj (n:=a)
+      repeat linarith
+      . have : a > 0 := by
+          simp_all
+        grind
+      repeat linarith
+  simp_all
 
 -- Final part of Exercise 5.6.5: state and prove versions of the above lemmas covering the case of negative q.
 
