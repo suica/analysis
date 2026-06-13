@@ -1278,11 +1278,84 @@ theorem Real.ratPow_ratPow {x:Real} (hx: x > 0) (q r:ℚ) : (x^q)^r = x^(q*r) :=
 
 /-- Lemma 5.6.9(c) / Exercise 5.6.2 -/
 theorem Real.ratPow_neg {x:Real} (hx: x > 0) (q:ℚ) : x^(-q) = 1 / x^q := by
-  sorry
+  obtain ⟨a, b, hbpos, hab⟩ := Rat.eq_quot (q)
+  have hq_neg: -q = (↑(-a):ℤ)/(b:ℕ) := by
+    rw [hab]
+    field_simp
+    grind
+  simp [hq_neg]
+  have h1:= ratPow_def (x:=x) (a:=-a) (b:=b) (by grind) (by grind)
+  simp at h1
+  rw [h1]
+  have : x.root b ^ a =  x ^ q := by
+    rw [hab, ratPow_def]
+    linarith
+    linarith
+  rw [this]
+
+lemma pow_mono {x y:Real} (hx: x > 0) (hy: y > 0) {n:ℕ} (hn: n ≥ 1) : x > y ↔ x^n > y^n := by
+  constructor
+  . intro h
+    apply Real.pow_gt_pow
+    repeat linarith
+  intro h
+  have : x ≥ y := by
+    apply lemma1 (n:=n)
+    repeat linarith
+    simp
+    grind
+  rcases this with h1 | h1
+  . exact h1
+  simp_all
 
 /-- Lemma 5.6.9(d) / Exercise 5.6.2 -/
 theorem Real.ratPow_mono {x y:Real} (hx: x > 0) (hy: y > 0) {q:ℚ} (h: q > 0) : x > y ↔ x^q > y^q := by
-  sorry
+  obtain ⟨a, b, hbpos, hab⟩ := Rat.eq_quot q
+  have hapos: a > 0 := by
+    simp [hab] at h
+    simp_all
+  simp [hab]
+  constructor
+  . intro h
+    rw [ratPow_def, ratPow_def]
+    lift a to ℕ using by order
+    have h1:= Real.root_mono (x:= x) (y:= y) (hy:=by grind) (n:=b) (hn:=hbpos) (by grind)
+    simp at h1
+    rw [h1] at h
+    change x.root b ^ a > y.root b ^ a
+    have h2 := pow_gt_pow (x:= x.root b) (y:= y.root b)  (hxy:=by grind) a ?_ (by grind)
+    exact h2
+    . apply root_nonneg
+      linarith
+      linarith
+    repeat linarith
+  intro h
+  rw [ratPow_def, ratPow_def] at h
+  lift a to ℕ using by order
+  simp_all
+
+  have h1 : (y.root b ^ a) ^ b < (x.root b ^ a) ^ b := by
+    rw [← gt_iff_lt]
+    rw [← pow_mono]
+    exact h
+    apply pow_pos
+    rw [root_pos]
+    linarith
+    linarith
+    linarith
+    apply pow_pos
+    rw [root_pos]
+    linarith
+    linarith
+    linarith
+    linarith
+  simp [pow_mul, mul_comm] at h1
+  simp [← pow_mul] at h1
+  rw [pow_of_root, pow_of_root] at h1
+  rw [← gt_iff_lt] at h1
+  rw [← pow_mono] at h1
+  exact h1
+  repeat linarith
 
 /-- Lemma 5.6.9(e) / Exercise 5.6.2 -/
 theorem Real.ratPow_mono_of_gt_one {x:Real} (hx: x > 1) {q r:ℚ} : x^q > x^r ↔ q > r := by
