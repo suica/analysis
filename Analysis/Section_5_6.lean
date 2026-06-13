@@ -1426,7 +1426,96 @@ theorem Real.ratPow_mono_of_gt_one {x:Real} (hx: x > 1) {q r:ℚ} : x^q > x^r �
       . simp_all
         exact_mod_cast this
   . intro h
-    sorry
+    field_simp at h
+    have h1: x^(↑a' * ↑b:ℤ) < x^(↑b' * ↑a:ℤ):= by
+      by_cases ha' : a' ≥ 0
+      . by_cases ha : a ≥ 0
+        . lift a to ℕ using by order
+          lift a' to ℕ using by order
+          simp_all
+          exact_mod_cast h
+        . simp_all
+          norm_cast at h
+      . by_cases ha : a ≥ 0
+        . simp_all
+          exact_mod_cast h
+        . simp_all
+          exact_mod_cast h
+    have h2: ((x ^ (↑b' * a)).root b).root b' > ((x ^ (a' * ↑b)).root b).root b' := by
+      rw [← Real.root_mono]
+      rw [← Real.root_mono]
+      . linarith
+      . apply zpow_nonneg
+        linarith
+      . apply zpow_nonneg
+        linarith
+      . linarith
+      . apply root_nonneg
+        apply zpow_nonneg
+        positivity
+        linarith
+      . apply root_nonneg
+        apply zpow_nonneg
+        positivity
+        linarith
+      . linarith
+    -- replace h2: ((((x ^ (↑b' * a)).root b).root b'))^(1/a) > (((x ^ (a' * ↑b)).root b).root b')^((1/a'):ℚ) := by
+    --   sorry
+    have h3: x^(↑a' / ↑b':ℚ) < x^(↑a / ↑b:ℚ) := by
+      rw [mul_comm, ← zpow_mul, root_root, mul_comm, ← root_root] at h2
+      norm_cast at h2
+      rw [root_of_pow] at h2
+      simp at h2
+      rw [← zpow_mul] at h2
+      norm_cast at h2
+      rw [root_of_pow] at h2
+
+      rw [ratPow_def, ratPow_def]
+
+      by_cases ha' : a' ≥ 0
+      . by_cases ha : a ≥ 0
+        . lift a to ℕ using by order
+          lift a' to ℕ using by order
+          simp_all
+          have : (((x ^ a').root b').root a')^a' = (x.root b')^a' := by
+            rw [root_root, mul_comm, ← root_root, root_of_pow]
+            repeat linarith
+            . sorry
+            apply pow_nonneg
+            positivity
+            . sorry
+            linarith
+            apply pow_nonneg
+            linarith
+            linarith
+            . sorry
+          sorry
+        . simp_all
+          sorry
+      . by_cases ha : a ≥ 0
+        . simp_all
+          sorry
+        . simp_all
+          sorry
+
+
+
+
+      -- rw [← Real.ratPow_eq_pow, ← Real.ratPow_eq_pow] at h2
+      -- have : (x ^ (a':ℚ)) = x ^ (↑(a':ℤ) / (1:ℕ): ℚ) := by
+      --   sorry
+      -- rw [this, ratPow_def] at h2
+      -- have : (x ^ (a:ℚ)) = x ^ (↑(a:ℤ) / (1:ℕ): ℚ) := by
+      --   sorry
+      -- rw [this, ratPow_def] at h2
+
+
+
+
+      sorry
+    rw [ratPow_def, ratPow_def] at h3
+    exact h3
+    repeat linarith
   repeat linarith
 
 /-- Lemma 5.6.9(e) / Exercise 5.6.2 -/
