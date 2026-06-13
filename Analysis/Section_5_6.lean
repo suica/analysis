@@ -1359,7 +1359,75 @@ theorem Real.ratPow_mono {x y:Real} (hx: x > 0) (hy: y > 0) {q:ℚ} (h: q > 0) :
 
 /-- Lemma 5.6.9(e) / Exercise 5.6.2 -/
 theorem Real.ratPow_mono_of_gt_one {x:Real} (hx: x > 1) {q r:ℚ} : x^q > x^r ↔ q > r := by
-  sorry
+  obtain ⟨a, b, hbpos, hab⟩ := Rat.eq_quot q
+  obtain ⟨a', b', hbpos', hab'⟩ := Rat.eq_quot r
+  simp [hab, hab']
+  rw [ratPow_def, ratPow_def]
+  constructor
+  . intro h
+    have h : ((x.root b' ^ a') ^ b) ^ b' < ((x.root b ^ a) ^ b) ^ b' := by
+      rw [← gt_iff_lt]
+      rw [← pow_mono]
+      rw [← pow_mono]
+      exact h
+      apply zpow_pos
+      rw [root_pos]
+      linarith
+      linarith
+      linarith
+      apply zpow_pos
+      rw [root_pos]
+      repeat linarith
+      apply pow_pos
+      apply zpow_pos
+      rw [root_pos]
+      linarith
+      linarith
+      linarith
+      apply pow_pos
+      apply zpow_pos
+      rw [root_pos]
+      repeat linarith
+
+    rw [pow_mul, pow_mul] at h
+    change (x.root b' ^ a') ^ (b * b':ℤ) < (x.root b ^ a) ^ (b * b':ℤ) at h
+    rw [zpow_mul, zpow_mul] at h
+    ring_nf at h
+    have : x ^ (a' * ↑b) < x ^ (↑b' * a) := by
+      rw [show a' * b * ↑b' =  b' * (a' * ↑b) by ring_nf] at h
+      rw [show ↑b * ↑b' * a=  ↑b *(↑b' * a) by ring_nf] at h
+      rw [← zpow_mul] at h
+      simp at h
+      rw [pow_of_root] at h
+
+      rw [← zpow_mul _ b] at h
+      simp at h
+      rw [pow_of_root] at h
+      exact h
+      repeat linarith
+    field_simp
+    by_cases ha' : a' ≥ 0
+    . by_cases ha : a ≥ 0
+      . lift a to ℕ using by order
+        lift a' to ℕ using by order
+        simp_all
+        exact_mod_cast this
+      . simp_all
+        exfalso
+        have : a' * ↑b ≥ 0 := by
+          positivity
+        have : ↑b' * a < 0 := by
+          refine Int.mul_neg_of_pos_of_neg ?_ ha
+          grind
+        linarith
+    . by_cases ha : a ≥ 0
+      . simp_all
+        exact_mod_cast this
+      . simp_all
+        exact_mod_cast this
+  . intro h
+    sorry
+  repeat linarith
 
 /-- Lemma 5.6.9(e) / Exercise 5.6.2 -/
 theorem Real.ratPow_mono_of_lt_one {x:Real} (hx0: 0 < x) (hx: x < 1) {q r:ℚ} : x^q > x^r ↔ q < r := by
