@@ -1435,10 +1435,25 @@ theorem Real.ratPow_mono_of_lt_one {x:Real} (hx0: 0 < x) (hx: x < 1) {q r:ℚ} :
 
 /-- Lemma 5.6.9(f) / Exercise 5.6.2 -/
 theorem Real.ratPow_mul {x y:Real} (hx: x > 0) (hy: y > 0) (q:ℚ) : (x*y)^q = x^q * y^q := by
-  sorry
+  obtain ⟨a, b, hbpos, hab⟩ := Rat.eq_quot q
+  rw [hab, ratPow_def, ratPow_def, ratPow_def]
+  rw [Real.root_mul, mul_zpow]
+  repeat linarith
+  positivity
+  linarith
 
 /-- Exercise 5.6.3 -/
-theorem Real.pow_even (x:Real) {n:ℕ} (hn: Even n) : x^n ≥ 0 := by sorry
+theorem Real.pow_even (x:Real) {n:ℕ} (hn: Even n) : x^n ≥ 0 := by
+  obtain ⟨k, hk⟩ := hn
+  rw [hk, ← pow_add]
+  rcases trichotomous' 0 (x ^ k) with h | h | h
+  . left
+    exact mul_pos_of_neg_of_neg h h
+  . left
+    exact Left.mul_pos h h
+  . simp_all
+    rw [← h]
+    simp
 
 /-- Exercise 5.6.5 -/
 theorem Real.max_ratPow {x y:Real} (hx: x > 0) (hy: y > 0) {q:ℚ} (hq: q > 0) :
